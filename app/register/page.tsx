@@ -455,7 +455,7 @@ export default function Register() {
               variant="h5"
               sx={{ 
                 textAlign: 'center',
-                marginBottom: 3,
+                marginBottom: 0.1,
                 fontWeight: 700,
                 color: 'text.primary',
               }}
@@ -545,11 +545,11 @@ export default function Register() {
             </Box>
 
             <Box sx={{ textAlign: 'center', mt: 4 }}>
-              <Typography variant="body1" color="text.secondary" sx={{ fontSize: '0.9rem' }}>
+              <Typography variant="body2" color="text.secondary" sx={{ fontSize: '0.9rem' }}>
                 Sudah punya akun?{' '}
                 <Link
                   href="/"
-                  variant="body1"
+                  variant="body2"
                   sx={{ 
                     fontWeight: 600,
                     color: 'primary.main',
