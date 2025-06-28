@@ -1,34 +1,89 @@
 'use client';
 
-import * as React from 'react';
-import { styled } from '@mui/material/styles';
-import Box from '@mui/material/Box';
-import Typography from '@mui/material/Typography';
-import Card from '@mui/material/Card';
-import CardContent from '@mui/material/CardContent';
-import Grid from '@mui/material/Grid';
-import IconButton from '@mui/material/IconButton';
-import Chip from '@mui/material/Chip';
-import Stack from '@mui/material/Stack';
-import Avatar from '@mui/material/Avatar';
-import ArticleIcon from '@mui/icons-material/Article';
-import AccessTimeIcon from '@mui/icons-material/AccessTime';
-import PersonIcon from '@mui/icons-material/Person';
-import Image from 'next/image';
+import React from 'react';
+import { 
+  Box, 
+  Typography, 
+  Card, 
+  CardContent, 
+  Grid,
+  Stack,
+  useTheme,
+  alpha,
+  Paper
+} from '@mui/material';
+import {
+  FamilyRestroom,
+  HomeWork,
+  Business,
+  Work,
+  LocalHospital,
+  AccountBox
+} from '@mui/icons-material';
+import { styled } from '@mui/system';
 
-const DocumentCard = styled(Card)(({ theme }) => ({
-  borderRadius: '16px',
-  border: `1px solid ${theme.palette.divider}`,
+const documents = [
+  {
+    id: 'sktm',
+    title: 'SKTM',
+    subtitle: 'Surat Keterangan Tidak Mampu',
+    description: 'Untuk bantuan sosial dan beasiswa',
+    icon: <FamilyRestroom />,
+    color: '#10b981'
+  },
+  {
+    id: 'domisili',
+    title: 'Domisili',
+    subtitle: 'Surat Keterangan Domisili',
+    description: 'Untuk keperluan tempat tinggal',
+    icon: <HomeWork />,
+    color: '#3b82f6'
+  },
+  {
+    id: 'sku',
+    title: 'SKU',
+    subtitle: 'Surat Keterangan Usaha',
+    description: 'Untuk keperluan usaha',
+    icon: <Business />,
+    color: '#8b5cf6'
+  },
+  {
+    id: 'skck',
+    title: 'SKCK',
+    subtitle: 'Surat Pengantar SKCK',
+    description: 'Untuk kepolisian',
+    icon: <Work />,
+    color: '#f59e0b'
+  },
+  {
+    id: 'kematian',
+    title: 'Kematian',
+    subtitle: 'Surat Keterangan Kematian',
+    description: 'Untuk keperluan administrasi',
+    icon: <LocalHospital />,
+    color: '#ef4444'
+  },
+  {
+    id: 'kelahiran',
+    title: 'Kelahiran',
+    subtitle: 'Surat Keterangan Kelahiran',
+    description: 'Untuk keperluan administrasi',
+    icon: <AccountBox />,
+    color: '#06b6d4'
+  }
+];
+
+const SectionContainer = styled(Paper)(({ theme }) => ({
   background: theme.palette.mode === 'dark'
-    ? 'linear-gradient(135deg, rgba(30, 41, 59, 0.8) 0%, rgba(51, 65, 85, 0.8) 100%)'
-    : 'linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(248, 250, 252, 0.9) 100%)',
-  backdropFilter: 'blur(20px)',
+    ? 'linear-gradient(145deg, rgba(15, 23, 42, 0.95) 0%, rgba(30, 41, 59, 0.98) 50%, rgba(51, 65, 85, 0.95) 100%)'
+    : 'linear-gradient(145deg, rgba(255, 255, 255, 0.98) 0%, rgba(248, 250, 252, 1) 50%, rgba(241, 245, 249, 0.98) 100%)',
+  backdropFilter: 'blur(30px)',
+  borderRadius: '20px',
+  border: `1px solid ${alpha(theme.palette.divider, 0.15)}`,
   boxShadow: theme.palette.mode === 'dark'
-    ? '0 4px 20px rgba(0, 0, 0, 0.2)'
-    : '0 4px 20px rgba(148, 163, 184, 0.08)',
-  transition: 'all 0.3s ease',
-  cursor: 'pointer',
-  height: '100%',
+    ? '0 20px 40px rgba(0, 0, 0, 0.4), 0 8px 16px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.1)'
+    : '0 20px 40px rgba(0, 0, 0, 0.08), 0 8px 16px rgba(0, 0, 0, 0.04), inset 0 1px 0 rgba(255, 255, 255, 0.8)',
+  transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
   position: 'relative',
   overflow: 'hidden',
   '&::before': {
@@ -37,229 +92,129 @@ const DocumentCard = styled(Card)(({ theme }) => ({
     top: 0,
     left: 0,
     right: 0,
-    height: '3px',
-    background: 'transparent',
-    transition: 'all 0.3s ease',
-  },
-  '&:hover': {
-    transform: 'translateY(-8px)',
-    boxShadow: theme.palette.mode === 'dark'
-      ? '0 12px 40px rgba(0, 0, 0, 0.3)'
-      : '0 12px 40px rgba(148, 163, 184, 0.15)',
-    borderColor: theme.palette.primary.main,
-    '&::before': {
-      background: `linear-gradient(90deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
-    },
-  },
-}));
-
-const HeaderCard = styled(Card)(({ theme }) => ({
-  background: theme.palette.mode === 'dark'
-    ? 'linear-gradient(135deg, #1e3a8a 0%, #3730a3 100%)'
-    : 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)',
-  borderRadius: '20px',
-  border: 'none',
-  marginBottom: theme.spacing(4),
-  boxShadow: theme.palette.mode === 'dark'
-    ? '0 8px 32px rgba(59, 130, 246, 0.3)'
-    : '0 8px 32px rgba(59, 130, 246, 0.2)',
-  position: 'relative',
-  overflow: 'hidden',
-  '&::before': {
-    content: '""',
-    position: 'absolute',
-    top: 0,
-    right: 0,
-    width: '200px',
-    height: '200px',
-    background: 'radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%)',
-    borderRadius: '50%',
-    transform: 'translate(50%, -50%)',
+    bottom: 0,
+    background: theme.palette.mode === 'dark'
+      ? `
+        radial-gradient(circle at 20% 20%, rgba(59, 130, 246, 0.15) 0%, transparent 40%),
+        radial-gradient(circle at 80% 80%, rgba(147, 51, 234, 0.15) 0%, transparent 40%),
+        radial-gradient(circle at 50% 50%, rgba(16, 185, 129, 0.08) 0%, transparent 40%)
+      `
+      : `
+        radial-gradient(circle at 20% 20%, rgba(59, 130, 246, 0.08) 0%, transparent 40%),
+        radial-gradient(circle at 80% 80%, rgba(147, 51, 234, 0.08) 0%, transparent 40%),
+        radial-gradient(circle at 50% 50%, rgba(16, 185, 129, 0.04) 0%, transparent 40%)
+      `,
+    animation: 'float 8s ease-in-out infinite',
+    pointerEvents: 'none',
+    '@keyframes float': {
+      '0%, 100%': { transform: 'translateY(0px) scale(1)' },
+      '50%': { transform: 'translateY(-5px) scale(1.02)' },
+    }
   },
 }));
-
-const documentTypes = [
-  {
-    title: 'SKTM',
-    fullTitle: 'Surat Keterangan Tidak Mampu',
-    description: 'Untuk keperluan bantuan sosial, beasiswa, atau kebutuhan lainnya',
-    estimatedTime: '2-3 hari',
-    difficulty: 'Mudah',
-    icon: <PersonIcon />,
-  },
-  {
-    title: 'Domisili',
-    fullTitle: 'Surat Keterangan Domisili',
-    description: 'Untuk keperluan administrasi tempat tinggal',
-    estimatedTime: '1-2 hari',
-    difficulty: 'Mudah',
-    icon: <PersonIcon />,
-  },
-  {
-    title: 'SKU',
-    fullTitle: 'Surat Keterangan Usaha',
-    description: 'Untuk keperluan izin usaha atau SIUP',
-    estimatedTime: '3-5 hari',
-    difficulty: 'Sedang',
-    icon: <ArticleIcon />,
-  },
-  {
-    title: 'Pengantar',
-    fullTitle: 'Surat Pengantar',
-    description: 'Untuk keperluan administrasi ke instansi lain',
-    estimatedTime: '1-2 hari',
-    difficulty: 'Mudah',
-    icon: <ArticleIcon />,
-  },
-  {
-    title: 'Kelahiran',
-    fullTitle: 'Surat Keterangan Kelahiran',
-    description: 'Untuk keperluan pembuatan akta kelahiran',
-    estimatedTime: '2-3 hari',
-    difficulty: 'Sedang',
-    icon: <PersonIcon />,
-  },
-  {
-    title: 'Kematian',
-    fullTitle: 'Surat Keterangan Kematian',
-    description: 'Untuk keperluan pembuatan akta kematian',
-    estimatedTime: '2-3 hari',
-    difficulty: 'Sedang',
-    icon: <PersonIcon />,
-  },
-  {
-    title: 'Pindah',
-    fullTitle: 'Surat Keterangan Pindah',
-    description: 'Untuk keperluan mutasi alamat',
-    estimatedTime: '3-4 hari',
-    difficulty: 'Sedang',
-    icon: <PersonIcon />,
-  },
-  {
-    title: 'Belum Menikah',
-    fullTitle: 'Surat Keterangan Belum Menikah',
-    description: 'Untuk keperluan administrasi pernikahan',
-    estimatedTime: '2-3 hari',
-    difficulty: 'Mudah',
-    icon: <PersonIcon />,
-  },
-  {
-    title: 'Janda/Duda',
-    fullTitle: 'Surat Keterangan Janda/Duda',
-    description: 'Untuk keperluan administrasi status perkawinan',
-    estimatedTime: '2-3 hari',
-    difficulty: 'Mudah',
-    icon: <PersonIcon />,
-  },
-  {
-    title: 'Ahli Waris',
-    fullTitle: 'Surat Keterangan Ahli Waris',
-    description: 'Untuk keperluan warisan dan administrasi hukum',
-    estimatedTime: '5-7 hari',
-    difficulty: 'Kompleks',
-    icon: <ArticleIcon />,
-  },
-];
-
-const getDifficultyColor = (difficulty) => {
-  switch (difficulty) {
-    case 'Mudah': return 'success';
-    case 'Sedang': return 'warning';
-    case 'Kompleks': return 'error';
-    default: return 'default';
-  }
-};
 
 export default function DocumentSelection({ onDocumentSelect }) {
+  const theme = useTheme();
+
   return (
-    <Box sx={{ p: 3, backgroundColor: 'background.default', minHeight: '100vh' }}>
-      {/* Header */}
-      <HeaderCard>
-        <CardContent sx={{ p: 4, position: 'relative', zIndex: 1 }}>
-          <Stack direction="row" alignItems="center" spacing={3}>
-            <Avatar
-              sx={{
-                width: 64,
-                height: 64,
-                background: 'rgba(255, 255, 255, 0.2)',
-                backdropFilter: 'blur(10px)',
-                border: '2px solid rgba(255, 255, 255, 0.3)',
-                p: 1.5,
-              }}
-            >
-              <Image
-                src="/logo.png"
-                alt="Logo Kelurahan Simokerto"
-                width={32}
-                height={32}
-                style={{ borderRadius: '6px' }}
-              />
-            </Avatar>
-            <Box>
-              <Typography variant="h3" sx={{ fontWeight: 800, color: 'white', mb: 1 }}>
-                Pilih Jenis Surat
-              </Typography>
-              <Typography variant="h6" sx={{ opacity: 0.9, color: 'white' }}>
-                Pilih jenis surat yang ingin Anda ajukan
-              </Typography>
-            </Box>
-          </Stack>
+    <Box sx={{ width: '100%', p: 2 }}>
+      {/* Header in consistent container */}
+      <SectionContainer elevation={0} sx={{ mb: 4 }}>
+        <CardContent sx={{ p: 3, position: 'relative', zIndex: 1, textAlign: 'center' }}>
+          <Typography variant="h4" sx={{ 
+            fontWeight: 700, 
+            mb: 1, 
+            color: theme.palette.text.primary,
+            fontSize: '1.75rem'
+          }}>
+            Pilih Jenis Surat
+          </Typography>
+          <Typography variant="body1" color="text.secondary" sx={{ fontSize: '0.95rem' }}>
+            Pilih dokumen yang ingin Anda ajukan
+          </Typography>
         </CardContent>
-      </HeaderCard>
-      
-      <Grid container spacing={4}>
-        {documentTypes.map((doc, index) => (
-          <Grid item xs={12} sm={6} lg={4} key={index}>
-            <DocumentCard onClick={() => onDocumentSelect(doc.fullTitle)}>
-              <CardContent sx={{ p: 4, height: '100%', display: 'flex', flexDirection: 'column' }}>
-                <Stack direction="row" justifyContent="space-between" alignItems="flex-start" sx={{ mb: 3 }}>
-                  <Box
-                    sx={{
-                      width: 56,
-                      height: 56,
-                      borderRadius: '14px',
-                      background: 'linear-gradient(135deg, #667eea15, #764ba225)',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      color: 'primary.main',
-                      transition: 'all 0.3s ease',
-                    }}
-                  >
-                    {doc.icon}
-                  </Box>
-                  <Chip
-                    label={doc.difficulty}
-                    color={getDifficultyColor(doc.difficulty)}
-                    size="small"
-                    variant="filled"
-                    sx={{ fontWeight: 600 }}
-                  />
-                </Stack>
+      </SectionContainer>
 
-                <Box sx={{ flex: 1 }}>
-                  <Typography variant="h5" sx={{ fontWeight: 700, mb: 1, color: 'primary.main' }}>
-                    {doc.title}
-                  </Typography>
-                  <Typography variant="h6" sx={{ fontWeight: 600, mb: 2, lineHeight: 1.3 }}>
-                    {doc.fullTitle}
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary" sx={{ mb: 3, lineHeight: 1.6 }}>
-                    {doc.description}
-                  </Typography>
-                </Box>
+      {/* Document Grid in consistent container */}
+      <SectionContainer elevation={0}>
+        <CardContent sx={{ p: 3, position: 'relative', zIndex: 1 }}>
+          <Grid container spacing={2}>
+            {documents.map((doc) => (
+              <Grid item xs={12} sm={6} md={4} key={doc.id}>
+                <Card
+                  onClick={() => onDocumentSelect(doc.subtitle)}
+                  sx={{
+                    borderRadius: 3,
+                    border: `1px solid ${alpha(theme.palette.divider, 0.2)}`,
+                    bgcolor: theme.palette.mode === 'dark'
+                      ? 'rgba(15, 23, 42, 0.6)'
+                      : 'rgba(255, 255, 255, 0.8)',
+                    backdropFilter: 'blur(20px)',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s ease',
+                    '&:hover': {
+                      transform: 'translateY(-2px)',
+                      borderColor: doc.color,
+                      bgcolor: theme.palette.mode === 'dark'
+                        ? 'rgba(15, 23, 42, 0.8)'
+                        : 'rgba(255, 255, 255, 0.95)',
+                      boxShadow: `0 8px 24px ${alpha(doc.color, 0.15)}`,
+                    },
+                  }}
+                >
+                  <CardContent sx={{ p: 3 }}>
+                    <Stack spacing={2}>
+                      {/* Icon and Title Row */}
+                      <Stack direction="row" spacing={2} alignItems="center">
+                        <Box
+                          sx={{
+                            width: 40,
+                            height: 40,
+                            borderRadius: 2,
+                            background: alpha(doc.color, 0.1),
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            color: doc.color,
+                          }}
+                        >
+                          {React.cloneElement(doc.icon, { sx: { fontSize: 20 } })}
+                        </Box>
+                        
+                        <Box sx={{ flex: 1 }}>
+                          <Typography variant="h6" sx={{ 
+                            fontWeight: 700, 
+                            color: theme.palette.text.primary,
+                            fontSize: '1rem',
+                            mb: 0.25
+                          }}>
+                            {doc.title}
+                          </Typography>
+                          <Typography variant="body2" color="text.secondary" sx={{ 
+                            fontSize: '0.8rem',
+                            fontWeight: 500
+                          }}>
+                            {doc.subtitle}
+                          </Typography>
+                        </Box>
+                      </Stack>
 
-                <Stack direction="row" alignItems="center" spacing={2}>
-                  <AccessTimeIcon sx={{ fontSize: 16, color: 'text.secondary' }} />
-                  <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 500 }}>
-                    {doc.estimatedTime}
-                  </Typography>
-                </Stack>
-              </CardContent>
-            </DocumentCard>
+                      {/* Description */}
+                      <Typography variant="body2" color="text.secondary" sx={{ 
+                        fontSize: '0.85rem',
+                        lineHeight: 1.4,
+                        pl: 7
+                      }}>
+                        {doc.description}
+                      </Typography>
+                    </Stack>
+                  </CardContent>
+                </Card>
+              </Grid>
+            ))}
           </Grid>
-        ))}
-      </Grid>
+        </CardContent>
+      </SectionContainer>
     </Box>
   );
 }

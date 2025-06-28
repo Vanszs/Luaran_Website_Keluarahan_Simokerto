@@ -13,8 +13,9 @@ import DashboardHome from '../../components/DashboardHome';
 import DocumentSelection from '../../components/DocumentSelection';
 import DocumentForm from '../../components/DocumentForm';
 import RiwayatPage from '../../components/RiwayatPage';
+import SettingsPage from '../../components/SettingsPage';
 import Image from 'next/image';
-import { Fade, Grow, Slide, CircularProgress, Zoom } from '@mui/material';
+import { Fade, Grow, Slide, CircularProgress, Zoom, Container, Paper } from '@mui/material';
 
 // Enhanced modern animations
 const float = keyframes`
@@ -60,9 +61,15 @@ const scaleIn = keyframes`
   }
 `;
 
-const glow = keyframes`
-  0%, 100% { box-shadow: 0 0 20px rgba(59, 130, 246, 0.3); }
-  50% { box-shadow: 0 0 30px rgba(59, 130, 246, 0.5), 0 0 40px rgba(147, 51, 234, 0.3); }
+const modernGlow = keyframes`
+  0%, 100% { 
+    box-shadow: 0 8px 32px rgba(59, 130, 246, 0.15),
+                0 4px 16px rgba(147, 51, 234, 0.1);
+  }
+  50% { 
+    box-shadow: 0 12px 48px rgba(59, 130, 246, 0.25),
+                0 6px 24px rgba(147, 51, 234, 0.15);
+  }
 `;
 
 export default function Dashboard() {
@@ -70,7 +77,19 @@ export default function Dashboard() {
   const [selectedDocument, setSelectedDocument] = React.useState('');
   const [isLoading, setIsLoading] = React.useState(true);
   const [contentVisible, setContentVisible] = React.useState(false);
+  const [mounted, setMounted] = React.useState(false);
   const theme = useTheme();
+  const isDark = theme.palette.mode === 'dark';
+
+  // Add theme mode debugging
+  React.useEffect(() => {
+    console.log('Dashboard theme mode:', theme.palette.mode);
+  }, [theme.palette.mode]);
+
+  // Handle client-side mounting
+  React.useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const handleViewChange = (view: any) => {
     setContentVisible(false);
@@ -95,7 +114,11 @@ export default function Dashboard() {
     return () => clearTimeout(timer);
   }, []);
 
-  // Original Loading Screen
+  // Don't render until mounted to prevent hydration mismatch
+  if (!mounted) {
+    return null;
+  }
+
   if (isLoading) {
     return (
       <AppTheme>
@@ -201,61 +224,31 @@ export default function Dashboard() {
   }
 
   const renderContent = () => {
-    const getContentWithAnimation = (content: React.ReactNode, index: number = 0) => {
-      const animations = [slideInFromLeft, slideInFromRight, scaleIn];
-      const selectedAnimation = animations[index % animations.length];
-      
+    const getModernContentWrapper = (content: React.ReactNode, TransitionComponent: any, transitionProps: any) => {
       return (
-        <Box
-          sx={{
-            animation: contentVisible ? `${selectedAnimation} 0.8s ease-out` : 'none',
-            opacity: contentVisible ? 1 : 0,
-          }}
-        >
-          {content}
-        </Box>
+        <TransitionComponent {...transitionProps}>
+          <Box
+            sx={{
+              background: 'transparent',
+              borderRadius: 0,
+              border: 'none',
+              boxShadow: 'none',
+              p: 0,
+              position: 'relative',
+              overflow: 'visible',
+            }}
+          >
+            {content}
+          </Box>
+        </TransitionComponent>
       );
     };
 
     if (currentView === 'dashboard') {
-      return (
-        <Grow in={contentVisible} timeout={800}>
-          <Box
-            sx={{
-              background: theme.palette.mode === 'dark'
-                ? 'linear-gradient(135deg, rgba(15, 23, 42, 0.4) 0%, rgba(30, 41, 59, 0.4) 100%)'
-                : 'linear-gradient(135deg, rgba(255, 255, 255, 0.8) 0%, rgba(248, 250, 252, 0.8) 100%)',
-              backdropFilter: 'blur(20px)',
-              borderRadius: 4,
-              border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
-              boxShadow: theme.palette.mode === 'dark'
-                ? '0 25px 50px -12px rgba(0, 0, 0, 0.25)'
-                : '0 25px 50px -12px rgba(0, 0, 0, 0.1)',
-              p: 3,
-              position: 'relative',
-              overflow: 'hidden',
-              '&::before': {
-                content: '""',
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                right: 0,
-                bottom: 0,
-                background: theme.palette.mode === 'dark'
-                  ? 'radial-gradient(circle at 20% 20%, rgba(59, 130, 246, 0.1) 0%, transparent 50%)'
-                  : 'radial-gradient(circle at 20% 20%, rgba(59, 130, 246, 0.05) 0%, transparent 50%)',
-                pointerEvents: 'none',
-              },
-              '&:hover': {
-                transform: 'translateY(-2px)',
-                transition: 'transform 0.3s ease',
-                animation: `${glow} 2s ease-in-out infinite`,
-              }
-            }}
-          >
-            <DashboardHome onViewChange={handleViewChange} />
-          </Box>
-        </Grow>
+      return getModernContentWrapper(
+        <DashboardHome onViewChange={handleViewChange} />,
+        Grow,
+        { in: contentVisible, timeout: 800 }
       );
     }
     
@@ -269,150 +262,26 @@ export default function Dashboard() {
         <DocumentSelection onDocumentSelect={handleDocumentSelect} />
       );
 
-      return (
-        <Slide direction="up" in={contentVisible} timeout={600}>
-          <Box
-            sx={{
-              background: theme.palette.mode === 'dark'
-                ? 'linear-gradient(135deg, rgba(15, 23, 42, 0.6) 0%, rgba(30, 41, 59, 0.6) 100%)'
-                : 'linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(248, 250, 252, 0.9) 100%)',
-              backdropFilter: 'blur(30px)',
-              borderRadius: 4,
-              border: `1px solid ${alpha(theme.palette.primary.main, 0.2)}`,
-              boxShadow: '0 20px 40px -10px rgba(59, 130, 246, 0.3)',
-              p: 4,
-              minHeight: '500px',
-              position: 'relative',
-              '&::after': {
-                content: '""',
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                right: 0,
-                height: '2px',
-                background: 'linear-gradient(90deg, #3b82f6, #8b5cf6, #ec4899)',
-              }
-            }}
-          >
-            {content}
-          </Box>
-        </Slide>
+      return getModernContentWrapper(
+        content,
+        Slide,
+        { direction: "up", in: contentVisible, timeout: 600 }
       );
     }
 
     if (currentView === 'riwayat') {
-      return (
-        <Zoom in={contentVisible} timeout={700}>
-          <Box
-            sx={{
-              background: theme.palette.mode === 'dark'
-                ? 'linear-gradient(135deg, rgba(15, 23, 42, 0.5) 0%, rgba(30, 41, 59, 0.5) 100%)'
-                : 'linear-gradient(135deg, rgba(255, 255, 255, 0.8) 0%, rgba(248, 250, 252, 0.8) 100%)',
-              backdropFilter: 'blur(25px)',
-              borderRadius: 4,
-              border: `1px solid ${alpha(theme.palette.success.main, 0.2)}`,
-              boxShadow: '0 20px 40px -10px rgba(34, 197, 94, 0.2)',
-              p: 3,
-              position: 'relative',
-              '&::before': {
-                content: '""',
-                position: 'absolute',
-                top: '-50%',
-                left: '-50%',
-                width: '200%',
-                height: '200%',
-                background: theme.palette.mode === 'dark'
-                  ? 'conic-gradient(from 0deg, transparent, rgba(34, 197, 94, 0.1), transparent)'
-                  : 'conic-gradient(from 0deg, transparent, rgba(34, 197, 94, 0.05), transparent)',
-                animation: 'rotate 10s linear infinite',
-                '@keyframes rotate': {
-                  '0%': { transform: 'rotate(0deg)' },
-                  '100%': { transform: 'rotate(360deg)' },
-                },
-                pointerEvents: 'none',
-              }
-            }}
-          >
-            <RiwayatPage />
-          </Box>
-        </Zoom>
+      return getModernContentWrapper(
+        <RiwayatPage />,
+        Zoom,
+        { in: contentVisible, timeout: 700 }
       );
     }
     
     if (currentView === 'settings') {
-      return (
-        <Fade in={contentVisible} timeout={800}>
-          <Box 
-            sx={{ 
-              textAlign: 'center', 
-              py: 16,
-              background: theme.palette.mode === 'dark'
-                ? 'linear-gradient(135deg, rgba(15, 23, 42, 0.7) 0%, rgba(30, 41, 59, 0.7) 100%)'
-                : 'linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(241, 245, 249, 0.9) 100%)',
-              borderRadius: 4,
-              backdropFilter: 'blur(20px)',
-              border: `1px solid ${alpha(theme.palette.warning.main, 0.2)}`,
-              boxShadow: '0 20px 40px -10px rgba(245, 158, 11, 0.2)',
-              position: 'relative',
-              overflow: 'hidden',
-              '&::before': {
-                content: '""',
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                right: 0,
-                bottom: 0,
-                background: 'linear-gradient(45deg, transparent 30%, rgba(245, 158, 11, 0.1) 50%, transparent 70%)',
-                animation: 'shimmer 3s ease-in-out infinite',
-                '@keyframes shimmer': {
-                  '0%': { transform: 'translateX(-100%)' },
-                  '50%': { transform: 'translateX(100%)' },
-                  '100%': { transform: 'translateX(-100%)' },
-                },
-              }
-            }}
-          >
-            <Box sx={{ position: 'relative', zIndex: 1 }}>
-              <CircularProgress 
-                sx={{ 
-                  mb: 4, 
-                  color: 'warning.main',
-                  '& .MuiCircularProgress-circle': {
-                    strokeLinecap: 'round',
-                  }
-                }}
-                size={60}
-                thickness={3}
-              />
-              <Typography 
-                variant="h4" 
-                color="text.primary" 
-                sx={{ 
-                  mb: 2, 
-                  fontWeight: 700,
-                  background: theme.palette.mode === 'dark'
-                    ? 'linear-gradient(135deg, #ffffff 0%, #f59e0b 100%)'
-                    : 'linear-gradient(135deg, #1e293b 0%, #f59e0b 100%)',
-                  backgroundClip: 'text',
-                  WebkitBackgroundClip: 'text',
-                  color: 'transparent',
-                }}
-              >
-                Halaman Pengaturan
-              </Typography>
-              <Typography 
-                variant="h6" 
-                color="text.secondary"
-                sx={{ 
-                  fontWeight: 400,
-                  opacity: 0.8 
-                }}
-              >
-                Fitur dalam tahap pengembangan
-              </Typography>
-            </Box>
-          </Box>
-        </Fade>
+      return getModernContentWrapper(
+        <SettingsPage />,
+        Fade,
+        { in: contentVisible, timeout: 800 }
       );
     }
     
@@ -422,74 +291,51 @@ export default function Dashboard() {
   return (
     <AppTheme>
       <CssBaseline enableColorScheme />
-      <Box sx={{ display: 'flex', minHeight: '100vh' }}>
+      <Box 
+        sx={{ 
+          display: 'flex', 
+          minHeight: '100vh',
+          bgcolor: 'background.default',
+          transition: 'background-color 0.3s ease-in-out'
+        }}
+      >
         <SideMenu 
           currentView={currentView}
           onViewChange={handleViewChange}
         />
         <AppNavbar />
         
-        {/* Ultra-modern main content */}
         <Box
           component="main"
           sx={{
             flexGrow: 1,
-            background: theme.palette.mode === 'dark'
-              ? 'linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%)'
-              : 'linear-gradient(135deg, #f8fafc 0%, #f1f5f9 50%, #f8fafc 100%)',
-            ml: { xs: 0 },
+            position: 'relative',
             pt: { xs: '90px', md: '90px' },
-            px: { xs: 2, md: 4 },
             pb: 4,
             minHeight: '100vh',
-            position: 'relative',
-            '&::before': {
-              content: '""',
-              position: 'fixed',
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 0,
-              background: theme.palette.mode === 'dark'
-                ? `
-                  radial-gradient(circle at 20% 80%, rgba(59, 130, 246, 0.15) 0%, transparent 50%),
-                  radial-gradient(circle at 80% 20%, rgba(147, 51, 234, 0.15) 0%, transparent 50%),
-                  radial-gradient(circle at 40% 40%, rgba(16, 185, 129, 0.1) 0%, transparent 50%)
-                `
-                : `
-                  radial-gradient(circle at 20% 80%, rgba(59, 130, 246, 0.08) 0%, transparent 50%),
-                  radial-gradient(circle at 80% 20%, rgba(147, 51, 234, 0.08) 0%, transparent 50%),
-                  radial-gradient(circle at 40% 40%, rgba(16, 185, 129, 0.05) 0%, transparent 50%)
-                `,
-              pointerEvents: 'none',
-              zIndex: 0,
-            },
-            '&::after': {
-              content: '""',
-              position: 'fixed',
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 0,
-              background: theme.palette.mode === 'dark'
-                ? 'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255, 255, 255, 0.01) 2px, rgba(255, 255, 255, 0.01) 4px)'
-                : 'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0, 0, 0, 0.005) 2px, rgba(0, 0, 0, 0.005) 4px)',
-              pointerEvents: 'none',
-              zIndex: 0,
-            }
+            bgcolor: 'background.default',
           }}
         >
-          <Box 
-            sx={{ 
-              maxWidth: '1600px', 
-              mx: 'auto', 
-              width: '100%',
+          <Container
+            maxWidth="xl"
+            sx={{
               position: 'relative',
               zIndex: 1,
+              px: { xs: 2, sm: 3, md: 4, lg: 6 },
+              bgcolor: 'transparent',
             }}
           >
-            {renderContent()}
-          </Box>
+            <Box
+              sx={{
+                maxWidth: '1600px',
+                mx: 'auto',
+                width: '100%',
+                bgcolor: 'transparent',
+              }}
+            >
+              {renderContent()}
+            </Box>
+          </Container>
         </Box>
       </Box>
     </AppTheme>
