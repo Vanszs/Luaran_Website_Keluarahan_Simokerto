@@ -9,7 +9,6 @@ import Typography from '@mui/material/Typography';
 import Stack from '@mui/material/Stack';
 import MuiCard from '@mui/material/Card';
 import Fade from '@mui/material/Fade';
-import Divider from '@mui/material/Divider';
 import Link from '@mui/material/Link';
 import LinearProgress from '@mui/material/LinearProgress';
 import { styled, keyframes } from '@mui/material/styles';
@@ -35,104 +34,123 @@ const fadeInUp = keyframes`
   }
 `;
 
-// Modern minimalist card
+// Modern comfortable card
 const Card = styled(MuiCard)(({ theme }) => ({
   display: 'flex',
   flexDirection: 'column',
   alignSelf: 'center',
   width: '100%',
-  padding: theme.spacing(4),
+  padding: theme.spacing(5),
   gap: theme.spacing(3),
   margin: 'auto',
-  borderRadius: '16px',
+  borderRadius: '20px',
   border: 'none',
   background: theme.palette.mode === 'dark' ? 
-    'rgba(18, 18, 18, 0.8)' : 
-    'rgba(255, 255, 255, 0.9)',
-  backdropFilter: 'blur(10px)',
+    'rgba(20, 20, 20, 0.9)' : 
+    'rgba(255, 255, 255, 0.95)',
+  backdropFilter: 'blur(20px)',
   [theme.breakpoints.up('sm')]: {
-    maxWidth: '440px',
+    maxWidth: '480px',
   },
   boxShadow: theme.palette.mode === 'dark' ? 
-    '0 10px 40px rgba(0, 0, 0, 0.3)' : 
-    '0 10px 40px rgba(0, 0, 0, 0.1)',
+    '0 12px 40px rgba(0, 0, 0, 0.4), 0 4px 12px rgba(255, 255, 255, 0.05)' : 
+    '0 12px 40px rgba(0, 0, 0, 0.12), 0 4px 12px rgba(0, 0, 0, 0.04)',
   animation: `${fadeInUp} 0.6s ease-out`,
+  transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+  transform: 'translateY(0)',
+  '&:hover': {
+    transform: 'translateY(-2px)',
+    boxShadow: theme.palette.mode === 'dark' ? 
+      '0 16px 50px rgba(0, 0, 0, 0.5), 0 6px 16px rgba(255, 255, 255, 0.08)' : 
+      '0 16px 50px rgba(0, 0, 0, 0.15), 0 6px 16px rgba(0, 0, 0, 0.06)',
+  },
 }));
 
-// Clean background container
+// Comfortable background container
 const RegisterContainer = styled(Stack)(({ theme }) => ({
   height: '100vh',
   minHeight: '100%',
-  padding: theme.spacing(2),
+  padding: theme.spacing(3),
   position: 'relative',
   overflow: 'hidden',
-  backgroundColor: theme.palette.mode === 'dark' ? '#121212' : '#f7f9fc',
+  backgroundColor: theme.palette.mode === 'dark' ? '#0d1117' : '#f8fafc',
   [theme.breakpoints.up('sm')]: {
     padding: theme.spacing(4),
   },
+  '&::before': {
+    content: '""',
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    background: theme.palette.mode === 'dark' ?
+      'radial-gradient(circle at 30% 20%, rgba(59, 130, 246, 0.15) 0%, transparent 50%), radial-gradient(circle at 80% 80%, rgba(139, 92, 246, 0.15) 0%, transparent 50%)' :
+      'radial-gradient(circle at 30% 20%, rgba(59, 130, 246, 0.08) 0%, transparent 50%), radial-gradient(circle at 80% 80%, rgba(139, 92, 246, 0.08) 0%, transparent 50%)',
+    animation: `${float} 8s ease-in-out infinite`,
+  },
 }));
 
-// Minimalist branding
+// Attractive branding
 const BrandingContainer = styled(Box)(({ theme }) => ({
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'center',
-  gap: theme.spacing(1.5),
+  gap: theme.spacing(2),
   marginBottom: theme.spacing(4),
   textAlign: 'center',
 }));
 
-// Modern minimal input
+// Modern comfortable input
 const StyledTextField = styled(TextField)(({ theme }) => ({
   '& .MuiOutlinedInput-root': {
-    borderRadius: '10px',
+    borderRadius: '14px',
     backgroundColor: theme.palette.mode === 'dark' ? 
-      'rgba(255, 255, 255, 0.05)' : 
-      'rgba(0, 0, 0, 0.02)',
-    transition: 'all 0.2s ease',
-    border: 'none',
+      'rgba(255, 255, 255, 0.06)' : 
+      'rgba(0, 0, 0, 0.03)',
+    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+    border: `1px solid ${theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.08)'}`,
     '&:hover': {
       backgroundColor: theme.palette.mode === 'dark' ? 
         'rgba(255, 255, 255, 0.08)' : 
         'rgba(0, 0, 0, 0.04)',
+      borderColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.12)' : 'rgba(0, 0, 0, 0.12)',
+      transform: 'translateY(-1px)',
     },
     '&.Mui-focused': {
       backgroundColor: theme.palette.mode === 'dark' ? 
         'rgba(255, 255, 255, 0.1)' : 
         'rgba(0, 0, 0, 0.05)',
+      transform: 'translateY(-1px)',
+      borderColor: theme.palette.primary.main,
+      boxShadow: theme.palette.mode === 'dark' ? 
+        '0 6px 20px rgba(144, 202, 249, 0.25)' : 
+        '0 6px 20px rgba(25, 118, 210, 0.2)',
     },
   },
   '& .MuiOutlinedInput-notchedOutline': {
     border: 'none',
   },
+  '& .MuiInputBase-input': {
+    fontSize: '1rem',
+    fontWeight: 500,
+    padding: '16px 14px',
+  },
 }));
 
-// Clean, modern button
+// Attractive smooth button  
 const StyledButton = styled(Button)(({ theme }) => ({
-  borderRadius: '10px',
-  padding: '12px',
-  fontSize: '0.95rem',
+  borderRadius: '14px',
+  padding: '16px 24px',
+  fontSize: '1rem',
   fontWeight: 600,
   textTransform: 'none',
-  transition: 'all 0.2s ease',
+  transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
   boxShadow: 'none',
   '&:hover': {
-    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
-    transform: 'translateY(-1px)',
+    boxShadow: '0 8px 25px rgba(0, 0, 0, 0.15)',
+    transform: 'translateY(-2px)',
   },
-}));
-
-// Minimal divider
-const OrDivider = styled(Divider)(({ theme }) => ({
-  marginTop: theme.spacing(2),
-  marginBottom: theme.spacing(2),
-  opacity: 0.6,
-  '&::before, &::after': {
-    borderColor: theme.palette.mode === 'dark' ? 
-      'rgba(255, 255, 255, 0.1)' : 
-      'rgba(0, 0, 0, 0.1)',
-  },
-  color: theme.palette.text.secondary,
 }));
 
 const PasswordStrengthIndicator = ({ password }: { password: string }) => {
@@ -164,12 +182,12 @@ const PasswordStrengthIndicator = ({ password }: { password: string }) => {
   if (!password) return null;
 
   return (
-    <Box sx={{ mt: 1 }}>
+    <Box sx={{ mt: 1.5 }}>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.5 }}>
-        <Typography variant="caption" color="text.secondary">
+        <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.8rem' }}>
           Kekuatan kata sandi
         </Typography>
-        <Typography variant="caption" color={`${getColor()}.main`}>
+        <Typography variant="caption" color={`${getColor()}.main`} sx={{ fontSize: '0.8rem' }}>
           {getText()}
         </Typography>
       </Box>
@@ -178,9 +196,9 @@ const PasswordStrengthIndicator = ({ password }: { password: string }) => {
         value={strength}
         color={getColor() as any}
         sx={{
-          height: 3,
-          borderRadius: 3,
-          backgroundColor: 'rgba(0,0,0,0.05)',
+          height: 4,
+          borderRadius: 4,
+          backgroundColor: 'rgba(0,0,0,0.08)',
         }}
       />
     </Box>
@@ -270,7 +288,7 @@ export default function Register(props: { disableCustomTheme?: boolean }) {
   // Loading Screen
   if (isLoading) {
     return (
-      <AppTheme {...props} defaultMode="dark">
+      <AppTheme {...props} defaultMode="light">
         <CssBaseline />
         <Box
           sx={{
@@ -280,8 +298,8 @@ export default function Register(props: { disableCustomTheme?: boolean }) {
             right: 0,
             bottom: 0,
             background: theme => theme.palette.mode === 'dark' ?
-              'linear-gradient(135deg, #101010 0%, #1a1a1a 100%)' :
-              'linear-gradient(135deg, #f7f9fc 0%, #e6eef7 100%)',
+              'linear-gradient(135deg, #0d1117 0%, #161b22 100%)' :
+              'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -292,26 +310,40 @@ export default function Register(props: { disableCustomTheme?: boolean }) {
           <Box
             sx={{
               animation: `${float} 3s ease-in-out infinite`,
+              position: 'relative',
+              '&::before': {
+                content: '""',
+                position: 'absolute',
+                top: '-15px',
+                left: '-15px',
+                right: '-15px',
+                bottom: '-15px',
+                background: 'linear-gradient(45deg, rgba(59, 130, 246, 0.1), rgba(139, 92, 246, 0.1))',
+                borderRadius: '50%',
+                animation: `${float} 4s ease-in-out infinite reverse`,
+              },
             }}
           >
             <Image
               src={logoImage}
               alt="Logo Surabaya"
-              width={100}
-              height={100}
+              width={110}
+              height={110}
               style={{
-                borderRadius: '16px',
+                borderRadius: '20px',
                 objectFit: 'contain',
                 filter: 'drop-shadow(0 8px 16px rgba(0,0,0,0.1))',
+                position: 'relative',
+                zIndex: 1,
               }}
             />
           </Box>
           <Typography
-            variant="h5"
+            variant="h4"
             sx={{
               mt: 3,
               fontWeight: 700,
-              color: theme => theme.palette.mode === 'dark' ? '#fff' : '#333',
+              color: 'text.primary',
               textAlign: 'center',
             }}
           >
@@ -322,6 +354,7 @@ export default function Register(props: { disableCustomTheme?: boolean }) {
             sx={{ 
               color: 'text.secondary', 
               mt: 1,
+              fontSize: '1rem',
             }}
           >
             Memuat pendaftaran...
@@ -332,7 +365,7 @@ export default function Register(props: { disableCustomTheme?: boolean }) {
   }
 
   return (
-    <AppTheme {...props} defaultMode="dark">
+    <AppTheme {...props} defaultMode="light">
       <CssBaseline />
       <RegisterContainer direction="column" justifyContent="center">
         <ColorModeSelect sx={{ 
@@ -341,40 +374,59 @@ export default function Register(props: { disableCustomTheme?: boolean }) {
           right: '1.5rem', 
           zIndex: 10,
           backgroundColor: theme => theme.palette.mode === 'dark' ? 
-            'rgba(255, 255, 255, 0.05)' : 
-            'rgba(0, 0, 0, 0.05)',
+            'rgba(255, 255, 255, 0.1)' : 
+            'rgba(0, 0, 0, 0.06)',
           borderRadius: '50%',
+          transition: 'all 0.3s ease',
+          backdropFilter: 'blur(10px)',
+          '&:hover': {
+            backgroundColor: theme => theme.palette.mode === 'dark' ? 
+              'rgba(255, 255, 255, 0.15)' : 
+              'rgba(0, 0, 0, 0.1)',
+            transform: 'scale(1.05)',
+          },
         }} />
         
         <Fade in timeout={800}>
           <Card>
             <BrandingContainer>
-              <Image
-                src={logoImage}
-                alt="Logo Surabaya"
-                width={70}
-                height={70}
-                style={{
-                  borderRadius: '12px',
-                  objectFit: 'contain',
+              <Box
+                sx={{
+                  position: 'relative',
+                  transition: 'transform 0.3s ease',
+                  '&:hover': {
+                    transform: 'scale(1.05) rotate(2deg)',
+                  },
                 }}
-              />
+              >
+                <Image
+                  src={logoImage}
+                  alt="Logo Surabaya"
+                  width={80}
+                  height={80}
+                  style={{
+                    borderRadius: '16px',
+                    objectFit: 'contain',
+                  }}
+                />
+              </Box>
               <Typography
-                variant="h5"
+                variant="h4"
                 component="h1"
                 sx={{
                   fontWeight: 700,
                   color: 'text.primary',
-                  lineHeight: 1.2,
-                  marginBottom: 0,
+                  lineHeight: 1.1,
+                  marginBottom: 0.5,
                 }}
               >
                 Kelurahan Simokerto
               </Typography>
               <Typography
-                variant="body2"
+                variant="body1"
                 sx={{
                   color: 'text.secondary',
+                  fontSize: '0.95rem',
                 }}
               >
                 Kota Surabaya
@@ -383,7 +435,7 @@ export default function Register(props: { disableCustomTheme?: boolean }) {
             
             <Typography
               component="h2"
-              variant="h6"
+              variant="h5"
               sx={{ 
                 textAlign: 'center',
                 marginBottom: 3,
@@ -418,7 +470,6 @@ export default function Register(props: { disableCustomTheme?: boolean }) {
                 fullWidth
                 variant="outlined"
                 color={nameError ? 'error' : 'primary'}
-                size="small"
               />
 
               <StyledTextField
@@ -433,7 +484,6 @@ export default function Register(props: { disableCustomTheme?: boolean }) {
                 fullWidth
                 variant="outlined"
                 color={emailError ? 'error' : 'primary'}
-                size="small"
               />
               
               <StyledTextField
@@ -448,7 +498,6 @@ export default function Register(props: { disableCustomTheme?: boolean }) {
                 fullWidth
                 variant="outlined"
                 color={passwordError ? 'error' : 'primary'}
-                size="small"
                 onChange={(e) => setPassword(e.target.value)}
               />
               <PasswordStrengthIndicator password={password} />
@@ -465,7 +514,6 @@ export default function Register(props: { disableCustomTheme?: boolean }) {
                 fullWidth
                 variant="outlined"
                 color={confirmPasswordError ? 'error' : 'primary'}
-                size="small"
               />
               
               <StyledButton
@@ -473,39 +521,34 @@ export default function Register(props: { disableCustomTheme?: boolean }) {
                 fullWidth
                 variant="contained"
                 onClick={validateInputs}
-                sx={{ mt: 2 }}
+                sx={{ 
+                  mt: 2,
+                  background: 'linear-gradient(135deg, #3b82f6, #1d4ed8)',
+                  '&:hover': {
+                    background: 'linear-gradient(135deg, #1d4ed8, #1e40af)',
+                    boxShadow: '0 8px 25px rgba(59, 130, 246, 0.3)',
+                  },
+                }}
               >
                 Daftar
               </StyledButton>
             </Box>
 
-            <OrDivider>atau</OrDivider>
-
-            <StyledButton
-              fullWidth
-              variant="outlined"
-              onClick={() => window.location.href = '/'}
-              sx={{ 
-                borderWidth: 1,
-                '&:hover': {
-                  borderWidth: 1,
-                },
-              }}
-            >
-              Masuk ke Akun
-            </StyledButton>
-
-            <Box sx={{ textAlign: 'center', mt: 2 }}>
-              <Typography variant="body2" color="text.secondary">
+            <Box sx={{ textAlign: 'center', mt: 0.1 }}>
+              <Typography variant="body1" color="text.secondary" sx={{ fontSize: '0.9rem' }}>
                 Sudah punya akun?{' '}
                 <Link
                   href="/"
-                  variant="body2"
+                  variant="body1"
                   sx={{ 
                     fontWeight: 600,
+                    color: 'primary.main',
                     textDecoration: 'none',
+                    transition: 'all 0.3s ease',
                     '&:hover': {
                       textDecoration: 'underline',
+                      color: 'primary.dark',
+                      transform: 'translateY(-1px)',
                     },
                   }}
                 >
