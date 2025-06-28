@@ -264,25 +264,34 @@ export default function SignIn() {
                 left: '-15px',
                 right: '-15px',
                 bottom: '-15px',
-                background: 'linear-gradient(45deg, rgba(59, 130, 246, 0.1), rgba(139, 92, 246, 0.1))',
                 borderRadius: '50%',
                 animation: `${float} 4s ease-in-out infinite reverse`,
               },
             }}
           >
-            <Image
-              src={logoImage}
-              alt="Logo Surabaya"
-              width={110}
-              height={110}
-              style={{
+            <Box
+              sx={{
+                width: 110,
+                height: 110,
                 borderRadius: '20px',
-                objectFit: 'contain',
+                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
                 filter: 'drop-shadow(0 8px 16px rgba(0,0,0,0.1))',
                 position: 'relative',
                 zIndex: 1,
+                p: 2,
               }}
-            />
+            >
+              <Image
+                src="/logo.png"
+                alt="Logo Kelurahan Simokerto"
+                width={70}
+                height={70}
+                style={{ borderRadius: '12px' }}
+              />
+            </Box>
           </Box>
           <Typography
             variant="h4"
@@ -347,16 +356,26 @@ export default function SignIn() {
                   },
                 }}
               >
-                <Image
-                  src={logoImage}
-                  alt="Logo Surabaya"
-                  width={80}
-                  height={80}
-                  style={{
+                <Box
+                  sx={{
+                    width: 80,
+                    height: 80,
                     borderRadius: '16px',
-                    objectFit: 'contain',
+                    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    p: 1.5,
                   }}
-                />
+                >
+                  <Image
+                    src="/logo.png"
+                    alt="Logo Kelurahan Simokerto"
+                    width={50}
+                    height={50}
+                    style={{ borderRadius: '8px' }}
+                  />
+                </Box>
               </Box>
               <Typography
                 variant="h4"

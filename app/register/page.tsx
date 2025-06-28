@@ -322,33 +322,25 @@ export default function Register() {
         >
           <Box
             sx={{
-              animation: `${float} 3s ease-in-out infinite`,
+              width: 110,
+              height: 110,
+              borderRadius: '20px',
+              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              filter: 'drop-shadow(0 8px 16px rgba(0,0,0,0.1))',
               position: 'relative',
-              '&::before': {
-                content: '""',
-                position: 'absolute',
-                top: '-15px',
-                left: '-15px',
-                right: '-15px',
-                bottom: '-15px',
-                background: 'linear-gradient(45deg, rgba(59, 130, 246, 0.1), rgba(139, 92, 246, 0.1))',
-                borderRadius: '50%',
-                animation: `${float} 4s ease-in-out infinite reverse`,
-              },
+              zIndex: 1,
+              p: 2,
             }}
           >
             <Image
               src="/logo.png"
-              alt="Logo Surabaya"
-              width={110}
-              height={110}
-              style={{
-                borderRadius: '20px',
-                objectFit: 'contain',
-                filter: 'drop-shadow(0 8px 16px rgba(0,0,0,0.1))',
-                position: 'relative',
-                zIndex: 1,
-              }}
+              alt="Logo Kelurahan Simokerto"
+              width={70}
+              height={70}
+              style={{ borderRadius: '12px' }}
             />
           </Box>
           <Typography
@@ -414,16 +406,26 @@ export default function Register() {
                   },
                 }}
               >
-                <Image
-                  src="/logo.png"
-                  alt="Logo Surabaya"
-                  width={80}
-                  height={80}
-                  style={{
+                <Box
+                  sx={{
+                    width: 80,
+                    height: 80,
                     borderRadius: '16px',
-                    objectFit: 'contain',
+                    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    p: 1.5,
                   }}
-                />
+                >
+                  <Image
+                    src="/logo.png"
+                    alt="Logo Kelurahan Simokerto"
+                    width={50}
+                    height={50}
+                    style={{ borderRadius: '8px' }}
+                  />
+                </Box>
               </Box>
               <Typography
                 variant="h4"
