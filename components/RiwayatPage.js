@@ -15,7 +15,7 @@ import InputAdornment from '@mui/material/InputAdornment';
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
 import Button from '@mui/material/Button';
-import LinearProgress from '@mui/material/LinearProgress';
+import Avatar from '@mui/material/Avatar';
 import DescriptionIcon from '@mui/icons-material/Description';
 import SearchIcon from '@mui/icons-material/Search';
 import DownloadIcon from '@mui/icons-material/Download';
@@ -24,16 +24,7 @@ import PendingIcon from '@mui/icons-material/Pending';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import CancelIcon from '@mui/icons-material/Cancel';
 import TrendingUpIcon from '@mui/icons-material/TrendingUp';
-
-const HeaderCard = styled(Card)(({ theme }) => ({
-  background: theme.palette.mode === 'dark' 
-    ? 'linear-gradient(135deg, #1e3a8a 0%, #3730a3 100%)'
-    : 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)',
-  color: 'white',
-  borderRadius: '24px',
-  border: 'none',
-  marginBottom: theme.spacing(4),
-}));
+import Image from 'next/image';
 
 const DocumentCard = styled(Card)(({ theme }) => ({
   borderRadius: '16px',
@@ -164,23 +155,55 @@ export default function RiwayatPage() {
   const filteredDocuments = filterDocuments();
 
   return (
-    <Box sx={{ py: 1 }}>
+    <Box sx={{ p: 2, backgroundColor: 'background.default', minHeight: '100vh' }}>
       {/* Header */}
-      <HeaderCard>
-        <CardContent sx={{ p: 4 }}>
-          <Typography variant="h3" sx={{ fontWeight: 800, mb: 2 }}>
-            Riwayat Pengajuan
-          </Typography>
-          <Typography variant="h6" sx={{ opacity: 0.9 }}>
-            Lihat semua pengajuan surat yang pernah Anda buat beserta statusnya
-          </Typography>
+      <Card sx={{ 
+        borderRadius: '12px', 
+        border: '1px solid', 
+        borderColor: 'divider', 
+        mb: 3,
+        boxShadow: 'none',
+      }}>
+        <CardContent sx={{ p: 3 }}>
+          <Stack direction="row" alignItems="center" spacing={2}>
+            <Avatar
+              sx={{
+                width: 40,
+                height: 40,
+                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                p: 1,
+              }}
+            >
+              <Image
+                src="/logo.png"
+                alt="Logo Kelurahan Simokerto"
+                width={20}
+                height={20}
+                style={{ borderRadius: '3px' }}
+              />
+            </Avatar>
+            <Box>
+              <Typography variant="h6" sx={{ fontWeight: 700, mb: 0.25 }}>
+                Riwayat Pengajuan
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                Lihat semua pengajuan surat yang pernah Anda buat
+              </Typography>
+            </Box>
+          </Stack>
         </CardContent>
-      </HeaderCard>
+      </Card>
 
       {/* Search and Filter */}
-      <Card sx={{ borderRadius: '16px', mb: 3 }}>
-        <CardContent sx={{ p: 3 }}>
-          <Stack direction={{ xs: 'column', md: 'row' }} spacing={3} alignItems="center">
+      <Card sx={{ 
+        borderRadius: '12px', 
+        mb: 3, 
+        border: '1px solid', 
+        borderColor: 'divider',
+        boxShadow: 'none',
+      }}>
+        <CardContent sx={{ p: 2.5 }}>
+          <Stack direction={{ xs: 'column', md: 'row' }} spacing={2} alignItems="center">
             <TextField
               fullWidth
               placeholder="Cari berdasarkan jenis surat, nomor, atau keperluan..."
@@ -189,15 +212,17 @@ export default function RiwayatPage() {
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">
-                    <SearchIcon />
+                    <SearchIcon sx={{ fontSize: 18 }} />
                   </InputAdornment>
                 ),
               }}
               sx={{
                 '& .MuiOutlinedInput-root': {
-                  borderRadius: '12px',
+                  borderRadius: '8px',
+                  fontSize: '0.875rem',
                 },
               }}
+              size="small"
             />
             <Box sx={{ minWidth: { md: '300px' } }}>
               <Tabs 
@@ -208,7 +233,12 @@ export default function RiwayatPage() {
                 sx={{
                   '& .MuiTab-root': {
                     textTransform: 'none',
-                    fontWeight: 600,
+                    fontWeight: 500,
+                    fontSize: '0.875rem',
+                    minHeight: '36px',
+                  },
+                  '& .MuiTabs-indicator': {
+                    height: '2px',
                   },
                 }}
               >
@@ -223,13 +253,20 @@ export default function RiwayatPage() {
       </Card>
 
       {/* Documents List */}
-      <Grid container spacing={3}>
+      <Grid container spacing={2}>
         {filteredDocuments.length === 0 ? (
           <Grid item xs={12}>
-            <Card sx={{ borderRadius: '16px', textAlign: 'center', py: 8 }}>
+            <Card sx={{ 
+              borderRadius: '12px', 
+              textAlign: 'center', 
+              py: 6, 
+              border: '1px solid', 
+              borderColor: 'divider',
+              boxShadow: 'none',
+            }}>
               <CardContent>
-                <DescriptionIcon sx={{ fontSize: 64, color: 'text.secondary', mb: 2 }} />
-                <Typography variant="h6" color="text.secondary" sx={{ mb: 1 }}>
+                <DescriptionIcon sx={{ fontSize: 48, color: 'text.secondary', mb: 2, opacity: 0.5 }} />
+                <Typography variant="h6" color="text.secondary" sx={{ mb: 1, fontWeight: 600 }}>
                   Tidak ada data ditemukan
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
@@ -241,73 +278,89 @@ export default function RiwayatPage() {
         ) : (
           filteredDocuments.map((doc) => (
             <Grid item xs={12} key={doc.id}>
-              <DocumentCard>
-                <CardContent sx={{ p: 3 }}>
-                  <Grid container spacing={3} alignItems="center">
+              <Card sx={{ 
+                borderRadius: '8px', 
+                border: '1px solid', 
+                borderColor: 'divider',
+                boxShadow: 'none',
+                transition: 'all 0.2s ease',
+                '&:hover': {
+                  transform: 'translateY(-1px)',
+                  borderColor: theme => theme.palette.primary.main,
+                },
+              }}>
+                <CardContent sx={{ p: 2.5 }}>
+                  <Grid container spacing={2} alignItems="center">
                     <Grid item xs={12} md={8}>
                       <Stack direction="row" spacing={2} alignItems="center">
-                        <IconButton
+                        <Box
                           sx={{
-                            backgroundColor: 'primary.light',
-                            color: 'primary.contrastText',
-                            width: 56,
-                            height: 56,
+                            width: 36,
+                            height: 36,
+                            borderRadius: '8px',
+                            background: 'primary.main',
+                            color: 'white',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
                           }}
                         >
-                          <DescriptionIcon />
-                        </IconButton>
+                          <DescriptionIcon sx={{ fontSize: 18 }} />
+                        </Box>
                         <Box sx={{ flex: 1 }}>
-                          <Typography variant="h6" sx={{ fontWeight: 600, mb: 0.5 }}>
+                          <Typography variant="body1" sx={{ fontWeight: 600, mb: 0.25 }}>
                             {doc.fullType}
                           </Typography>
-                          <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-                            No. {doc.documentNumber} • {new Date(doc.date).toLocaleDateString('id-ID')}
+                          <Typography variant="caption" color="text.secondary" sx={{ mb: 0.25, display: 'block' }}>
+                            {doc.documentNumber} • {new Date(doc.date).toLocaleDateString('id-ID')}
                           </Typography>
-                          <Typography variant="body2" color="text.secondary">
+                          <Typography variant="caption" color="text.secondary">
                             Keperluan: {doc.purpose}
                           </Typography>
-                          {(doc.status === 'processing' || doc.status === 'pending') && (
-                            <Box sx={{ mt: 2, maxWidth: '300px' }}>
-                              <LinearProgress 
-                                variant="determinate" 
-                                value={doc.progress} 
-                                sx={{ height: 8, borderRadius: 4 }}
-                              />
-                              <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>
-                                {doc.progress}% selesai
-                              </Typography>
-                            </Box>
-                          )}
                         </Box>
                       </Stack>
                     </Grid>
                     <Grid item xs={12} md={4}>
-                      <Stack direction="row" spacing={2} alignItems="center" justifyContent={{ xs: 'flex-start', md: 'flex-end' }}>
+                      <Stack direction="row" spacing={1} alignItems="center" justifyContent={{ xs: 'flex-start', md: 'flex-end' }}>
                         <Chip
                           icon={getStatusIcon(doc.status)}
                           label={getStatusText(doc.status)}
                           color={getStatusColor(doc.status)}
-                          variant="filled"
-                          sx={{ fontWeight: 600 }}
+                          size="small"
+                          variant="outlined"
+                          sx={{ fontWeight: 500, fontSize: '0.75rem' }}
                         />
                         {doc.status === 'approved' && (
                           <Button
                             variant="outlined"
                             size="small"
-                            startIcon={<DownloadIcon />}
-                            sx={{ borderRadius: '8px' }}
+                            startIcon={<DownloadIcon sx={{ fontSize: 14 }} />}
+                            sx={{ 
+                              borderRadius: '6px', 
+                              fontWeight: 500,
+                              fontSize: '0.75rem',
+                              minWidth: 'auto',
+                              px: 1.5,
+                            }}
                           >
                             Unduh
                           </Button>
                         )}
-                        <IconButton size="small" sx={{ borderRadius: '8px' }}>
-                          <VisibilityIcon />
+                        <IconButton 
+                          size="small" 
+                          sx={{ 
+                            borderRadius: '6px',
+                            width: 32,
+                            height: 32,
+                          }}
+                        >
+                          <VisibilityIcon sx={{ fontSize: 16 }} />
                         </IconButton>
                       </Stack>
                     </Grid>
                   </Grid>
                 </CardContent>
-              </DocumentCard>
+              </Card>
             </Grid>
           ))
         )}

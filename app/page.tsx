@@ -20,8 +20,13 @@ import logoImage from '../public/logo.png';
 
 // Animations
 const float = keyframes`
-  0%, 100% { transform: translateY(0px) rotate(0deg); }
-  50% { transform: translateY(-3px) rotate(0.5deg); }
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+`;
+
+const fadeIn = keyframes`
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
 `;
 
 const fadeInUp = keyframes`
@@ -243,9 +248,9 @@ export default function SignIn() {
             left: 0,
             right: 0,
             bottom: 0,
-            background: theme => theme.palette.mode === 'dark' ?
-              'linear-gradient(135deg, #0d1117 0%, #161b22 100%)' :
-              'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)',
+            background: theme => theme.palette.mode === 'dark'
+              ? 'linear-gradient(135deg, #0d1117 0%, #161b22 100%)'
+              : 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -255,65 +260,83 @@ export default function SignIn() {
         >
           <Box
             sx={{
-              animation: `${float} 3s ease-in-out infinite`,
-              position: 'relative',
-              '&::before': {
-                content: '""',
-                position: 'absolute',
-                top: '-15px',
-                left: '-15px',
-                right: '-15px',
-                bottom: '-15px',
-                borderRadius: '50%',
-                animation: `${float} 4s ease-in-out infinite reverse`,
-              },
+              animation: `${float} 2s ease-in-out infinite`,
+              mb: 4,
             }}
           >
             <Box
               sx={{
-                width: 110,
-                height: 110,
-                borderRadius: '20px',
+                width: 80,
+                height: 80,
+                borderRadius: '16px',
                 background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                filter: 'drop-shadow(0 8px 16px rgba(0,0,0,0.1))',
-                position: 'relative',
-                zIndex: 1,
+                boxShadow: '0 8px 32px rgba(102, 126, 234, 0.3)',
                 p: 2,
               }}
             >
               <Image
                 src="/logo.png"
                 alt="Logo Kelurahan Simokerto"
-                width={70}
-                height={70}
-                style={{ borderRadius: '12px' }}
+                width={48}
+                height={48}
+                style={{ borderRadius: '8px' }}
               />
             </Box>
           </Box>
+          
           <Typography
             variant="h4"
             sx={{
-              mt: 3,
               fontWeight: 700,
               color: 'text.primary',
               textAlign: 'center',
+              mb: 1,
+              animation: `${fadeIn} 0.8s ease-out 0.5s both`,
             }}
           >
             Kelurahan Simokerto
           </Typography>
+          
           <Typography 
             variant="body1" 
             sx={{ 
-              color: 'text.secondary', 
-              mt: 1,
-              fontSize: '1rem',
+              color: 'text.secondary',
+              textAlign: 'center',
+              animation: `${fadeIn} 0.8s ease-out 0.7s both`,
             }}
           >
-            Memuat sistem...
+            Memuat sistem informasi...
           </Typography>
+
+          {/* Loading bar */}
+          <Box
+            sx={{
+              width: '200px',
+              height: '3px',
+              backgroundColor: 'divider',
+              borderRadius: '2px',
+              mt: 3,
+              overflow: 'hidden',
+              animation: `${fadeIn} 0.8s ease-out 0.9s both`,
+            }}
+          >
+            <Box
+              sx={{
+                width: '60px',
+                height: '100%',
+                background: 'linear-gradient(90deg, #667eea, #764ba2)',
+                borderRadius: '2px',
+                animation: 'loading 1.5s ease-in-out infinite',
+                '@keyframes loading': {
+                  '0%': { transform: 'translateX(-100px)' },
+                  '100%': { transform: 'translateX(240px)' },
+                },
+              }}
+            />
+          </Box>
         </Box>
       </AppTheme>
     );

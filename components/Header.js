@@ -9,6 +9,7 @@ import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import { styled } from '@mui/material/styles';
+import Image from 'next/image';
 
 const StyledCard = styled(Card)(({ theme }) => ({
   background: theme.palette.mode === 'dark' 
@@ -29,31 +30,53 @@ export default function Header() {
     <StyledCard sx={{ width: '100%', mb: 4 }}>
       <CardContent sx={{ p: 4 }}>
         <Stack spacing={3}>
-          <Breadcrumbs 
-            aria-label="breadcrumb" 
-            sx={{ 
-              fontSize: '0.875rem',
-              '& .MuiBreadcrumbs-separator': {
-                mx: 1
-              }
-            }}
-          >
-            <Link 
-              underline="hover" 
-              color="inherit" 
-              href="/"
-              sx={{ 
-                '&:hover': { color: 'primary.main' },
-                transition: 'color 0.2s ease',
-                fontWeight: 500
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+            <Box
+              sx={{
+                width: 48,
+                height: 48,
+                borderRadius: '12px',
+                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                p: 1,
               }}
             >
-              Home
-            </Link>
-            <Typography color="primary.main" sx={{ fontWeight: 600 }}>
-              Dashboard
-            </Typography>
-          </Breadcrumbs>
+              <Image
+                src="/logo.png"
+                alt="Logo Kelurahan Simokerto"
+                width={32}
+                height={32}
+                style={{ borderRadius: '6px' }}
+              />
+            </Box>
+            <Breadcrumbs 
+              aria-label="breadcrumb" 
+              sx={{ 
+                fontSize: '0.875rem',
+                '& .MuiBreadcrumbs-separator': {
+                  mx: 1
+                }
+              }}
+            >
+              <Link 
+                underline="hover" 
+                color="inherit" 
+                href="/"
+                sx={{ 
+                  '&:hover': { color: 'primary.main' },
+                  transition: 'color 0.2s ease',
+                  fontWeight: 500
+                }}
+              >
+                Home
+              </Link>
+              <Typography color="primary.main" sx={{ fontWeight: 600 }}>
+                Dashboard
+              </Typography>
+            </Breadcrumbs>
+          </Box>
           
           <Box>
             <Typography 

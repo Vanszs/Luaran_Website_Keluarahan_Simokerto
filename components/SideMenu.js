@@ -16,8 +16,9 @@ import DescriptionIcon from '@mui/icons-material/Description';
 import SettingsIcon from '@mui/icons-material/Settings';
 import LogoutIcon from '@mui/icons-material/Logout';
 import HistoryIcon from '@mui/icons-material/History';
+import Image from 'next/image';
 
-const drawerWidth = 280;
+const drawerWidth = 260;
 
 const Drawer = styled(MuiDrawer)(({ theme }) => ({
   width: drawerWidth,
@@ -28,31 +29,29 @@ const Drawer = styled(MuiDrawer)(({ theme }) => ({
       ? 'rgba(26, 26, 26, 0.95)' 
       : 'rgba(255, 255, 255, 0.95)',
     borderRight: `1px solid ${theme.palette.divider}`,
-    boxShadow: '0 4px 20px rgba(0, 0, 0, 0.08)',
+    boxShadow: 'none',
     backdropFilter: 'blur(20px)',
     zIndex: theme.zIndex.drawer,
-    paddingTop: '72px',
+    paddingTop: '64px',
   },
 }));
 
 const StyledListItemButton = styled(ListItemButton)(({ theme }) => ({
-  borderRadius: '14px',
-  margin: '6px 16px',
-  padding: '14px 18px',
-  transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+  borderRadius: '10px',
+  margin: '4px 12px',
+  padding: '10px 16px',
+  transition: 'all 0.2s ease',
   '&:hover': {
     backgroundColor: theme.palette.mode === 'dark' 
       ? 'rgba(144, 202, 249, 0.08)' 
       : 'rgba(25, 118, 210, 0.06)',
-    transform: 'translateX(4px)',
-    boxShadow: '0 4px 16px rgba(25, 118, 210, 0.15)',
+    transform: 'translateX(2px)',
   },
   '&.Mui-selected': {
     backgroundColor: theme.palette.mode === 'dark'
       ? 'rgba(144, 202, 249, 0.12)'
       : 'rgba(25, 118, 210, 0.1)',
-    borderLeft: `4px solid ${theme.palette.primary.main}`,
-    boxShadow: '0 4px 16px rgba(25, 118, 210, 0.2)',
+    borderLeft: `3px solid ${theme.palette.primary.main}`,
     '&:hover': {
       backgroundColor: theme.palette.mode === 'dark'
         ? 'rgba(144, 202, 249, 0.16)'
@@ -77,7 +76,7 @@ export default function SideMenu({ currentView, onViewChange }) {
       }}
     >
       {/* Navigation */}
-      <Box sx={{ flexGrow: 1, py: 2 }}>
+      <Box sx={{ flexGrow: 1, py: 1.5 }}>
         <List sx={{ px: 0 }}>
           {menuItems.map((item) => (
             <ListItem key={item.id} disablePadding>
@@ -86,15 +85,15 @@ export default function SideMenu({ currentView, onViewChange }) {
                 onClick={() => onViewChange(item.id)}
               >
                 <ListItemIcon sx={{ 
-                  minWidth: 44, 
+                  minWidth: 36, 
                   color: currentView === item.id ? 'primary.main' : 'inherit' 
                 }}>
-                  {item.icon}
+                  {React.cloneElement(item.icon, { sx: { fontSize: 20 } })}
                 </ListItemIcon>
                 <ListItemText 
                   primary={item.text}
                   primaryTypographyProps={{
-                    fontSize: '0.95rem',
+                    fontSize: '0.875rem',
                     fontWeight: currentView === item.id ? 600 : 500,
                   }}
                 />
@@ -106,31 +105,38 @@ export default function SideMenu({ currentView, onViewChange }) {
 
       {/* User Profile */}
       <Box sx={{ 
-        p: 2, 
+        p: 1.5, 
         borderTop: '1px solid', 
         borderColor: 'divider',
         background: theme => theme.palette.mode === 'dark'
-          ? 'rgba(0, 0, 0, 0.2)'
+          ? 'rgba(0, 0, 0, 0.1)'
           : 'rgba(0, 0, 0, 0.02)'
       }}>
         <StyledListItemButton>
-          <ListItemIcon sx={{ minWidth: 44 }}>
+          <ListItemIcon sx={{ minWidth: 36 }}>
             <Avatar sx={{ 
-              width: 36, 
-              height: 36,
+              width: 32, 
+              height: 32,
               background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-              fontWeight: 600
+              fontWeight: 600,
+              p: 0.5,
             }}>
-              B
+              <Image
+                src="/logo.png"
+                alt="Logo"
+                width={20}
+                height={20}
+                style={{ borderRadius: '2px' }}
+              />
             </Avatar>
           </ListItemIcon>
           <ListItemText 
             primary="Budi Santoso"
             secondary="budi.santoso@email.com"
-            primaryTypographyProps={{ fontSize: '0.9rem', fontWeight: 600 }}
-            secondaryTypographyProps={{ fontSize: '0.8rem' }}
+            primaryTypographyProps={{ fontSize: '0.875rem', fontWeight: 600 }}
+            secondaryTypographyProps={{ fontSize: '0.75rem' }}
           />
-          <LogoutIcon sx={{ fontSize: 20, color: 'text.secondary' }} />
+          <LogoutIcon sx={{ fontSize: 18, color: 'text.secondary' }} />
         </StyledListItemButton>
       </Box>
     </Drawer>

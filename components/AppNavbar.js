@@ -22,16 +22,15 @@ const StyledAppBar = styled(AppBar)(({ theme }) => ({
     ? 'rgba(26, 26, 26, 0.95)' 
     : 'rgba(255, 255, 255, 0.95)',
   borderBottom: `1px solid ${theme.palette.divider}`,
-  boxShadow: '0 4px 20px rgba(0, 0, 0, 0.08)',
+  boxShadow: 'none',
   backdropFilter: 'blur(20px)',
   zIndex: theme.zIndex.drawer + 1,
-  transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-  width: '100%', // Full width on all devices
+  width: '100%',
 }));
 
 const Toolbar = styled(MuiToolbar)({
-  padding: '8px 24px',
-  minHeight: '72px !important',
+  padding: '6px 20px',
+  minHeight: '64px !important',
 });
 
 const StyledIconButton = styled(IconButton)(({ theme }) => ({
@@ -60,22 +59,22 @@ export default function AppNavbar() {
           }}
         >
           {/* Left side - Mobile menu & Title */}
-          <Stack direction="row" spacing={2} alignItems="center">
+          <Stack direction="row" spacing={1.5} alignItems="center">
             <StyledIconButton
-              sx={{ display: { xs: 'flex', md: 'none' } }} // Only show on mobile
+              sx={{ display: { xs: 'flex', md: 'none' } }}
             >
-              <MenuRoundedIcon />
+              <MenuRoundedIcon sx={{ fontSize: 20 }} />
             </StyledIconButton>
             
-            <Stack direction="row" spacing={2} alignItems="center">
+            <Stack direction="row" spacing={1.5} alignItems="center">
               <CustomIcon />
               <Typography 
                 variant="h6" 
                 component="h1" 
                 sx={{ 
                   color: 'text.primary',
-                  fontWeight: 700,
-                  fontSize: '1.1rem',
+                  fontWeight: 600,
+                  fontSize: '1rem',
                 }}
               >
                 Kelurahan Simokerto
@@ -84,22 +83,23 @@ export default function AppNavbar() {
           </Stack>
 
           {/* Right side - Actions */}
-          <Stack direction="row" spacing={1} alignItems="center">
+          <Stack direction="row" spacing={0.5} alignItems="center">
             <ColorModeSelect />
             
             <StyledIconButton>
               <Badge badgeContent={3} color="error" variant="dot">
-                <NotificationsIcon sx={{ fontSize: 22 }} />
+                <NotificationsIcon sx={{ fontSize: 20 }} />
               </Badge>
             </StyledIconButton>
 
             <StyledIconButton>
               <Avatar 
                 sx={{ 
-                  width: 36, 
-                  height: 36,
+                  width: 32, 
+                  height: 32,
                   background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                  fontWeight: 600
+                  fontWeight: 600,
+                  fontSize: '0.875rem',
                 }}
               >
                 A
@@ -116,28 +116,23 @@ function CustomIcon() {
   return (
     <Box
       sx={{
-        width: 32,
-        height: 32,
-        borderRadius: '10px',
+        width: 28,
+        height: 28,
+        borderRadius: '8px',
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
         background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
         color: 'white',
-        boxShadow: '0 4px 16px rgba(102, 126, 234, 0.3)',
-        transition: 'all 0.3s ease',
-        '&:hover': {
-          transform: 'translateY(-2px)',
-          boxShadow: '0 6px 20px rgba(102, 126, 234, 0.4)',
-        },
+        transition: 'all 0.2s ease',
       }}
     >
       <Image
         src="/logo.png"
-        alt="Logo"
-        width={20}
-        height={20}
-        style={{ borderRadius: '3px' }}
+        alt="Logo Kelurahan Simokerto"
+        width={16}
+        height={16}
+        style={{ borderRadius: '2px' }}
       />
     </Box>
   );
