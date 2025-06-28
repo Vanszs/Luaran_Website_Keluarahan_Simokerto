@@ -91,7 +91,7 @@ export default function Dashboard() {
     setMounted(true);
   }, []);
 
-  const handleViewChange = (view: any) => {
+  const handleViewChange = (view: string) => {
     setContentVisible(false);
     setTimeout(() => {
       setCurrentView(view);
@@ -102,7 +102,7 @@ export default function Dashboard() {
     }, 200);
   };
 
-  const handleDocumentSelect = (documentType: any) => {
+  const handleDocumentSelect = (documentType: string) => {
     setSelectedDocument(documentType);
   };
 
@@ -296,7 +296,7 @@ export default function Dashboard() {
           display: 'flex', 
           minHeight: '100vh',
           bgcolor: 'background.default',
-          transition: 'background-color 0.3s ease-in-out'
+          transition: 'background-color 300ms cubic-bezier(0.4, 0, 0.2, 1) !important'
         }}
       >
         <SideMenu 
@@ -314,6 +314,7 @@ export default function Dashboard() {
             pb: 4,
             minHeight: '100vh',
             bgcolor: 'background.default',
+            transition: 'background-color 300ms cubic-bezier(0.4, 0, 0.2, 1) !important'
           }}
         >
           <Container

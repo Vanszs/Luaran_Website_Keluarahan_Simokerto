@@ -6,37 +6,21 @@ import Tooltip from '@mui/material/Tooltip';
 import LightModeIcon from '@mui/icons-material/LightMode';
 import DarkModeIcon from '@mui/icons-material/DarkMode';
 import { styled } from '@mui/material/styles';
-
-// SINGLE SOURCE OF TRUTH FOR COLOR MODE CONTEXT
-export const ColorModeContext = React.createContext({ 
-  mode: 'light',
-  toggleColorMode: () => {} 
-});
+import { ColorModeContext } from './AppTheme';
 
 const StyledIconButton = styled(IconButton)(({ theme }) => ({
-  width: 44,
-  height: 44,
-  borderRadius: '12px',
+  width: 40,
+  height: 40,
+  borderRadius: 8,
   backgroundColor: theme.palette.mode === 'dark' ? 
-    'rgba(251, 191, 36, 0.15)' : 
-    'rgba(59, 130, 246, 0.1)',
-  border: `1px solid ${theme.palette.mode === 'dark' ? 
-    'rgba(251, 191, 36, 0.3)' : 
-    'rgba(59, 130, 246, 0.2)'}`,
-  backdropFilter: 'blur(10px)',
-  transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-  cursor: 'pointer',
+    theme.palette.background.paper : 
+    theme.palette.background.default,
+  border: `1px solid ${theme.palette.divider}`,
+  color: theme.palette.text.primary,
+  transition: 'all 0.2s ease-in-out',
   '&:hover': {
-    backgroundColor: theme.palette.mode === 'dark' ? 
-      'rgba(251, 191, 36, 0.2)' : 
-      'rgba(59, 130, 246, 0.15)',
-    transform: 'translateY(-2px) scale(1.05)',
-    boxShadow: theme.palette.mode === 'dark' ?
-      '0 8px 24px rgba(0, 0, 0, 0.4), 0 0 20px rgba(251, 191, 36, 0.3)' :
-      '0 8px 24px rgba(0, 0, 0, 0.12), 0 0 20px rgba(59, 130, 246, 0.2)',
-  },
-  '&:active': {
-    transform: 'scale(0.95)',
+    backgroundColor: theme.palette.action.hover,
+    transform: 'translateY(-1px)',
   },
 }));
 
@@ -45,7 +29,7 @@ export default function ColorModeSelect(props: any) {
   
   return (
     <Tooltip 
-      title={mode === 'light' ? 'Switch to dark mode' : 'Switch to light mode'}
+      title={mode === 'light' ? 'Mode Gelap' : 'Mode Terang'}
       placement="bottom"
     >
       <StyledIconButton
@@ -56,12 +40,12 @@ export default function ColorModeSelect(props: any) {
         {mode === 'light' ? (
           <DarkModeIcon sx={{ 
             fontSize: 20, 
-            color: '#1d4ed8'
+            color: 'text.primary'  // Use theme color
           }} />
         ) : (
           <LightModeIcon sx={{ 
             fontSize: 20, 
-            color: '#fbbf24'
+            color: 'warning.main'  // Use theme warning color
           }} />
         )}
       </StyledIconButton>

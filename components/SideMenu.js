@@ -19,6 +19,7 @@ import HistoryIcon from '@mui/icons-material/History';
 import Image from 'next/image';
 import Paper from '@mui/material/Paper';
 import Stack from '@mui/material/Stack';
+import { useTheme } from '@mui/material/styles';
 
 const drawerWidth = 260;
 
@@ -27,42 +28,61 @@ const Drawer = styled(MuiDrawer)(({ theme }) => ({
   flexShrink: 0,
   [`& .${drawerClasses.paper}`]: {
     width: drawerWidth,
-    background: theme.palette.mode === 'dark' 
-      ? 'linear-gradient(145deg, rgba(15, 23, 42, 0.98) 0%, rgba(30, 41, 59, 0.99) 50%, rgba(51, 65, 85, 0.98) 100%)'
-      : 'linear-gradient(145deg, rgba(255, 255, 255, 0.99) 0%, rgba(248, 250, 252, 1) 50%, rgba(241, 245, 249, 0.99) 100%)',
-    borderRight: `1px solid ${alpha(theme.palette.divider, 0.15)}`,
+    background: theme.palette.mode === 'dark'
+      ? 'linear-gradient(145deg, rgba(15, 23, 42, 0.98) 0%, rgba(30, 41, 59, 0.95) 100%)'
+      : 'linear-gradient(145deg, rgba(255, 255, 255, 0.98) 0%, rgba(248, 250, 252, 0.95) 100%)',
+    backdropFilter: 'blur(20px)',
+    borderRight: theme.palette.mode === 'dark'
+      ? `2px solid rgba(148, 163, 184, 0.25)`
+      : `3px solid rgba(51, 65, 85, 0.1)`,
     boxShadow: theme.palette.mode === 'dark'
-      ? '4px 0 32px rgba(0, 0, 0, 0.5), inset -1px 0 0 rgba(255, 255, 255, 0.08)'
-      : '4px 0 32px rgba(0, 0, 0, 0.08), inset -1px 0 0 rgba(255, 255, 255, 0.8)',
-    backdropFilter: 'blur(25px)',
+      ? `
+          4px 0 20px rgba(0, 0, 0, 0.4),
+          2px 0 8px rgba(0, 0, 0, 0.3),
+          inset 1px 0 0 rgba(255, 255, 255, 0.1)
+        `
+      : `
+          4px 0 20px rgba(37, 99, 235, 0.06),
+          2px 0 8px rgba(51, 65, 85, 0.04),
+          inset 1px 0 0 rgba(255, 255, 255, 0.8)
+        `,
     zIndex: theme.zIndex.drawer,
     paddingTop: '64px',
     position: 'fixed',
     height: '100vh',
     top: 0,
     left: 0,
-    '&::before': {
-      content: '""',
-      position: 'absolute',
-      top: 0,
-      left: 0,
-      right: 0,
-      bottom: 0,
-      background: theme.palette.mode === 'dark'
-        ? `
-          radial-gradient(circle at 10% 20%, rgba(59, 130, 246, 0.12) 0%, transparent 50%),
-          radial-gradient(circle at 90% 80%, rgba(147, 51, 234, 0.12) 0%, transparent 50%)
-        `
-        : `
-          radial-gradient(circle at 10% 20%, rgba(59, 130, 246, 0.06) 0%, transparent 50%),
-          radial-gradient(circle at 90% 80%, rgba(147, 51, 234, 0.06) 0%, transparent 50%)
+    color: theme.palette.text.primary,
+    transition: 'all 300ms ease-in-out !important',
+    ...(theme.palette.mode === 'light' && {
+      '&::before': {
+        content: '""',
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        width: '60%',
+        height: '100%',
+        background: `
+          linear-gradient(90deg, 
+            rgba(255, 255, 255, 0.3) 0%, 
+            rgba(255, 255, 255, 0.1) 50%,
+            rgba(255, 255, 255, 0) 100%
+          )
         `,
-      pointerEvents: 'none',
-    },
+        pointerEvents: 'none',
+        zIndex: 1,
+      }
+    }),
   },
 }));
 
 export default function SideMenu({ currentView, onViewChange }) {
+  const theme = useTheme();
+
+  React.useEffect(() => {
+    console.log('SideMenu theme mode:', theme.palette.mode);
+  }, [theme.palette.mode]);
+
   const menuItems = [
     {
       id: 'dashboard',
@@ -93,16 +113,20 @@ export default function SideMenu({ currentView, onViewChange }) {
         display: { xs: 'none', md: 'block' },
       }}
     >
-      <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column', position: 'relative', zIndex: 1 }}>
-        {/* Modern Logo Header */}
+      <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column', position: 'relative', zIndex: 2 }}>
         <Box sx={{ 
           p: 3, 
-          borderBottom: theme => `1px solid ${alpha(theme.palette.divider, 0.15)}`, 
+          borderBottom: theme => `1px solid ${theme.palette.divider}`, 
           textAlign: 'center',
-          background: theme => theme.palette.mode === 'dark'
-            ? 'rgba(30, 41, 59, 0.8)'
-            : 'rgba(248, 250, 252, 0.8)',
+          background: theme.palette.mode === 'dark'
+            ? 'linear-gradient(135deg, rgba(30, 41, 59, 0.9) 0%, rgba(51, 65, 85, 0.8) 100%)'
+            : 'linear-gradient(135deg, rgba(248, 250, 252, 0.9) 0%, rgba(241, 245, 249, 0.8) 100%)',
           backdropFilter: 'blur(10px)',
+          transition: 'all 300ms ease-in-out !important',
+          position: 'relative',
+          boxShadow: theme.palette.mode === 'dark'
+            ? '0 4px 12px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.1)'
+            : '0 4px 12px rgba(37, 99, 235, 0.04), inset 0 1px 0 rgba(255, 255, 255, 0.8)',
         }}>
           <Box
             sx={{
@@ -116,9 +140,17 @@ export default function SideMenu({ currentView, onViewChange }) {
               mx: 'auto',
               mb: 2,
               boxShadow: theme => theme.palette.mode === 'dark'
-                ? '0 8px 24px rgba(102, 126, 234, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.2)'
-                : '0 8px 24px rgba(102, 126, 234, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.8)',
-              border: theme => `1px solid ${alpha(theme.palette.divider, 0.2)}`,
+                ? `
+                    0 8px 24px rgba(102, 126, 234, 0.4),
+                    0 4px 12px rgba(102, 126, 234, 0.3),
+                    inset 0 1px 0 rgba(255, 255, 255, 0.2)
+                  `
+                : `
+                    0 8px 24px rgba(102, 126, 234, 0.2),
+                    0 4px 12px rgba(102, 126, 234, 0.1),
+                    inset 0 1px 0 rgba(255, 255, 255, 0.8)
+                  `,
+              border: theme => `1px solid ${theme.palette.divider}`,
             }}
           >
             <Image
@@ -135,19 +167,12 @@ export default function SideMenu({ currentView, onViewChange }) {
               fontWeight: 800,
               fontSize: '1.1rem',
               color: 'text.primary',
-              background: theme => theme.palette.mode === 'dark'
-                ? 'linear-gradient(135deg, #ffffff 0%, #e2e8f0 100%)'
-                : 'linear-gradient(135deg, #0f172a 0%, #475569 100%)',
-              backgroundClip: 'text',
-              WebkitBackgroundClip: 'text',
-              color: 'transparent',
             }}
           >
             Portal Warga
           </Typography>
         </Box>
 
-        {/* Enhanced Menu Items */}
         <Box sx={{ flex: 1, p: 2 }}>
           <List sx={{ p: 0 }}>
             {menuItems.map((item) => (
@@ -162,16 +187,26 @@ export default function SideMenu({ currentView, onViewChange }) {
                     py: 1.5,
                     position: 'relative',
                     overflow: 'hidden',
+                    transition: 'all 300ms ease-in-out !important',
                     '&.Mui-selected': {
                       background: theme => theme.palette.mode === 'dark'
-                        ? 'linear-gradient(135deg, rgba(59, 130, 246, 0.2) 0%, rgba(147, 51, 234, 0.15) 100%)'
-                        : 'linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(147, 51, 234, 0.08) 100%)',
+                        ? 'linear-gradient(135deg, rgba(96, 165, 250, 0.15) 0%, rgba(96, 165, 250, 0.1) 100%)'
+                        : 'linear-gradient(135deg, rgba(29, 78, 216, 0.1) 0%, rgba(29, 78, 216, 0.05) 100%)',
                       color: theme => theme.palette.primary.main,
-                      border: theme => `1px solid ${alpha(theme.palette.primary.main, 0.3)}`,
+                      border: theme => `2px solid ${theme.palette.mode === 'dark' 
+                        ? 'rgba(96, 165, 250, 0.3)' 
+                        : 'rgba(29, 78, 216, 0.2)'}`,
                       boxShadow: theme => theme.palette.mode === 'dark'
-                        ? `0 8px 20px ${alpha(theme.palette.primary.main, 0.3)}, inset 0 1px 0 rgba(255, 255, 255, 0.1)`
-                        : `0 8px 20px ${alpha(theme.palette.primary.main, 0.15)}, inset 0 1px 0 rgba(255, 255, 255, 0.8)`,
-                      backdropFilter: 'blur(10px)',
+                        ? `
+                            0 6px 16px rgba(96, 165, 250, 0.2),
+                            0 3px 8px rgba(96, 165, 250, 0.15),
+                            inset 0 1px 0 rgba(255, 255, 255, 0.1)
+                          `
+                        : `
+                            0 4px 12px rgba(29, 78, 216, 0.1),
+                            0 2px 6px rgba(29, 78, 216, 0.08),
+                            inset 0 1px 0 rgba(255, 255, 255, 0.6)
+                          `,
                       '&::before': {
                         content: '""',
                         position: 'absolute',
@@ -179,26 +214,22 @@ export default function SideMenu({ currentView, onViewChange }) {
                         left: 0,
                         width: '4px',
                         height: '100%',
-                        background: 'linear-gradient(180deg, #3b82f6 0%, #8b5cf6 100%)',
+                        background: 'linear-gradient(180deg, #60a5fa 0%, #a78bfa 100%)',
                         borderRadius: '0 4px 4px 0',
                       },
                       '&:hover': {
                         background: theme => theme.palette.mode === 'dark'
-                          ? 'linear-gradient(135deg, rgba(59, 130, 246, 0.25) 0%, rgba(147, 51, 234, 0.2) 100%)'
-                          : 'linear-gradient(135deg, rgba(59, 130, 246, 0.12) 0%, rgba(147, 51, 234, 0.1) 100%)',
+                          ? 'linear-gradient(135deg, rgba(96, 165, 250, 0.2) 0%, rgba(96, 165, 250, 0.15) 100%)'
+                          : 'linear-gradient(135deg, rgba(29, 78, 216, 0.15) 0%, rgba(29, 78, 216, 0.08) 100%)',
                         transform: 'translateX(4px)',
                       },
                     },
                     '&:hover': {
                       background: theme => theme.palette.mode === 'dark'
-                        ? 'rgba(59, 130, 246, 0.08)'
-                        : 'rgba(59, 130, 246, 0.04)',
+                        ? 'rgba(96, 165, 250, 0.08)'
+                        : 'rgba(29, 78, 216, 0.04)',
                       transform: 'translateX(2px)',
-                      boxShadow: theme => theme.palette.mode === 'dark'
-                        ? '0 4px 12px rgba(0, 0, 0, 0.3)'
-                        : '0 4px 12px rgba(0, 0, 0, 0.08)',
                     },
-                    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                   }}
                 >
                   <ListItemIcon
@@ -228,27 +259,26 @@ export default function SideMenu({ currentView, onViewChange }) {
           </List>
         </Box>
 
-        {/* Enhanced User Profile at Bottom */}
         <Box sx={{ 
           p: 2, 
-          borderTop: theme => `1px solid ${alpha(theme.palette.divider, 0.15)}`,
-          background: theme => theme.palette.mode === 'dark'
-            ? 'rgba(15, 23, 42, 0.8)'
-            : 'rgba(248, 250, 252, 0.8)',
+          borderTop: theme => `1px solid ${theme.palette.divider}`,
+          background: theme.palette.mode === 'dark'
+            ? 'linear-gradient(135deg, rgba(30, 41, 59, 0.9) 0%, rgba(51, 65, 85, 0.8) 100%)'
+            : 'linear-gradient(135deg, rgba(248, 250, 252, 0.9) 0%, rgba(241, 245, 249, 0.8) 100%)',
           backdropFilter: 'blur(10px)',
+          transition: 'all 300ms ease-in-out !important',
+          boxShadow: theme.palette.mode === 'dark'
+            ? '0 -4px 12px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.1)'
+            : '0 -4px 12px rgba(37, 99, 235, 0.04), inset 0 1px 0 rgba(255, 255, 255, 0.8)',
         }}>
           <ListItemButton
             sx={{
               borderRadius: 3,
               p: 2,
-              background: theme => theme.palette.mode === 'dark'
-                ? 'linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, rgba(220, 38, 38, 0.08) 100%)'
-                : 'linear-gradient(135deg, rgba(239, 68, 68, 0.05) 0%, rgba(220, 38, 38, 0.04) 100%)',
+              background: theme => alpha(theme.palette.error.main, 0.08),
               border: theme => `1px solid ${alpha(theme.palette.error.main, 0.2)}`,
               '&:hover': {
-                background: theme => theme.palette.mode === 'dark'
-                  ? 'linear-gradient(135deg, rgba(239, 68, 68, 0.15) 0%, rgba(220, 38, 38, 0.12) 100%)'
-                  : 'linear-gradient(135deg, rgba(239, 68, 68, 0.08) 0%, rgba(220, 38, 38, 0.06) 100%)',
+                background: theme => alpha(theme.palette.error.main, 0.12),
                 transform: 'translateY(-2px)',
                 boxShadow: theme => `0 8px 20px ${alpha(theme.palette.error.main, 0.2)}`,
               },
@@ -272,8 +302,15 @@ export default function SideMenu({ currentView, onViewChange }) {
             <ListItemText 
               primary="Budi Santoso"
               secondary="Keluar"
-              primaryTypographyProps={{ fontSize: '0.9rem', fontWeight: 600 }}
-              secondaryTypographyProps={{ fontSize: '0.75rem', color: 'error.main' }}
+              primaryTypographyProps={{ 
+                fontSize: '0.9rem', 
+                fontWeight: 600,
+                color: 'text.primary'
+              }}
+              secondaryTypographyProps={{ 
+                fontSize: '0.75rem', 
+                color: 'error.main' 
+              }}
             />
             <LogoutIcon sx={{ fontSize: 20, color: 'error.main' }} />
           </ListItemButton>

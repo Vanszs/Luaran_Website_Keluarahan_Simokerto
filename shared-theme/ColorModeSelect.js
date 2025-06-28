@@ -6,48 +6,44 @@ import Tooltip from '@mui/material/Tooltip';
 import LightModeIcon from '@mui/icons-material/LightMode';
 import DarkModeIcon from '@mui/icons-material/DarkMode';
 import { styled } from '@mui/material/styles';
-
-export const ColorModeContext = React.createContext({ 
-  mode: 'light',
-  toggleColorMode: () => {} 
-});
+import { ColorModeContext } from './AppTheme';
 
 const StyledIconButton = styled(IconButton)(({ theme }) => ({
   width: 48,
   height: 48,
   borderRadius: '12px',
   backgroundColor: theme.palette.mode === 'dark' ? 
-    'rgba(255, 255, 255, 0.1)' : 
-    'rgba(0, 0, 0, 0.06)',
-  border: `2px solid ${theme.palette.mode === 'dark' ? 
-    'rgba(255, 255, 255, 0.2)' : 
-    'rgba(0, 0, 0, 0.1)'}`,
-  transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-  cursor: 'pointer',
+    'rgba(96, 165, 250, 0.1)' : 
+    'rgba(29, 78, 216, 0.08)',
+  border: `1px solid ${theme.palette.mode === 'dark' ? 
+    'rgba(96, 165, 250, 0.2)' : 
+    'rgba(29, 78, 216, 0.15)'}`,
+  // UNIFIED TRANSITION
+  transition: 'all 200ms ease-in-out !important',
   '&:hover': {
     backgroundColor: theme.palette.mode === 'dark' ? 
-      'rgba(255, 255, 255, 0.2)' : 
-      'rgba(0, 0, 0, 0.1)',
-    transform: 'scale(1.1)',
+      'rgba(96, 165, 250, 0.15)' : 
+      'rgba(29, 78, 216, 0.12)',
+    transform: 'translateY(-2px)',
     boxShadow: theme.palette.mode === 'dark' ?
-      '0 6px 20px rgba(255, 255, 255, 0.2)' :
-      '0 6px 20px rgba(0, 0, 0, 0.15)',
-  },
-  '&:active': {
-    transform: 'scale(0.95)',
+      '0 8px 24px rgba(96, 165, 250, 0.25)' :
+      '0 4px 12px rgba(29, 78, 216, 0.15)',
   },
 }));
 
 export default function ColorModeSelect(props) {
-  const { mode, toggleColorMode } = React.useContext(ColorModeContext);
+  const colorModeContext = React.useContext(ColorModeContext);
   
-  if (!mode) {
+  // PREVENT CRASH IF CONTEXT IS NULL
+  if (!colorModeContext || !colorModeContext.mode) {
     return null;
   }
 
+  const { mode, toggleColorMode } = colorModeContext;
+
   return (
     <Tooltip 
-      title={mode === 'light' ? 'Switch to dark mode' : 'Switch to light mode'}
+      title={mode === 'light' ? 'Mode Gelap' : 'Mode Terang'}
       placement="bottom"
     >
       <StyledIconButton
@@ -56,9 +52,9 @@ export default function ColorModeSelect(props) {
         {...props}
       >
         {mode === 'light' ? (
-          <DarkModeIcon sx={{ fontSize: 24, color: 'text.primary' }} />
+          <DarkModeIcon sx={{ fontSize: 24, color: 'primary.main' }} />
         ) : (
-          <LightModeIcon sx={{ fontSize: 24, color: 'text.primary' }} />
+          <LightModeIcon sx={{ fontSize: 24, color: 'warning.main' }} />
         )}
       </StyledIconButton>
     </Tooltip>

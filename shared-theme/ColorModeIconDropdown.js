@@ -8,7 +8,7 @@ import Tooltip from '@mui/material/Tooltip';
 import LightModeIcon from '@mui/icons-material/LightMode';
 import DarkModeIcon from '@mui/icons-material/DarkMode';
 import SettingsBrightnessIcon from '@mui/icons-material/SettingsBrightness';
-import { ColorModeContext } from './ColorModeSelect';
+import { ColorModeContext } from './AppTheme'; // FIXED: Import dari AppTheme
 
 export default function ColorModeIconDropdown() {
   const { mode, toggleColorMode } = React.useContext(ColorModeContext);
@@ -24,6 +24,7 @@ export default function ColorModeIconDropdown() {
   };
 
   const handleModeChange = () => {
+    console.log('Theme toggle triggered from dropdown'); // DEBUG LOG
     toggleColorMode();
     handleClose();
   };

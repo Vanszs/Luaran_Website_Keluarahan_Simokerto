@@ -32,19 +32,106 @@ import BusinessIcon from '@mui/icons-material/Business';
 import SchoolIcon from '@mui/icons-material/School';
 import WorkIcon from '@mui/icons-material/Work';
 
+// ENHANCED SECTION CONTAINER - STUNNING 3D EFFECTS
 const SectionContainer = styled(Paper)(({ theme }) => ({
   background: theme.palette.mode === 'dark'
     ? 'linear-gradient(145deg, rgba(15, 23, 42, 0.95) 0%, rgba(30, 41, 59, 0.98) 50%, rgba(51, 65, 85, 0.95) 100%)'
-    : 'linear-gradient(145deg, rgba(255, 255, 255, 0.98) 0%, rgba(248, 250, 252, 1) 50%, rgba(241, 245, 249, 0.98) 100%)',
-  backdropFilter: 'blur(30px)',
-  borderRadius: '20px',
-  border: `1px solid ${alpha(theme.palette.divider, 0.15)}`,
+    : `
+        linear-gradient(145deg, 
+          rgba(255, 255, 255, 0.98) 0%, 
+          rgba(248, 250, 252, 0.95) 20%,
+          rgba(224, 242, 254, 0.9) 40%,
+          rgba(241, 245, 249, 0.95) 60%,
+          rgba(231, 229, 228, 0.9) 80%,
+          rgba(254, 247, 205, 0.95) 100%
+        )
+      `,
+  backdropFilter: 'blur(20px)',
+  borderRadius: '24px',
+  border: theme.palette.mode === 'dark'
+    ? `2px solid rgba(148, 163, 184, 0.25)`
+    : `3px solid rgba(37, 99, 235, 0.15)`,
   boxShadow: theme.palette.mode === 'dark'
-    ? '0 20px 40px rgba(0, 0, 0, 0.4), 0 8px 16px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.1)'
-    : '0 20px 40px rgba(0, 0, 0, 0.08), 0 8px 16px rgba(0, 0, 0, 0.04), inset 0 1px 0 rgba(255, 255, 255, 0.8)',
-  transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+    ? `
+        0 20px 64px rgba(0, 0, 0, 0.6),
+        0 12px 32px rgba(0, 0, 0, 0.4),
+        inset 0 2px 0 rgba(255, 255, 255, 0.1),
+        inset 0 -2px 0 rgba(0, 0, 0, 0.2)
+      `
+    : `
+        0 24px 80px rgba(37, 99, 235, 0.1),
+        0 16px 48px rgba(16, 185, 129, 0.08),
+        0 8px 24px rgba(124, 58, 237, 0.06),
+        inset 0 2px 0 rgba(255, 255, 255, 0.9),
+        inset 0 -2px 0 rgba(37, 99, 235, 0.05)
+      `,
+  transition: 'all 300ms cubic-bezier(0.4, 0, 0.2, 1) !important',
   position: 'relative',
   overflow: 'hidden',
+  
+  '&:hover': {
+    transform: theme.palette.mode === 'dark' 
+      ? 'translateY(-3px)' 
+      : 'translateY(-5px)',
+    boxShadow: theme.palette.mode === 'dark'
+      ? `
+          0 28px 80px rgba(0, 0, 0, 0.7),
+          0 16px 40px rgba(0, 0, 0, 0.5),
+          inset 0 2px 0 rgba(255, 255, 255, 0.15)
+        `
+      : `
+          0 32px 100px rgba(37, 99, 235, 0.14),
+          0 20px 60px rgba(16, 185, 129, 0.1),
+          0 12px 32px rgba(124, 58, 237, 0.08),
+          inset 0 2px 0 rgba(255, 255, 255, 1),
+          inset 0 -2px 0 rgba(37, 99, 235, 0.08)
+        `,
+  },
+  
+  // STUNNING 3D EFFECTS
+  ...(theme.palette.mode === 'light' && {
+    '&::before': {
+      content: '""',
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      background: `
+        radial-gradient(circle at 25% 25%, rgba(37, 99, 235, 0.12) 0%, transparent 50%),
+        radial-gradient(circle at 75% 25%, rgba(16, 185, 129, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 50% 75%, rgba(124, 58, 237, 0.08) 0%, transparent 50%),
+        linear-gradient(135deg, 
+          rgba(255, 255, 255, 0.6) 0%, 
+          rgba(255, 255, 255, 0.3) 50%,
+          rgba(255, 255, 255, 0.1) 100%
+        )
+      `,
+      borderRadius: '24px',
+      pointerEvents: 'none',
+      zIndex: 1,
+      transition: 'all 300ms cubic-bezier(0.4, 0, 0.2, 1) !important',
+    },
+    '&::after': {
+      content: '""',
+      position: 'absolute',
+      top: 3,
+      left: 3,
+      right: 3,
+      bottom: 3,
+      background: `
+        linear-gradient(135deg, 
+          rgba(255, 255, 255, 0.4) 0%, 
+          rgba(255, 255, 255, 0.2) 50%,
+          rgba(255, 255, 255, 0.1) 100%
+        )
+      `,
+      borderRadius: '21px',
+      pointerEvents: 'none',
+      zIndex: 0,
+      transition: 'all 300ms cubic-bezier(0.4, 0, 0.2, 1) !important',
+    }
+  }),
 }));
 
 const documents = [
@@ -100,24 +187,49 @@ const documents = [
   },
 ];
 
-const getStatusColor = (status) => {
-  switch (status) {
-    case 'selesai': return 'success';
-    case 'menunggu': return 'warning';
-    case 'diproses': return 'info';
-    case 'ditolak': return 'error';
-    default: return 'default';
-  }
+const getStatusConfig = (status, theme) => {
+  const configs = {
+    selesai: {
+      color: 'success',
+      icon: <CheckCircleIcon sx={{ fontSize: 14 }} />,
+      backgroundColor: theme.palette.mode === 'dark' ? '#065f46' : '#d1fae5',
+      textColor: theme.palette.mode === 'dark' ? '#34d399' : '#065f46',
+      borderColor: theme.palette.mode === 'dark' ? '#34d399' : '#059669',
+    },
+    menunggu: {
+      color: 'warning',
+      icon: <PendingIcon sx={{ fontSize: 14 }} />,
+      backgroundColor: theme.palette.mode === 'dark' ? '#92400e' : '#fef3c7',
+      textColor: theme.palette.mode === 'dark' ? '#fbbf24' : '#92400e',
+      borderColor: theme.palette.mode === 'dark' ? '#fbbf24' : '#d97706',
+    },
+    diproses: {
+      color: 'info',
+      icon: <TrendingUpIcon sx={{ fontSize: 14 }} />,
+      backgroundColor: theme.palette.mode === 'dark' ? '#0e7490' : '#dbeafe',
+      textColor: theme.palette.mode === 'dark' ? '#22d3ee' : '#0e7490',
+      borderColor: theme.palette.mode === 'dark' ? '#22d3ee' : '#0891b2',
+    },
+    ditolak: {
+      color: 'error',
+      icon: <CancelIcon sx={{ fontSize: 14 }} />,
+      backgroundColor: theme.palette.mode === 'dark' ? '#991b1b' : '#fee2e2',
+      textColor: theme.palette.mode === 'dark' ? '#f87171' : '#991b1b',
+      borderColor: theme.palette.mode === 'dark' ? '#f87171' : '#dc2626',
+    },
+  };
+  return configs[status] || configs.menunggu;
 };
 
-const getStatusIcon = (status) => {
-  switch (status) {
-    case 'selesai': return <CheckCircleIcon />;
-    case 'menunggu': return <PendingIcon />;
-    case 'diproses': return <TrendingUpIcon />;
-    case 'ditolak': return <CancelIcon />;
-    default: return <DescriptionIcon />;
-  }
+const getDocumentIconColor = (type, theme) => {
+  const colors = {
+    SKTM: theme.palette.mode === 'dark' ? '#34d399' : '#059669',
+    Domisili: theme.palette.mode === 'dark' ? '#60a5fa' : '#2563eb',
+    SKU: theme.palette.mode === 'dark' ? '#a78bfa' : '#7c3aed',
+    SKCK: theme.palette.mode === 'dark' ? '#fbbf24' : '#d97706',
+    SKS: theme.palette.mode === 'dark' ? '#f87171' : '#dc2626',
+  };
+  return colors[type] || theme.palette.text.secondary;
 };
 
 export default function RiwayatPage() {
@@ -140,36 +252,46 @@ export default function RiwayatPage() {
 
   const filteredDocuments = filterDocuments();
 
-  const getDocumentIconColor = (type) => {
-    switch (type) {
-      case 'SKTM': return theme.palette.mode === 'dark' ? '#34d399' : '#059669';
-      case 'Domisili': return theme.palette.mode === 'dark' ? '#60a5fa' : '#2563eb';
-      case 'SKU': return theme.palette.mode === 'dark' ? '#a78bfa' : '#7c3aed';
-      case 'SKCK': return theme.palette.mode === 'dark' ? '#fbbf24' : '#d97706';
-      case 'SKS': return theme.palette.mode === 'dark' ? '#f87171' : '#dc2626';
-      default: return theme.palette.text.secondary;
-    }
-  };
-
   return (
-    <Box sx={{ width: '100%', p: 2 }}>
-      {/* Header with consistent container */}
+    <Box sx={{ 
+      width: '100%', 
+      p: 2,
+      // BEAUTIFUL GRADIENT BACKGROUND FOR LIGHT MODE
+      background: theme.palette.mode === 'dark'
+        ? 'transparent'
+        : 'linear-gradient(135deg, #e0f2fe 0%, #f8fafc 25%, #f1f5f9 50%, #e7e5e4 75%, #fef7cd 100%)',
+      minHeight: '100vh',
+      transition: 'background 300ms ease-in-out !important'
+    }}>
+      {/* ENHANCED HEADER */}
       <SectionContainer elevation={0} sx={{ mb: 4 }}>
-        <CardContent sx={{ p: 3, position: 'relative', zIndex: 1 }}>
-          <Stack direction="row" alignItems="center" spacing={2}>
-            <Typography variant="h5" sx={{ fontWeight: 700, mb: 0.25, color: theme.palette.text.primary, fontSize: '1.25rem' }}>
+        <CardContent sx={{ p: 4, position: 'relative', zIndex: 2 }}>
+          <Stack direction="row" alignItems="center" spacing={3}>
+            <Typography variant="h4" sx={{ 
+              fontWeight: 700, 
+              mb: 0.5, 
+              color: theme.palette.text.primary, 
+              fontSize: '1.75rem',
+              textShadow: theme.palette.mode === 'dark' 
+                ? 'none' 
+                : '0 2px 4px rgba(37, 99, 235, 0.1)',
+            }}>
               Riwayat Pengajuan
             </Typography>
-            <Typography variant="body2" color="text.secondary" sx={{ fontSize: '0.875rem' }}>
+            <Typography variant="body1" sx={{ 
+              fontSize: '1rem',
+              color: theme.palette.text.secondary,
+              fontWeight: 500
+            }}>
               Lihat semua pengajuan surat yang pernah Anda buat
             </Typography>
           </Stack>
         </CardContent>
       </SectionContainer>
 
-      {/* Search in consistent container */}
+      {/* ENHANCED SEARCH */}
       <SectionContainer elevation={0} sx={{ mb: 4 }}>
-        <CardContent sx={{ p: 2.5, position: 'relative', zIndex: 1 }}>
+        <CardContent sx={{ p: 4, position: 'relative', zIndex: 2 }}>
           <TextField
             fullWidth
             placeholder="Cari berdasarkan jenis surat, nomor, atau keperluan..."
@@ -178,196 +300,309 @@ export default function RiwayatPage() {
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
-                  <SearchIcon sx={{ fontSize: 16, color: theme.palette.text.secondary }} />
+                  <SearchIcon sx={{ 
+                    fontSize: 24, 
+                    color: theme.palette.text.secondary 
+                  }} />
                 </InputAdornment>
               ),
             }}
             sx={{
               '& .MuiOutlinedInput-root': {
-                borderRadius: '8px',
-                fontSize: '0.875rem',
-                height: 40,
-                background: theme.palette.mode === 'dark'
-                  ? 'rgba(15, 23, 42, 0.6)'
-                  : 'rgba(255, 255, 255, 0.8)',
-                backdropFilter: 'blur(10px)',
+                borderRadius: '16px',
+                fontSize: '1rem',
+                backgroundColor: theme.palette.mode === 'dark'
+                  ? 'rgba(15, 23, 42, 0.8)'
+                  : 'rgba(255, 255, 255, 0.9)',
+                border: theme.palette.mode === 'dark'
+                  ? '2px solid rgba(148, 163, 184, 0.2)'
+                  : '3px solid rgba(51, 65, 85, 0.1)',
+                boxShadow: theme.palette.mode === 'dark'
+                  ? '0 4px 12px rgba(0, 0, 0, 0.2)'
+                  : '0 4px 16px rgba(37, 99, 235, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.8)',
+                transition: 'all 300ms ease-in-out !important',
                 '& fieldset': {
-                  borderColor: alpha(theme.palette.divider, 0.3),
+                  border: 'none',
+                },
+                '&:hover': {
+                  borderColor: theme.palette.mode === 'dark'
+                    ? 'rgba(96, 165, 250, 0.4)'
+                    : 'rgba(37, 99, 235, 0.3)',
+                  transform: 'translateY(-1px)',
+                },
+                '&.Mui-focused': {
+                  borderColor: theme.palette.primary.main,
+                  transform: 'translateY(-2px)',
+                  boxShadow: theme.palette.mode === 'dark'
+                    ? '0 8px 24px rgba(96, 165, 250, 0.2)'
+                    : '0 8px 24px rgba(37, 99, 235, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.9)',
                 },
               },
             }}
-            size="small"
+            size="medium"
           />
         </CardContent>
       </SectionContainer>
 
-      {/* Table in consistent container */}
+      {/* ENHANCED TABLE CONTAINER */}
       <SectionContainer elevation={0}>
-        <CardContent sx={{ p: 3, position: 'relative', zIndex: 1 }}>
+        <CardContent sx={{ p: 4, position: 'relative', zIndex: 2 }}>
           <TableContainer 
             component={Paper} 
             sx={{ 
-              borderRadius: 2,
+              borderRadius: '16px',
               background: theme.palette.mode === 'dark'
-                ? 'rgba(15, 23, 42, 0.6)'
-                : 'rgba(255, 255, 255, 0.8)',
-              backdropFilter: 'blur(10px)',
-              border: `1px solid ${alpha(theme.palette.divider, 0.2)}`,
+                ? 'linear-gradient(135deg, rgba(15, 23, 42, 0.9) 0%, rgba(30, 41, 59, 0.95) 100%)'
+                : 'linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(248, 250, 252, 0.95) 100%)',
+              border: theme.palette.mode === 'dark'
+                ? '2px solid rgba(148, 163, 184, 0.2)'
+                : '3px solid rgba(51, 65, 85, 0.08)',
+              overflow: 'hidden',
+              transition: 'all 300ms cubic-bezier(0.4, 0, 0.2, 1) !important',
+              boxShadow: theme.palette.mode === 'dark'
+                ? '0 8px 32px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.1)'
+                : '0 8px 32px rgba(37, 99, 235, 0.06), inset 0 2px 0 rgba(255, 255, 255, 0.8)',
             }}
           >
             <Table>
               <TableHead>
-                <TableRow>
+                <TableRow sx={{
+                  background: theme.palette.mode === 'dark'
+                    ? 'linear-gradient(135deg, rgba(30, 41, 59, 0.9) 0%, rgba(51, 65, 85, 0.9) 100%)'
+                    : 'linear-gradient(135deg, rgba(241, 245, 249, 0.95) 0%, rgba(226, 232, 240, 0.95) 100%)',
+                }}>
                   <TableCell sx={{ 
-                    fontWeight: 600, 
+                    fontWeight: 700, 
                     color: theme.palette.text.primary,
-                    fontSize: '0.875rem',
-                    background: theme.palette.mode === 'dark'
-                      ? alpha(theme.palette.background.default, 0.5)
-                      : alpha(theme.palette.background.default, 0.8),
+                    fontSize: '0.9rem',
+                    borderBottom: theme.palette.mode === 'dark'
+                      ? '1px solid rgba(148, 163, 184, 0.2)'
+                      : '1px solid rgba(148, 163, 184, 0.3)',
+                    py: 2,
                   }}>
                     Dokumen
                   </TableCell>
                   <TableCell sx={{ 
-                    fontWeight: 600, 
+                    fontWeight: 700, 
                     color: theme.palette.text.primary,
-                    fontSize: '0.875rem',
-                    background: theme.palette.mode === 'dark'
-                      ? alpha(theme.palette.background.default, 0.5)
-                      : alpha(theme.palette.background.default, 0.8),
+                    fontSize: '0.9rem',
+                    borderBottom: theme.palette.mode === 'dark'
+                      ? '1px solid rgba(148, 163, 184, 0.2)'
+                      : '1px solid rgba(148, 163, 184, 0.3)',
+                    py: 2,
                   }}>
                     Nomor
                   </TableCell>
                   <TableCell sx={{ 
-                    fontWeight: 600, 
+                    fontWeight: 700, 
                     color: theme.palette.text.primary,
-                    fontSize: '0.875rem',
-                    background: theme.palette.mode === 'dark'
-                      ? alpha(theme.palette.background.default, 0.5)
-                      : alpha(theme.palette.background.default, 0.8),
+                    fontSize: '0.9rem',
+                    borderBottom: theme.palette.mode === 'dark'
+                      ? '1px solid rgba(148, 163, 184, 0.2)'
+                      : '1px solid rgba(148, 163, 184, 0.3)',
+                    py: 2,
                   }}>
                     Tanggal
                   </TableCell>
                   <TableCell sx={{ 
-                    fontWeight: 600, 
+                    fontWeight: 700, 
                     color: theme.palette.text.primary,
-                    fontSize: '0.875rem',
-                    background: theme.palette.mode === 'dark'
-                      ? alpha(theme.palette.background.default, 0.5)
-                      : alpha(theme.palette.background.default, 0.8),
+                    fontSize: '0.9rem',
+                    borderBottom: theme.palette.mode === 'dark'
+                      ? '1px solid rgba(148, 163, 184, 0.2)'
+                      : '1px solid rgba(148, 163, 184, 0.3)',
+                    py: 2,
                   }}>
                     Status
                   </TableCell>
                   <TableCell sx={{ 
-                    fontWeight: 600, 
+                    fontWeight: 700, 
                     color: theme.palette.text.primary,
-                    fontSize: '0.875rem',
-                    background: theme.palette.mode === 'dark'
-                      ? alpha(theme.palette.background.default, 0.5)
-                      : alpha(theme.palette.background.default, 0.8),
+                    fontSize: '0.9rem',
+                    borderBottom: theme.palette.mode === 'dark'
+                      ? '1px solid rgba(148, 163, 184, 0.2)'
+                      : '1px solid rgba(148, 163, 184, 0.3)',
+                    py: 2,
                   }}>
                     Keterangan
                   </TableCell>
                   <TableCell sx={{ 
-                    fontWeight: 600, 
+                    fontWeight: 700, 
                     color: theme.palette.text.primary,
-                    fontSize: '0.875rem',
-                    background: theme.palette.mode === 'dark'
-                      ? alpha(theme.palette.background.default, 0.5)
-                      : alpha(theme.palette.background.default, 0.8),
+                    fontSize: '0.9rem',
+                    borderBottom: theme.palette.mode === 'dark'
+                      ? '1px solid rgba(148, 163, 184, 0.2)'
+                      : '1px solid rgba(148, 163, 184, 0.3)',
+                    py: 2,
                   }}>
                     Aksi
                   </TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
-                {filteredDocuments.map((doc) => (
-                  <TableRow 
-                    key={doc.id} 
-                    hover
-                    sx={{
-                      '&:hover': {
-                        backgroundColor: theme.palette.mode === 'dark'
-                          ? alpha(theme.palette.primary.main, 0.08)
-                          : alpha(theme.palette.primary.main, 0.04),
-                      }
-                    }}
-                  >
-                    <TableCell>
-                      <Stack direction="row" spacing={2} alignItems="center">
-                        <Box
-                          sx={{
-                            width: 36,
-                            height: 36,
-                            borderRadius: 2,
-                            background: alpha(getDocumentIconColor(doc.type), 0.15),
-                            color: getDocumentIconColor(doc.type),
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
+                {filteredDocuments.map((doc) => {
+                  const statusConfig = getStatusConfig(doc.status, theme);
+                  
+                  return (
+                    <TableRow 
+                      key={doc.id} 
+                      hover
+                      sx={{
+                        borderBottom: theme.palette.mode === 'dark'
+                          ? '1px solid rgba(148, 163, 184, 0.15)'
+                          : '1px solid rgba(148, 163, 184, 0.1)',
+                        transition: 'all 200ms ease-in-out',
+                        '&:hover': {
+                          backgroundColor: theme.palette.mode === 'dark'
+                            ? 'rgba(59, 130, 246, 0.08)'
+                            : 'rgba(37, 99, 235, 0.04)',
+                          transform: 'translateX(4px)',
+                        },
+                        '&:last-child td': {
+                          borderBottom: 'none',
+                        }
+                      }}
+                    >
+                      <TableCell sx={{ py: 2 }}>
+                        <Stack direction="row" spacing={2} alignItems="center">
+                          <Box
+                            sx={{
+                              width: 40,
+                              height: 40,
+                              borderRadius: '10px',
+                              background: alpha(getDocumentIconColor(doc.type, theme), 0.15),
+                              color: getDocumentIconColor(doc.type, theme),
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              border: `1px solid ${alpha(getDocumentIconColor(doc.type, theme), 0.3)}`,
+                            }}
+                          >
+                            {React.cloneElement(doc.icon, { sx: { fontSize: 20 } })}
+                          </Box>
+                          <Box>
+                            <Typography variant="subtitle2" sx={{ 
+                              fontWeight: 600, 
+                              color: theme.palette.text.primary, 
+                              fontSize: '0.9rem',
+                              lineHeight: 1.3,
+                              mb: 0.5,
+                            }}>
+                              {doc.fullType}
+                            </Typography>
+                            <Typography variant="caption" sx={{ 
+                              fontSize: '0.75rem',
+                              color: theme.palette.text.secondary,
+                              fontWeight: 500,
+                            }}>
+                              {doc.type}
+                            </Typography>
+                          </Box>
+                        </Stack>
+                      </TableCell>
+                      <TableCell sx={{ py: 2 }}>
+                        <Typography variant="body2" sx={{ 
+                          fontFamily: 'monospace', 
+                          color: theme.palette.text.primary, 
+                          fontSize: '0.85rem',
+                          fontWeight: 600,
+                        }}>
+                          {doc.documentNumber}
+                        </Typography>
+                      </TableCell>
+                      <TableCell sx={{ py: 2 }}>
+                        <Typography variant="body2" sx={{ 
+                          fontSize: '0.9rem',
+                          color: theme.palette.text.primary,
+                          fontWeight: 500,
+                        }}>
+                          {new Date(doc.date).toLocaleDateString('id-ID')}
+                        </Typography>
+                      </TableCell>
+                      <TableCell sx={{ py: 2 }}>
+                        <Chip
+                          icon={statusConfig.icon}
+                          label={doc.status.charAt(0).toUpperCase() + doc.status.slice(1)}
+                          sx={{ 
+                            fontWeight: 700, 
+                            fontSize: '0.75rem',
+                            height: 32,
+                            minWidth: 110,
+                            borderRadius: '16px',
+                            backgroundColor: statusConfig.backgroundColor,
+                            color: statusConfig.textColor,
+                            border: `1px solid ${statusConfig.borderColor}`,
+                            '& .MuiChip-label': {
+                              px: 1,
+                              fontWeight: 700,
+                            },
+                            '& .MuiChip-icon': {
+                              color: statusConfig.textColor,
+                            }
                           }}
-                        >
-                          {React.cloneElement(doc.icon, { sx: { fontSize: 18 } })}
-                        </Box>
-                        <Box>
-                          <Typography variant="subtitle2" sx={{ fontWeight: 600, color: theme.palette.text.primary, fontSize: '0.875rem' }}>
-                            {doc.fullType}
-                          </Typography>
-                          <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.75rem' }}>
-                            {doc.type}
-                          </Typography>
-                        </Box>
-                      </Stack>
-                    </TableCell>
-                    <TableCell>
-                      <Typography variant="body2" sx={{ fontFamily: 'monospace', color: theme.palette.text.primary, fontSize: '0.8rem' }}>
-                        {doc.documentNumber}
-                      </Typography>
-                    </TableCell>
-                    <TableCell>
-                      <Typography variant="body2" color="text.primary" sx={{ fontSize: '0.875rem' }}>
-                        {new Date(doc.date).toLocaleDateString('id-ID')}
-                      </Typography>
-                    </TableCell>
-                    <TableCell>
-                      <Chip
-                        icon={React.cloneElement(getStatusIcon(doc.status), { sx: { fontSize: 14 } })}
-                        label={doc.status.charAt(0).toUpperCase() + doc.status.slice(1)}
-                        color={getStatusColor(doc.status)}
-                        size="small"
-                        sx={{ 
-                          fontWeight: 700, 
-                          fontSize: '0.75rem',
-                          height: 28,
-                          minWidth: 100,
-                          borderRadius: '14px',
-                          px: 2,
-                          '& .MuiChip-label': {
-                            px: 1,
-                          },
-                        }}
-                      />
-                    </TableCell>
-                    <TableCell>
-                      <Typography variant="body2" color="text.secondary" sx={{ fontSize: '0.875rem' }}>
-                        {doc.description}
-                      </Typography>
-                    </TableCell>
-                    <TableCell>
-                      <Stack direction="row" spacing={1}>
-                        <IconButton size="small" sx={{ color: theme.palette.primary.main, width: 32, height: 32 }}>
-                          <VisibilityIcon sx={{ fontSize: 16 }} />
-                        </IconButton>
-                        <IconButton size="small" sx={{ color: theme.palette.success.main, width: 32, height: 32 }}>
-                          <DownloadIcon sx={{ fontSize: 16 }} />
-                        </IconButton>
-                        <IconButton size="small" sx={{ color: theme.palette.info.main, width: 32, height: 32 }}>
-                          <PrintIcon sx={{ fontSize: 16 }} />
-                        </IconButton>
-                      </Stack>
-                    </TableCell>
-                  </TableRow>
-                ))}
+                        />
+                      </TableCell>
+                      <TableCell sx={{ py: 2 }}>
+                        <Typography variant="body2" sx={{ 
+                          fontSize: '0.9rem',
+                          color: theme.palette.text.secondary,
+                          fontWeight: 500,
+                        }}>
+                          {doc.description}
+                        </Typography>
+                      </TableCell>
+                      <TableCell sx={{ py: 2 }}>
+                        <Stack direction="row" spacing={1}>
+                          <IconButton 
+                            size="small" 
+                            sx={{ 
+                              color: theme.palette.primary.main, 
+                              width: 36, 
+                              height: 36,
+                              backgroundColor: alpha(theme.palette.primary.main, 0.1),
+                              border: `1px solid ${alpha(theme.palette.primary.main, 0.2)}`,
+                              '&:hover': {
+                                backgroundColor: alpha(theme.palette.primary.main, 0.2),
+                              }
+                            }}
+                          >
+                            <VisibilityIcon sx={{ fontSize: 16 }} />
+                          </IconButton>
+                          <IconButton 
+                            size="small" 
+                            sx={{ 
+                              color: theme.palette.success.main, 
+                              width: 36, 
+                              height: 36,
+                              backgroundColor: alpha(theme.palette.success.main, 0.1),
+                              border: `1px solid ${alpha(theme.palette.success.main, 0.2)}`,
+                              '&:hover': {
+                                backgroundColor: alpha(theme.palette.success.main, 0.2),
+                              }
+                            }}
+                          >
+                            <DownloadIcon sx={{ fontSize: 16 }} />
+                          </IconButton>
+                          <IconButton 
+                            size="small" 
+                            sx={{ 
+                              color: theme.palette.info.main, 
+                              width: 36, 
+                              height: 36,
+                              backgroundColor: alpha(theme.palette.info.main, 0.1),
+                              border: `1px solid ${alpha(theme.palette.info.main, 0.2)}`,
+                              '&:hover': {
+                                backgroundColor: alpha(theme.palette.info.main, 0.2),
+                              }
+                            }}
+                          >
+                            <PrintIcon sx={{ fontSize: 16 }} />
+                          </IconButton>
+                        </Stack>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
               </TableBody>
             </Table>
           </TableContainer>
