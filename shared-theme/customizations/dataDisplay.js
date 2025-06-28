@@ -1,3 +1,5 @@
+'use client';
+
 import { alpha } from '@mui/material/styles';
 import { svgIconClasses } from '@mui/material/SvgIcon';
 import { typographyClasses } from '@mui/material/Typography';
@@ -93,7 +95,7 @@ export const dataDisplayCustomizations = {
     styleOverrides: {
       root: ({ theme }) => ({
         border: '1px solid',
-        borderRadius: '999px',
+        borderRadius: '8px',
         [`& .${chipClasses.label}`]: {
           fontWeight: 600,
         },

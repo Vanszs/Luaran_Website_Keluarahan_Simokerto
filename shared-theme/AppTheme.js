@@ -1,3 +1,5 @@
+'use client';
+
 import * as React from 'react';
 import PropTypes from 'prop-types';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
@@ -8,7 +10,6 @@ import { dataDisplayCustomizations } from './customizations/dataDisplay';
 import { feedbackCustomizations } from './customizations/feedback';
 import { navigationCustomizations } from './customizations/navigation';
 import { surfacesCustomizations } from './customizations/surfaces';
-import { colorSchemes, typography, shadows, shape } from './themePrimitives';
 
 function AppTheme(props) {
   const { children, disableCustomTheme, themeComponents, defaultMode = 'light' } = props;
@@ -47,7 +48,7 @@ function AppTheme(props) {
                     dark: '#1976d2',
                   },
                   background: {
-                    default: '#0d1117',
+                    default: '#121212',
                     paper: '#1e1e1e',
                   },
                   text: {
@@ -56,15 +57,37 @@ function AppTheme(props) {
                   },
                 }),
           },
-          typography,
-          shadows,
-          shape,
+          typography: {
+            fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
+          },
+          shape: {
+            borderRadius: 12,
+          },
           components: {
-            ...inputsCustomizations,
-            ...dataDisplayCustomizations,
-            ...feedbackCustomizations,
-            ...navigationCustomizations,
-            ...surfacesCustomizations,
+            MuiCard: {
+              styleOverrides: {
+                root: {
+                  borderRadius: 16,
+                  boxShadow: mode === 'dark' 
+                    ? '0 4px 20px rgba(0, 0, 0, 0.5)'
+                    : '0 4px 20px rgba(0, 0, 0, 0.1)',
+                },
+              },
+            },
+            MuiButton: {
+              styleOverrides: {
+                root: {
+                  borderRadius: 12,
+                  textTransform: 'none',
+                  fontWeight: 600,
+                },
+              },
+            },
+            ...(inputsCustomizations || {}),
+            ...(dataDisplayCustomizations || {}),
+            ...(feedbackCustomizations || {}),
+            ...(navigationCustomizations || {}),
+            ...(surfacesCustomizations || {}),
             ...themeComponents,
           },
         });

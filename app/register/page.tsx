@@ -15,8 +15,6 @@ import { styled, keyframes } from '@mui/material/styles';
 import AppTheme from '../../shared-theme/AppTheme';
 import ColorModeSelect from '../../shared-theme/ColorModeSelect';
 import Image from 'next/image';
-import logoImage from '../logo.png';
-
 // Animations
 const float = keyframes`
   0%, 100% { transform: translateY(0px) rotate(0deg); }
@@ -34,7 +32,7 @@ const fadeInUp = keyframes`
   }
 `;
 
-// Modern comfortable card
+// Ultra-modern comfortable card - same as login
 const Card = styled(MuiCard)(({ theme }) => ({
   display: 'flex',
   flexDirection: 'column',
@@ -50,12 +48,11 @@ const Card = styled(MuiCard)(({ theme }) => ({
     'rgba(255, 255, 255, 0.95)',
   backdropFilter: 'blur(20px)',
   [theme.breakpoints.up('sm')]: {
-    maxWidth: '480px',
+    maxWidth: '440px',
   },
   boxShadow: theme.palette.mode === 'dark' ? 
     '0 12px 40px rgba(0, 0, 0, 0.4), 0 4px 12px rgba(255, 255, 255, 0.05)' : 
     '0 12px 40px rgba(0, 0, 0, 0.12), 0 4px 12px rgba(0, 0, 0, 0.04)',
-  animation: `${fadeInUp} 0.6s ease-out`,
   transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
   transform: 'translateY(0)',
   '&:hover': {
@@ -66,7 +63,7 @@ const Card = styled(MuiCard)(({ theme }) => ({
   },
 }));
 
-// Comfortable background container
+// Comfortable background - same as login
 const RegisterContainer = styled(Stack)(({ theme }) => ({
   height: '100vh',
   minHeight: '100%',
@@ -91,17 +88,18 @@ const RegisterContainer = styled(Stack)(({ theme }) => ({
   },
 }));
 
-// Attractive branding
+// Attractive branding - same as login
 const BrandingContainer = styled(Box)(({ theme }) => ({
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'center',
   gap: theme.spacing(2),
-  marginBottom: theme.spacing(4),
+  marginBottom: theme.spacing(0.1), // Much much smaller gap - like single <br>
   textAlign: 'center',
+  animation: `${fadeInUp} 0.6s ease-out both`,
 }));
 
-// Modern comfortable input
+// Modern comfortable input - same as login
 const StyledTextField = styled(TextField)(({ theme }) => ({
   '& .MuiOutlinedInput-root': {
     borderRadius: '14px',
@@ -136,9 +134,13 @@ const StyledTextField = styled(TextField)(({ theme }) => ({
     fontWeight: 500,
     padding: '16px 14px',
   },
+  '& .MuiInputBase-input::placeholder': {
+    color: theme.palette.text.secondary,
+    opacity: 0.7,
+  },
 }));
 
-// Attractive smooth button  
+// Attractive smooth button - same as login
 const StyledButton = styled(Button)(({ theme }) => ({
   borderRadius: '14px',
   padding: '16px 24px',
@@ -147,9 +149,20 @@ const StyledButton = styled(Button)(({ theme }) => ({
   textTransform: 'none',
   transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
   boxShadow: 'none',
+  background: theme.palette.mode === 'dark' ?
+    'linear-gradient(135deg, #3b82f6, #1d4ed8)' :
+    'linear-gradient(135deg, #3b82f6, #1d4ed8)',
   '&:hover': {
-    boxShadow: '0 8px 25px rgba(0, 0, 0, 0.15)',
+    boxShadow: theme.palette.mode === 'dark' ?
+      '0 8px 25px rgba(59, 130, 246, 0.4)' :
+      '0 8px 25px rgba(59, 130, 246, 0.3)',
     transform: 'translateY(-2px)',
+    background: theme.palette.mode === 'dark' ?
+      'linear-gradient(135deg, #1d4ed8, #1e40af)' :
+      'linear-gradient(135deg, #1d4ed8, #1e40af)',
+  },
+  '&:active': {
+    transform: 'translateY(0)',
   },
 }));
 
@@ -205,7 +218,7 @@ const PasswordStrengthIndicator = ({ password }: { password: string }) => {
   );
 };
 
-export default function Register(props: { disableCustomTheme?: boolean }) {
+export default function Register() {
   const [nameError, setNameError] = React.useState(false);
   const [nameErrorMessage, setNameErrorMessage] = React.useState('');
   const [emailError, setEmailError] = React.useState(false);
@@ -288,7 +301,7 @@ export default function Register(props: { disableCustomTheme?: boolean }) {
   // Loading Screen
   if (isLoading) {
     return (
-      <AppTheme {...props} defaultMode="light">
+      <AppTheme>
         <CssBaseline />
         <Box
           sx={{
@@ -325,7 +338,7 @@ export default function Register(props: { disableCustomTheme?: boolean }) {
             }}
           >
             <Image
-              src={logoImage}
+              src="/logo.png"
               alt="Logo Surabaya"
               width={110}
               height={110}
@@ -365,28 +378,30 @@ export default function Register(props: { disableCustomTheme?: boolean }) {
   }
 
   return (
-    <AppTheme {...props} defaultMode="light">
+    <AppTheme>
       <CssBaseline />
       <RegisterContainer direction="column" justifyContent="center">
-        <ColorModeSelect sx={{ 
-          position: 'fixed', 
-          top: '1.5rem', 
-          right: '1.5rem', 
-          zIndex: 10,
-          backgroundColor: theme => theme.palette.mode === 'dark' ? 
-            'rgba(255, 255, 255, 0.1)' : 
-            'rgba(0, 0, 0, 0.06)',
-          borderRadius: '50%',
-          transition: 'all 0.3s ease',
-          backdropFilter: 'blur(10px)',
-          '&:hover': {
+        <ColorModeSelect
+          sx={{
+            position: 'fixed',
+            top: '1.5rem',
+            right: '1.5rem',
+            zIndex: 10,
             backgroundColor: theme => theme.palette.mode === 'dark' ? 
-              'rgba(255, 255, 255, 0.15)' : 
-              'rgba(0, 0, 0, 0.1)',
-            transform: 'scale(1.05)',
-          },
-        }} />
-        
+              'rgba(255, 255, 255, 0.1)' : 
+              'rgba(0, 0, 0, 0.06)',
+            borderRadius: '50%',
+            transition: 'all 0.3s ease',
+            backdropFilter: 'blur(10px)',
+            '&:hover': {
+              backgroundColor: theme => theme.palette.mode === 'dark' ? 
+                'rgba(255, 255, 255, 0.15)' : 
+                'rgba(0, 0, 0, 0.1)',
+              transform: 'scale(1.05)',
+            },
+          }}
+        />
+
         <Fade in timeout={800}>
           <Card>
             <BrandingContainer>
@@ -400,7 +415,7 @@ export default function Register(props: { disableCustomTheme?: boolean }) {
                 }}
               >
                 <Image
-                  src={logoImage}
+                  src="/logo.png"
                   alt="Logo Surabaya"
                   width={80}
                   height={80}
@@ -445,7 +460,7 @@ export default function Register(props: { disableCustomTheme?: boolean }) {
             >
               Daftar Akun Baru
             </Typography>
-            
+
             <Box
               component="form"
               onSubmit={handleSubmit}
@@ -521,20 +536,13 @@ export default function Register(props: { disableCustomTheme?: boolean }) {
                 fullWidth
                 variant="contained"
                 onClick={validateInputs}
-                sx={{ 
-                  mt: 2,
-                  background: 'linear-gradient(135deg, #3b82f6, #1d4ed8)',
-                  '&:hover': {
-                    background: 'linear-gradient(135deg, #1d4ed8, #1e40af)',
-                    boxShadow: '0 8px 25px rgba(59, 130, 246, 0.3)',
-                  },
-                }}
+                sx={{ mt: 2 }}
               >
                 Daftar
               </StyledButton>
             </Box>
 
-            <Box sx={{ textAlign: 'center', mt: 0.1 }}>
+            <Box sx={{ textAlign: 'center', mt: 4 }}>
               <Typography variant="body1" color="text.secondary" sx={{ fontSize: '0.9rem' }}>
                 Sudah punya akun?{' '}
                 <Link

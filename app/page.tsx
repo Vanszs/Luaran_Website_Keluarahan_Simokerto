@@ -16,7 +16,7 @@ import { styled, keyframes } from '@mui/material/styles';
 import AppTheme from '../shared-theme/AppTheme';
 import ColorModeSelect from '../shared-theme/ColorModeSelect';
 import Image from 'next/image';
-import logoImage from './logo.png';
+import logoImage from '../public/logo.png';
 
 // Animations
 const float = keyframes`
@@ -169,7 +169,7 @@ const StyledButton = styled(Button)(({ theme }) => ({
   },
 }));
 
-export default function SignIn(props: { disableCustomTheme?: boolean }) {
+export default function SignIn() {
   const [emailError, setEmailError] = React.useState(false);
   const [emailErrorMessage, setEmailErrorMessage] = React.useState('');
   const [passwordError, setPasswordError] = React.useState(false);
@@ -234,7 +234,7 @@ export default function SignIn(props: { disableCustomTheme?: boolean }) {
   // Loading Screen
   if (isLoading) {
     return (
-      <AppTheme {...props} defaultMode="light">
+      <AppTheme>
         <CssBaseline />
         <Box
           sx={{
@@ -311,7 +311,7 @@ export default function SignIn(props: { disableCustomTheme?: boolean }) {
   }
 
   return (
-    <AppTheme {...props} defaultMode="light">
+    <AppTheme>
       <CssBaseline />
       <SignInContainer direction="column" justifyContent="center">
         <ColorModeSelect

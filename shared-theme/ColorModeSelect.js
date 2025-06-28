@@ -1,3 +1,5 @@
+'use client';
+
 import * as React from 'react';
 import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
@@ -11,25 +13,28 @@ export const ColorModeContext = React.createContext({
 });
 
 const StyledIconButton = styled(IconButton)(({ theme }) => ({
-  width: 40,
-  height: 40,
-  borderRadius: '50%',
+  width: 48,
+  height: 48,
+  borderRadius: '12px',
   backgroundColor: theme.palette.mode === 'dark' ? 
     'rgba(255, 255, 255, 0.1)' : 
     'rgba(0, 0, 0, 0.06)',
-  backdropFilter: 'blur(10px)',
-  border: `1px solid ${theme.palette.mode === 'dark' ? 
-    'rgba(255, 255, 255, 0.08)' : 
-    'rgba(0, 0, 0, 0.08)'}`,
+  border: `2px solid ${theme.palette.mode === 'dark' ? 
+    'rgba(255, 255, 255, 0.2)' : 
+    'rgba(0, 0, 0, 0.1)'}`,
   transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+  cursor: 'pointer',
   '&:hover': {
     backgroundColor: theme.palette.mode === 'dark' ? 
-      'rgba(255, 255, 255, 0.15)' : 
+      'rgba(255, 255, 255, 0.2)' : 
       'rgba(0, 0, 0, 0.1)',
-    transform: 'scale(1.05)',
+    transform: 'scale(1.1)',
     boxShadow: theme.palette.mode === 'dark' ?
-      '0 4px 12px rgba(255, 255, 255, 0.1)' :
-      '0 4px 12px rgba(0, 0, 0, 0.1)',
+      '0 6px 20px rgba(255, 255, 255, 0.2)' :
+      '0 6px 20px rgba(0, 0, 0, 0.15)',
+  },
+  '&:active': {
+    transform: 'scale(0.95)',
   },
 }));
 
@@ -47,12 +52,13 @@ export default function ColorModeSelect(props) {
     >
       <StyledIconButton
         onClick={toggleColorMode}
+        aria-label="toggle color mode"
         {...props}
       >
         {mode === 'light' ? (
-          <DarkModeIcon sx={{ fontSize: 20 }} />
+          <DarkModeIcon sx={{ fontSize: 24, color: 'text.primary' }} />
         ) : (
-          <LightModeIcon sx={{ fontSize: 20 }} />
+          <LightModeIcon sx={{ fontSize: 24, color: 'text.primary' }} />
         )}
       </StyledIconButton>
     </Tooltip>

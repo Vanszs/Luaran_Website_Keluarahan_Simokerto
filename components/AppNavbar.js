@@ -1,105 +1,144 @@
+'use client';
+
 import * as React from 'react';
 import { styled } from '@mui/material/styles';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Stack from '@mui/material/Stack';
 import MuiToolbar from '@mui/material/Toolbar';
-import { tabsClasses } from '@mui/material/Tabs';
 import Typography from '@mui/material/Typography';
+import IconButton from '@mui/material/IconButton';
+import Badge from '@mui/material/Badge';
+import Avatar from '@mui/material/Avatar';
 import MenuRoundedIcon from '@mui/icons-material/MenuRounded';
+import NotificationsIcon from '@mui/icons-material/Notifications';
 import DashboardRoundedIcon from '@mui/icons-material/DashboardRounded';
-import SideMenuMobile from './SideMenuMobile';
-import MenuButton from './MenuButton';
-import ColorModeIconDropdown from '../shared-theme/ColorModeIconDropdown';
+import ColorModeSelect from '../shared-theme/ColorModeSelect';
+import Image from 'next/image';
+
+const StyledAppBar = styled(AppBar)(({ theme }) => ({
+  position: 'fixed',
+  backgroundColor: theme.palette.mode === 'dark' 
+    ? 'rgba(26, 26, 26, 0.95)' 
+    : 'rgba(255, 255, 255, 0.95)',
+  borderBottom: `1px solid ${theme.palette.divider}`,
+  boxShadow: '0 4px 20px rgba(0, 0, 0, 0.08)',
+  backdropFilter: 'blur(20px)',
+  zIndex: theme.zIndex.drawer + 1,
+  transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+  width: '100%', // Full width on all devices
+}));
 
 const Toolbar = styled(MuiToolbar)({
-  width: '100%',
-  padding: '12px',
-  display: 'flex',
-  flexDirection: 'column',
-  alignItems: 'start',
-  justifyContent: 'center',
-  gap: '12px',
-  flexShrink: 0,
-  [`& ${tabsClasses.flexContainer}`]: {
-    gap: '8px',
-    p: '8px',
-    pb: 0,
-  },
+  padding: '8px 24px',
+  minHeight: '72px !important',
 });
 
+const StyledIconButton = styled(IconButton)(({ theme }) => ({
+  borderRadius: '12px',
+  padding: '10px',
+  transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+  '&:hover': {
+    backgroundColor: theme.palette.mode === 'dark' 
+      ? 'rgba(255, 255, 255, 0.08)' 
+      : 'rgba(0, 0, 0, 0.04)',
+    transform: 'translateY(-2px)',
+    boxShadow: '0 6px 20px rgba(0, 0, 0, 0.15)',
+  },
+}));
+
 export default function AppNavbar() {
-  const [open, setOpen] = React.useState(false);
-
-  const toggleDrawer = (newOpen) => () => {
-    setOpen(newOpen);
-  };
-
   return (
-    <AppBar
-      position="fixed"
-      sx={{
-        display: { xs: 'auto', md: 'none' },
-        boxShadow: 0,
-        bgcolor: 'background.paper',
-        backgroundImage: 'none',
-        borderBottom: '1px solid',
-        borderColor: 'divider',
-        top: 'var(--template-frame-height, 0px)',
-      }}
-    >
-      <Toolbar variant="regular">
+    <StyledAppBar>
+      <Toolbar>
         <Stack
           direction="row"
           sx={{
             alignItems: 'center',
-            flexGrow: 1,
+            justifyContent: 'space-between',
             width: '100%',
-            gap: 1,
           }}
         >
-          <Stack
-            direction="row"
-            spacing={1}
-            sx={{ justifyContent: 'center', mr: 'auto' }}
-          >
-            <CustomIcon />
-            <Typography variant="h4" component="h1" sx={{ color: 'text.primary' }}>
-              Dashboard
-            </Typography>
+          {/* Left side - Mobile menu & Title */}
+          <Stack direction="row" spacing={2} alignItems="center">
+            <StyledIconButton
+              sx={{ display: { xs: 'flex', md: 'none' } }} // Only show on mobile
+            >
+              <MenuRoundedIcon />
+            </StyledIconButton>
+            
+            <Stack direction="row" spacing={2} alignItems="center">
+              <CustomIcon />
+              <Typography 
+                variant="h6" 
+                component="h1" 
+                sx={{ 
+                  color: 'text.primary',
+                  fontWeight: 700,
+                  fontSize: '1.1rem',
+                }}
+              >
+                Kelurahan Simokerto
+              </Typography>
+            </Stack>
           </Stack>
-          <ColorModeIconDropdown />
-          <MenuButton aria-label="menu" onClick={toggleDrawer(true)}>
-            <MenuRoundedIcon />
-          </MenuButton>
-          <SideMenuMobile open={open} toggleDrawer={toggleDrawer} />
+
+          {/* Right side - Actions */}
+          <Stack direction="row" spacing={1} alignItems="center">
+            <ColorModeSelect />
+            
+            <StyledIconButton>
+              <Badge badgeContent={3} color="error" variant="dot">
+                <NotificationsIcon sx={{ fontSize: 22 }} />
+              </Badge>
+            </StyledIconButton>
+
+            <StyledIconButton>
+              <Avatar 
+                sx={{ 
+                  width: 36, 
+                  height: 36,
+                  background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                  fontWeight: 600
+                }}
+              >
+                A
+              </Avatar>
+            </StyledIconButton>
+          </Stack>
         </Stack>
       </Toolbar>
-    </AppBar>
+    </StyledAppBar>
   );
 }
 
-export function CustomIcon() {
+function CustomIcon() {
   return (
     <Box
       sx={{
-        width: '1.5rem',
-        height: '1.5rem',
-        bgcolor: 'black',
-        borderRadius: '999px',
+        width: 32,
+        height: 32,
+        borderRadius: '10px',
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
-        alignSelf: 'center',
-        backgroundImage:
-          'linear-gradient(135deg, hsl(210, 98%, 60%) 0%, hsl(210, 100%, 35%) 100%)',
-        color: 'hsla(210, 100%, 95%, 0.9)',
-        border: '1px solid',
-        borderColor: 'hsl(210, 100%, 55%)',
-        boxShadow: 'inset 0 2px 5px rgba(255, 255, 255, 0.3)',
+        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        color: 'white',
+        boxShadow: '0 4px 16px rgba(102, 126, 234, 0.3)',
+        transition: 'all 0.3s ease',
+        '&:hover': {
+          transform: 'translateY(-2px)',
+          boxShadow: '0 6px 20px rgba(102, 126, 234, 0.4)',
+        },
       }}
     >
-      <DashboardRoundedIcon color="inherit" sx={{ fontSize: '1rem' }} />
+      <Image
+        src="/logo.png"
+        alt="Logo"
+        width={20}
+        height={20}
+        style={{ borderRadius: '3px' }}
+      />
     </Box>
   );
 }

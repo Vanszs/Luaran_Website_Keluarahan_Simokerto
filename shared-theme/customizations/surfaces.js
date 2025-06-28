@@ -1,3 +1,5 @@
+'use client';
+
 import { alpha } from '@mui/material/styles';
 import { gray } from '../themePrimitives';
 
@@ -53,6 +55,11 @@ export const surfacesCustomizations = {
   MuiPaper: {
     defaultProps: {
       elevation: 0,
+    },
+    styleOverrides: {
+      root: {
+        borderRadius: '16px',
+      },
     },
   },
   MuiCard: {

@@ -1,3 +1,5 @@
+'use client';
+
 import * as React from 'react';
 import { alpha } from '@mui/material/styles';
 
@@ -148,9 +150,9 @@ export const navigationCustomizations = {
   },
   MuiDrawer: {
     styleOverrides: {
-      paper: ({ theme }) => ({
-        backgroundColor: (theme.vars || theme).palette.background.default,
-      }),
+      paper: {
+        borderRadius: '0 16px 16px 0',
+      },
     },
   },
   MuiPaginationItem: {
