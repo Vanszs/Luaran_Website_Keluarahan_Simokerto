@@ -5,10 +5,10 @@ import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
 import LightModeIcon from '@mui/icons-material/LightMode';
 import DarkModeIcon from '@mui/icons-material/DarkMode';
-import { styled } from '@mui/material/styles';
-import { ColorModeContext } from './AppTheme';
+import { styled, Theme } from '@mui/material/styles'; 
+import { ColorModeContext, ColorModeContextType } from './AppTheme';
 
-const StyledIconButton = styled(IconButton)(({ theme }) => ({
+const StyledIconButton = styled(IconButton)(({ theme }: { theme: Theme }) => ({
   width: 40,
   height: 40,
   borderRadius: 8,
@@ -25,7 +25,7 @@ const StyledIconButton = styled(IconButton)(({ theme }) => ({
 }));
 
 export default function ColorModeSelect(props: any) {
-  const { mode, toggleColorMode } = React.useContext(ColorModeContext);
+  const { mode, toggleColorMode } = React.useContext(ColorModeContext) as ColorModeContextType;
   
   return (
     <Tooltip 
@@ -40,12 +40,12 @@ export default function ColorModeSelect(props: any) {
         {mode === 'light' ? (
           <DarkModeIcon sx={{ 
             fontSize: 20, 
-            color: 'text.primary'  // Use theme color
+            color: 'text.primary'
           }} />
         ) : (
           <LightModeIcon sx={{ 
             fontSize: 20, 
-            color: 'warning.main'  // Use theme warning color
+            color: 'warning.main'
           }} />
         )}
       </StyledIconButton>
