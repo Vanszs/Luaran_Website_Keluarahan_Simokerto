@@ -54,116 +54,62 @@ import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import dayjs from 'dayjs';
 
-// ENHANCED SEMI-3D SECTION CONTAINER - CONSISTENT WITH OTHER COMPONENTS
+// Modernized SectionContainer for dark/light mode
 const SectionContainer = styled(Paper)(({ theme }) => ({
   background: theme.palette.mode === 'dark'
-    ? 'linear-gradient(145deg, rgba(15, 23, 42, 0.95) 0%, rgba(30, 41, 59, 0.98) 50%, rgba(51, 65, 85, 0.95) 100%)'
-    : `
-        linear-gradient(145deg, 
-          rgba(255, 255, 255, 0.98) 0%, 
-          rgba(248, 250, 252, 0.95) 20%,
-          rgba(224, 242, 254, 0.9) 40%,
-          rgba(241, 245, 249, 0.95) 60%,
-          rgba(231, 229, 228, 0.9) 80%,
-          rgba(254, 247, 205, 0.95) 100%
-        )
-      `,
-  backdropFilter: 'blur(20px)',
-  borderRadius: '24px',
-  border: theme.palette.mode === 'dark'
-    ? `2px solid rgba(148, 163, 184, 0.25)`
-    : `3px solid rgba(37, 99, 235, 0.15)`,
+    ? 'linear-gradient(135deg, #1e293b 0%, #0f172a 100%)'
+    : 'linear-gradient(135deg, #fff 0%, #f8fafc 100%)',
+  borderRadius: 20,
+  border: `1.5px solid ${alpha(theme.palette.primary.main, theme.palette.mode === 'dark' ? 0.15 : 0.08)}`,
   boxShadow: theme.palette.mode === 'dark'
-    ? `
-        0 20px 64px rgba(0, 0, 0, 0.6),
-        0 12px 32px rgba(0, 0, 0, 0.4),
-        inset 0 2px 0 rgba(255, 255, 255, 0.1),
-        inset 0 -2px 0 rgba(0, 0, 0, 0.2)
-      `
-    : `
-        0 32px 80px rgba(37, 99, 235, 0.12),
-        0 20px 48px rgba(16, 185, 129, 0.08),
-        0 12px 24px rgba(124, 58, 237, 0.06),
-        inset 0 2px 0 rgba(255, 255, 255, 0.9),
-        inset 0 -2px 0 rgba(37, 99, 235, 0.05)
-      `,
-  transition: 'all 300ms cubic-bezier(0.4, 0, 0.2, 1) !important',
-  position: 'relative',
-  overflow: 'hidden',
+    ? '0 8px 32px rgba(30,41,59,0.5), 0 2px 8px rgba(59,130,246,0.08)'
+    : '0 8px 32px rgba(37,99,235,0.08), 0 2px 8px rgba(16,185,129,0.04)',
   color: theme.palette.text.primary,
-  
-  // STUNNING 3D EFFECTS
-  ...(theme.palette.mode === 'light' && {
-    '&::before': {
-      content: '""',
-      position: 'absolute',
-      top: 0,
-      left: 0,
-      right: 0,
-      bottom: 0,
-      background: `
-        radial-gradient(circle at 25% 25%, rgba(37, 99, 235, 0.12) 0%, transparent 50%),
-        radial-gradient(circle at 75% 25%, rgba(16, 185, 129, 0.1) 0%, transparent 50%),
-        radial-gradient(circle at 50% 75%, rgba(124, 58, 237, 0.08) 0%, transparent 50%),
-        linear-gradient(135deg, 
-          rgba(255, 255, 255, 0.6) 0%, 
-          rgba(255, 255, 255, 0.3) 50%,
-          rgba(255, 255, 255, 0.1) 100%
-        )
-      `,
-      borderRadius: '24px',
-      pointerEvents: 'none',
-      zIndex: 1,
-      transition: 'all 300ms cubic-bezier(0.4, 0, 0.2, 1) !important',
-    },
-    '&::after': {
-      content: '""',
-      position: 'absolute',
-      top: 3,
-      left: 3,
-      right: 3,
-      bottom: 3,
-      background: `
-        linear-gradient(135deg, 
-          rgba(255, 255, 255, 0.4) 0%, 
-          rgba(255, 255, 255, 0.2) 50%,
-          rgba(255, 255, 255, 0.1) 100%
-        )
-      `,
-      borderRadius: '21px',
-      pointerEvents: 'none',
-      zIndex: 0,
-      transition: 'all 300ms cubic-bezier(0.4, 0, 0.2, 1) !important',
-    }
-  }),
+  overflow: 'hidden',
+  position: 'relative',
+  transition: 'all 0.3s cubic-bezier(0.4,0,0.2,1)',
+  '&::before': theme.palette.mode === 'dark'
+    ? {
+        content: '""',
+        position: 'absolute',
+        inset: 0,
+        background: 'radial-gradient(circle at 30% 20%, rgba(59,130,246,0.08) 0%, transparent 60%), radial-gradient(circle at 80% 80%, rgba(16,185,129,0.07) 0%, transparent 60%)',
+        zIndex: 0,
+        pointerEvents: 'none',
+      }
+    : {},
 }));
 
+// Modernized form field style for dark mode
 const StyledTextField = styled(TextField)(({ theme }) => ({
   '& .MuiOutlinedInput-root': {
-    borderRadius: '12px',
+    borderRadius: 12,
     backgroundColor: theme.palette.mode === 'dark'
-      ? 'rgba(15, 23, 42, 0.8)'
-      : 'rgba(255, 255, 255, 0.9)',
-    border: theme.palette.mode === 'dark'
-      ? '1px solid rgba(148, 163, 184, 0.2)'
-      : '2px solid rgba(51, 65, 85, 0.1)',
+      ? 'rgba(30,41,59,0.85)'
+      : 'rgba(255,255,255,0.95)',
     color: theme.palette.text.primary,
-    transition: 'all 300ms ease-in-out',
+    border: `1.5px solid ${alpha(theme.palette.primary.main, theme.palette.mode === 'dark' ? 0.18 : 0.08)}`,
+    transition: 'all 0.2s',
     '&:hover': {
       backgroundColor: theme.palette.mode === 'dark'
-        ? 'rgba(15, 23, 42, 0.9)'
-        : 'rgba(255, 255, 255, 1)',
-      borderColor: theme.palette.mode === 'dark'
-        ? 'rgba(96, 165, 250, 0.4)'
-        : 'rgba(37, 99, 235, 0.3)',
+        ? 'rgba(30,41,59,0.95)'
+        : 'rgba(255,255,255,1)',
+      borderColor: theme.palette.primary.main,
     },
     '&.Mui-focused': {
       backgroundColor: theme.palette.mode === 'dark'
-        ? 'rgba(15, 23, 42, 1)'
-        : 'rgba(255, 255, 255, 1)',
+        ? 'rgba(30,41,59,1)'
+        : 'rgba(255,255,255,1)',
       borderColor: theme.palette.primary.main,
     }
   },
+  '& .MuiInputBase-input': {
+    color: theme.palette.text.primary,
+  },
+  '& .MuiFormHelperText-root': {
+    color: theme.palette.error.main,
+    fontWeight: 500,
+  }
 }));
 
 const fileRequirementsKeywords = [
@@ -244,7 +190,7 @@ const documentTemplates = {
 };
 
 export default function DocumentForm({ selectedDocument, onBack }) {
-  const theme = useTheme(); // ADD MISSING THEME HOOK
+  const theme = useTheme();
   const [formData, setFormData] = useState({});
   const [errors, setErrors] = useState({});
   const [currentStep, setCurrentStep] = useState(0);
@@ -910,6 +856,142 @@ export default function DocumentForm({ selectedDocument, onBack }) {
     return renderStepContent();
   };
 
+  const renderHeaderSection = () => (
+    <SectionContainer elevation={0} sx={{ mb: 4, p: 0 }}>
+      <CardContent sx={{ p: { xs: 2, sm: 3, md: 4 }, position: 'relative', zIndex: 1 }}>
+        <Stack spacing={2}>
+          <Stack direction="row" alignItems="center" justifyContent="space-between">
+            <Box>
+              <Typography variant="h5" sx={{
+                fontWeight: 800,
+                color: theme.palette.mode === 'dark' ? theme.palette.primary.light : theme.palette.primary.main,
+                letterSpacing: 0.2,
+                mb: 0.5,
+                fontSize: { xs: '1.2rem', sm: '1.4rem' }
+              }}>
+                {selectedDocument}
+              </Typography>
+              <Typography variant="body2" color="text.secondary" sx={{
+                fontWeight: 500,
+                fontSize: '0.98rem',
+                mb: 0.5,
+                opacity: 0.85
+              }}>
+                {template?.description}
+              </Typography>
+            </Box>
+            {isDraft && (
+              <Chip
+                icon={<Drafts />}
+                label="Draft Tersimpan"
+                color="warning"
+                variant="soft"
+                sx={{
+                  fontWeight: 600,
+                  fontSize: '0.85rem',
+                  borderRadius: 2,
+                  px: 1.5,
+                  height: 32,
+                  background: theme.palette.mode === 'dark'
+                    ? 'rgba(251,191,36,0.12)'
+                    : 'rgba(251,191,36,0.09)',
+                  color: theme.palette.warning.main,
+                  border: `1.5px solid ${theme.palette.warning.main}22`,
+                }}
+              />
+            )}
+          </Stack>
+          <Grid container spacing={2}>
+            <Grid item xs={12} md={4}>
+              <Paper elevation={0} sx={{
+                p: 2,
+                borderRadius: 2,
+                bgcolor: theme.palette.mode === 'dark'
+                  ? alpha(theme.palette.success.main, 0.08)
+                  : alpha(theme.palette.success.main, 0.06),
+                border: `1px solid ${alpha(theme.palette.success.main, 0.13)}`,
+                minHeight: 70,
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'center',
+              }}>
+                <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600, mb: 0.5 }}>
+                  Estimasi Waktu
+                </Typography>
+                <Typography variant="body1" sx={{
+                  fontWeight: 700,
+                  color: theme.palette.success.main,
+                  fontSize: '1.05rem'
+                }}>
+                  {template.estimatedTime}
+                </Typography>
+              </Paper>
+            </Grid>
+            <Grid item xs={12} md={8}>
+              <Paper elevation={0} sx={{
+                p: 2,
+                borderRadius: 2,
+                bgcolor: theme.palette.mode === 'dark'
+                  ? alpha(theme.palette.primary.main, 0.08)
+                  : alpha(theme.palette.primary.main, 0.06),
+                border: `1px solid ${alpha(theme.palette.primary.main, 0.13)}`,
+                minHeight: 70,
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'center',
+              }}>
+                <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600, mb: 0.5 }}>
+                  Persyaratan Dokumen
+                </Typography>
+                <Stack direction="row" spacing={1} sx={{ flexWrap: 'wrap', gap: 1 }}>
+                  {template.requirements.map((req, idx) => (
+                    <Chip
+                      key={idx}
+                      label={req}
+                      size="small"
+                      variant="soft"
+                      sx={{
+                        fontWeight: 600,
+                        fontSize: '0.78rem',
+                        borderRadius: 1.5,
+                        bgcolor: theme.palette.mode === 'dark'
+                          ? alpha(theme.palette.primary.main, 0.13)
+                          : alpha(theme.palette.primary.main, 0.09),
+                        color: theme.palette.primary.main,
+                        border: `1px solid ${alpha(theme.palette.primary.main, 0.22)}`,
+                        height: 26,
+                      }}
+                    />
+                  ))}
+                </Stack>
+              </Paper>
+            </Grid>
+          </Grid>
+          <Stack>
+            <Stepper activeStep={currentStep} alternativeLabel>
+              {template.steps.map((label, idx) => (
+                <Step key={label}>
+                  <StepLabel
+                    sx={{
+                      '& .MuiStepLabel-label': {
+                        fontWeight: 600,
+                        fontSize: '0.95rem',
+                        color: theme.palette.text.primary,
+                        opacity: 0.95
+                      }
+                    }}
+                  >
+                    {label}
+                  </StepLabel>
+                </Step>
+              ))}
+            </Stepper>
+          </Stack>
+        </Stack>
+      </CardContent>
+    </SectionContainer>
+  );
+
   if (!template) {
     return (
       <Box sx={{ p: 2, textAlign: 'center' }}>
@@ -925,87 +1007,11 @@ export default function DocumentForm({ selectedDocument, onBack }) {
       <Box sx={{ 
         p: 2,
         background: theme => theme.palette.mode === 'dark'
-          ? 'transparent'
+          ? 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)'
           : 'linear-gradient(135deg, #e0f2fe 0%, #f8fafc 25%, #f1f5f9 50%, #e7e5e4 75%, #fef7cd 100%)',
         minHeight: '100vh',
       }}>
-        <SectionContainer elevation={0} sx={{ mb: 4 }}>
-          <CardContent sx={{ p: 4, position: 'relative', zIndex: 2 }}>
-            <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 3 }}>
-              <Box>
-                <Button
-                  onClick={onBack}
-                  startIcon={<ArrowBack />}
-                  variant="outlined"
-                  size="small"
-                  sx={{ mb: 2 }}
-                >
-                  Kembali
-                </Button>
-                <Typography variant="h5" sx={{ fontWeight: 700, mb: 1 }}>
-                  {selectedDocument}
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  {template.description}
-                </Typography>
-              </Box>
-              
-              {isDraft && (
-                <Chip
-                  icon={<Drafts />}
-                  label="Draft Tersimpan"
-                  color="warning"
-                  variant="outlined"
-                />
-              )}
-            </Stack>
-
-            <Grid container spacing={2} sx={{ mb: 3 }}>
-              <Grid item xs={12} md={4}>
-                <Paper sx={{ p: 2, bgcolor: 'background.default' }}>
-                  <Typography variant="caption" color="text.secondary">
-                    Estimasi Waktu
-                  </Typography>
-                  <Typography variant="body1" sx={{ fontWeight: 600 }}>
-                    {template.estimatedTime}
-                  </Typography>
-                </Paper>
-              </Grid>
-              <Grid item xs={12} md={8}>
-                <Paper sx={{ p: 2, bgcolor: 'background.default' }}>
-                  <Typography variant="caption" color="text.secondary">
-                    Persyaratan Dokumen
-                  </Typography>
-                  <Stack direction="row" spacing={1} sx={{ mt: 1, flexWrap: 'wrap', gap: 1 }}>
-                    {template.requirements.map((req, idx) => (
-                      <Chip key={idx} label={req} size="small" variant="outlined" />
-                    ))}
-                  </Stack>
-                </Paper>
-              </Grid>
-            </Grid>
-
-            <Stepper activeStep={currentStep} sx={{ mb: 3 }}>
-              {template.steps.map((label, index) => (
-                <Step key={label}>
-                  <StepLabel>{label}</StepLabel>
-                </Step>
-              ))}
-            </Stepper>
-
-            <Box sx={{ mb: 2 }}>
-              <LinearProgress 
-                variant="determinate" 
-                value={(currentStep / (template.steps.length - 1)) * 100}
-                sx={{ height: 8, borderRadius: 4 }}
-              />
-              <Typography variant="caption" color="text.secondary" sx={{ mt: 1, display: 'block' }}>
-                Step {currentStep + 1} dari {template.steps.length}
-              </Typography>
-            </Box>
-          </CardContent>
-        </SectionContainer>
-
+        {renderHeaderSection()}
         <SectionContainer elevation={0}>
           <CardContent sx={{ p: 4, position: 'relative', zIndex: 2 }}>
             {getStepContent()}
