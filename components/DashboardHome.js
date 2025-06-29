@@ -415,7 +415,8 @@ export default function DashboardHome({ onViewChange }) {
       status: 'selesai',
       date: '2024-01-15',
       documentNumber: 'SKTM/001/2024',
-      icon: <FamilyRestroomIcon />
+      icon: <FamilyRestroomIcon />,
+      description: 'Bantuan sosial & beasiswa'
     },
     {
       id: 2,
@@ -424,7 +425,8 @@ export default function DashboardHome({ onViewChange }) {
       status: 'diproses',
       date: '2024-01-20',
       documentNumber: 'DOM/045/2024',
-      icon: <HomeWorkIcon />
+      icon: <HomeWorkIcon />,
+      description: 'Verifikasi tempat tinggal'
     },
     {
       id: 3,
@@ -433,47 +435,48 @@ export default function DashboardHome({ onViewChange }) {
       status: 'menunggu',
       date: '2024-01-18',
       documentNumber: 'SKU/023/2024',
-      icon: <BusinessIcon />
+      icon: <BusinessIcon />,
+      description: 'Legalisasi usaha'
     },
   ];
 
   const informationItems = [
     {
       id: 1,
-      title: 'Jam Pelayanan',
-      description: 'Senin - Jumat: 08:00 - 15:00 WIB\nSabtu: 08:00 - 12:00 WIB\nMinggu & Hari Libur: Tutup',
+      title: 'Jam Operasional',
+      description: 'Sen-Jum: 08:00-15:00\nSabtu: 08:00-12:00',
       icon: <AccessTimeIcon />,
       color: theme.palette.mode === 'dark' ? '#60a5fa' : '#2563eb',
       type: 'info'
     },
     {
       id: 2,
-      title: 'Dokumen Persyaratan',
-      description: 'Pastikan KTP, KK, dan dokumen pendukung sudah disiapkan sebelum mengajukan surat',
+      title: 'Persyaratan',
+      description: 'Siapkan KTP, KK & dokumen pendukung',
       icon: <AssignmentIcon />,
       color: theme.palette.mode === 'dark' ? '#fbbf24' : '#d97706',
       type: 'tip'
     },
     {
       id: 3,
-      title: 'Estimasi Waktu Proses',
-      description: 'SKTM: 3-5 hari kerja\nDomisili: 2-3 hari kerja\nSKU: 5-7 hari kerja\nSKCK: 1-2 hari kerja',
+      title: 'Waktu Proses',
+      description: 'SKTM: 3-5 hari • Domisili: 2-3 hari\nSKU: 5-7 hari',
       icon: <SchoolIcon />,
       color: theme.palette.mode === 'dark' ? '#06b6d4' : '#0891b2',
       type: 'info'
     },
     {
       id: 4,
-      title: 'Pengambilan Dokumen',
-      description: 'Dokumen yang sudah jadi dapat diambil langsung di kantor kelurahan dengan membawa tanda terima',
+      title: 'Pengambilan',
+      description: 'Ambil dokumen dengan tanda terima',
       icon: <HomeWorkIcon />,
       color: theme.palette.mode === 'dark' ? '#34d399' : '#059669',
       type: 'reminder'
     },
     {
       id: 5,
-      title: 'Kontak Darurat',
-      description: 'WhatsApp: 0811-2345-6789\nTelepon: (031) 123-4567\nEmail: info@simokerto.surabaya.go.id',
+      title: 'Kontak',
+      description: 'WA: 0811-2345-6789\nTelp: (031) 123-4567',
       icon: <NotificationsIcon />,
       color: theme.palette.mode === 'dark' ? '#f87171' : '#dc2626',
       type: 'contact'
@@ -793,9 +796,9 @@ export default function DashboardHome({ onViewChange }) {
                             <Stack direction="row" spacing={2} alignItems="center" sx={{ flex: 1 }}>
                               <Box
                                 sx={{
-                                  width: 40,
-                                  height: 40,
-                                  borderRadius: 2,
+                                  width: 36,
+                                  height: 36,
+                                  borderRadius: 1.5,
                                   background: `linear-gradient(135deg, ${alpha(getDocumentIconColor(doc.type), 0.15)} 0%, ${alpha(getDocumentIconColor(doc.type), 0.25)} 100%)`,
                                   color: getDocumentIconColor(doc.type),
                                   display: 'flex',
@@ -806,37 +809,37 @@ export default function DashboardHome({ onViewChange }) {
                                     : `1px solid ${alpha(getDocumentIconColor(doc.type), 0.3)}`,
                                 }}
                               >
-                                {React.cloneElement(doc.icon, { sx: { fontSize: 20 } })}
+                                {React.cloneElement(doc.icon, { sx: { fontSize: 18 } })}
                               </Box>
                               <Box sx={{ flex: 1 }}>
                                 <Typography variant="h6" sx={{ 
-                                  fontWeight: 700, 
+                                  fontWeight: 600,
                                   mb: 0.5, 
                                   color: theme.palette.text.primary,
                                   fontSize: '0.9rem'
                                 }}>
                                   {doc.fullType}
                                 </Typography>
-                                <Stack direction="row" alignItems="center" spacing={1}>
+                                <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 0.5 }}>
                                   <Typography variant="body2" sx={{ 
                                     color: theme.palette.text.secondary,
                                     fontFamily: 'monospace',
-                                    fontSize: '0.75rem',
-                                    fontWeight: 600,
+                                    fontSize: '0.7rem',
+                                    fontWeight: 500,
                                   }}>
                                     {doc.documentNumber}
                                   </Typography>
                                   <Box
                                     sx={{
-                                      width: 3,
-                                      height: 3,
+                                      width: 2,
+                                      height: 2,
                                       borderRadius: '50%',
                                       background: theme.palette.text.secondary,
                                       opacity: 0.5,
                                     }}
                                   />
                                   <Typography variant="body2" sx={{ 
-                                    fontSize: '0.75rem',
+                                    fontSize: '0.7rem',
                                     color: theme.palette.text.secondary,
                                   }}>
                                     {new Date(doc.date).toLocaleDateString('id-ID', {
@@ -846,6 +849,13 @@ export default function DashboardHome({ onViewChange }) {
                                     })}
                                   </Typography>
                                 </Stack>
+                                <Typography variant="body2" sx={{ 
+                                  fontSize: '0.7rem',
+                                  color: theme.palette.text.secondary,
+                                  opacity: 0.8,
+                                }}>
+                                  {doc.description}
+                                </Typography>
                               </Box>
                             </Stack>
                             <Chip
@@ -883,21 +893,15 @@ export default function DashboardHome({ onViewChange }) {
             <CardContent sx={{ p: 3, position: 'relative', zIndex: 2 }}>
               <Stack direction="row" alignItems="center" spacing={2} sx={{ mb: 3 }}>
                 <NotificationsIcon sx={{ 
-                  fontSize: 24, 
+                  fontSize: 20,
                   color: theme.palette.primary.main,
-                  filter: theme.palette.mode === 'dark'
-                    ? 'none'
-                    : 'drop-shadow(0 2px 4px rgba(37, 99, 235, 0.2))'
                 }} />
                 <Typography variant="h6" sx={{ 
-                  fontWeight: 700, 
+                  fontWeight: 600,
                   color: theme.palette.text.primary,
-                  fontSize: '1.125rem',
-                  textShadow: theme.palette.mode === 'dark' 
-                    ? 'none' 
-                    : '0 1px 2px rgba(37, 99, 235, 0.1)',
+                  fontSize: '1rem',
                 }}>
-                  Informasi & Panduan
+                  Informasi Layanan
                 </Typography>
               </Stack>
 
@@ -906,34 +910,31 @@ export default function DashboardHome({ onViewChange }) {
                   <Grid item xs={12} sm={6} md={4} lg={2.4} key={item.id}>
                     <Box 
                       sx={{
-                        p: 2,
-                        borderRadius: 2,
+                        p: 1.5,
+                        borderRadius: 1.5,
                         background: theme.palette.mode === 'dark'
                           ? alpha(item.color, 0.1)
-                          : `linear-gradient(135deg, ${alpha(item.color, 0.08)} 0%, ${alpha(item.color, 0.05)} 100%)`,
+                          : alpha(item.color, 0.08),
                         border: theme.palette.mode === 'dark'
                           ? `1px solid ${alpha(item.color, 0.2)}`
                           : `1px solid ${alpha(item.color, 0.15)}`,
-                        transition: 'all 0.3s ease',
+                        transition: 'all 0.2s ease',
                         height: '100%',
-                        boxShadow: theme.palette.mode === 'dark'
-                          ? 'none'
-                          : `0 3px 8px ${alpha(item.color, 0.08)}`,
                         '&:hover': {
-                          transform: 'translateY(-2px)',
+                          transform: 'translateY(-1px)',
                           boxShadow: theme.palette.mode === 'dark'
-                            ? `0 8px 20px ${alpha(item.color, 0.2)}`
-                            : `0 6px 16px ${alpha(item.color, 0.12)}, 0 3px 8px ${alpha(item.color, 0.08)}`,
+                            ? `0 4px 12px ${alpha(item.color, 0.2)}`
+                            : `0 3px 8px ${alpha(item.color, 0.12)}`,
                         }
                       }}
                     >
-                      <Stack spacing={1.5} sx={{ height: '100%' }}>
-                        <Stack direction="row" alignItems="center" spacing={1.5}>
+                      <Stack spacing={1} sx={{ height: '100%' }}>
+                        <Stack direction="row" alignItems="center" spacing={1}>
                           <Box
                             sx={{
-                              width: 32,
-                              height: 32,
-                              borderRadius: 1.5,
+                              width: 24,
+                              height: 24,
+                              borderRadius: 1,
                               background: alpha(item.color, 0.15),
                               display: 'flex',
                               alignItems: 'center',
@@ -942,15 +943,15 @@ export default function DashboardHome({ onViewChange }) {
                               flexShrink: 0,
                             }}
                           >
-                            {React.cloneElement(item.icon, { sx: { fontSize: 16 } })}
+                            {React.cloneElement(item.icon, { sx: { fontSize: 12 } })}
                           </Box>
                           
                           <Typography 
                             variant="subtitle2" 
                             sx={{ 
-                              fontWeight: 700, 
+                              fontWeight: 600, 
                               color: item.color,
-                              fontSize: '0.8rem',
+                              fontSize: '0.75rem',
                               lineHeight: 1.2,
                             }}
                           >
@@ -962,12 +963,12 @@ export default function DashboardHome({ onViewChange }) {
                           variant="body2" 
                           color="text.secondary" 
                           sx={{ 
-                            fontSize: '0.7rem',
-                            lineHeight: 1.4,
+                            fontSize: '0.65rem',
+                            lineHeight: 1.3,
                             whiteSpace: 'pre-line',
                             flexGrow: 1,
                             display: '-webkit-box',
-                            WebkitLineClamp: 4,
+                            WebkitLineClamp: 3,
                             WebkitBoxOrient: 'vertical',
                             overflow: 'hidden',
                           }}
@@ -979,19 +980,19 @@ export default function DashboardHome({ onViewChange }) {
                           label={
                             item.type === 'info' ? 'Info' :
                             item.type === 'tip' ? 'Tips' :
-                            item.type === 'reminder' ? 'Reminder' :
+                            item.type === 'reminder' ? 'Pengingat' :
                             item.type === 'contact' ? 'Kontak' : 'Lainnya'
                           }
                           size="small"
                           sx={{
                             background: alpha(item.color, 0.15),
                             color: item.color,
-                            fontWeight: 600,
-                            fontSize: '0.65rem',
-                            height: 20,
+                            fontWeight: 500,
+                            fontSize: '0.6rem',
+                            height: 16,
                             alignSelf: 'flex-start',
                             '& .MuiChip-label': {
-                              px: 1,
+                              px: 0.5,
                             }
                           }}
                         />
@@ -1001,28 +1002,23 @@ export default function DashboardHome({ onViewChange }) {
                 ))}
               </Grid>
 
-              <Box sx={{ mt: 3, pt: 2, borderTop: `1px solid ${alpha(theme.palette.divider, 0.3)}` }}>
+              <Box sx={{ mt: 2, pt: 2, borderTop: `1px solid ${alpha(theme.palette.divider, 0.3)}` }}>
                 <Grid container spacing={2}>
                   <Grid item xs={6}>
                     <Button
                       variant="outlined"
                       fullWidth
                       size="small"
-                      startIcon={<AssignmentIcon sx={{ fontSize: 14 }} />}
+                      startIcon={<AssignmentIcon sx={{ fontSize: 12 }} />}
                       sx={{
-                        borderRadius: 2,
+                        borderRadius: 1.5,
                         textTransform: 'none',
-                        fontWeight: 600,
-                        fontSize: '0.75rem',
-                        height: 32,
-                        borderColor: theme.palette.primary.main,
-                        color: theme.palette.primary.main,
-                        '&:hover': {
-                          backgroundColor: alpha(theme.palette.primary.main, 0.08),
-                        }
+                        fontWeight: 500,
+                        fontSize: '0.7rem',
+                        height: 28,
                       }}
                     >
-                      Panduan Lengkap
+                      Panduan
                     </Button>
                   </Grid>
                   
@@ -1031,20 +1027,16 @@ export default function DashboardHome({ onViewChange }) {
                       variant="contained"
                       fullWidth
                       size="small"
-                      startIcon={<NotificationsIcon sx={{ fontSize: 14 }} />}
+                      startIcon={<NotificationsIcon sx={{ fontSize: 12 }} />}
                       sx={{
-                        borderRadius: 2,
+                        borderRadius: 1.5,
                         textTransform: 'none',
-                        fontWeight: 600,
-                        fontSize: '0.75rem',
-                        height: 32,
-                        background: `linear-gradient(135deg, ${theme.palette.success.main}, ${theme.palette.success.dark})`,
-                        '&:hover': {
-                          background: `linear-gradient(135deg, ${theme.palette.success.dark}, ${theme.palette.success.main})`,
-                        }
+                        fontWeight: 500,
+                        fontSize: '0.7rem',
+                        height: 28,
                       }}
                     >
-                      Hubungi Admin
+                      Bantuan
                     </Button>
                   </Grid>
                 </Grid>
@@ -1056,3 +1048,4 @@ export default function DashboardHome({ onViewChange }) {
     </Box>
   );
 }
+

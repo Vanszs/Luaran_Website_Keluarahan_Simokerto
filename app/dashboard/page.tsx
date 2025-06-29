@@ -74,7 +74,7 @@ const modernGlow = keyframes`
 
 export default function Dashboard() {
   const [currentView, setCurrentView] = React.useState('dashboard');
-  const [selectedDocument, setSelectedDocument] = React.useState('');
+  const [selectedDocument, setSelectedDocument] = React.useState(null);
   const [isLoading, setIsLoading] = React.useState(true);
   const [contentVisible, setContentVisible] = React.useState(false);
   const [mounted, setMounted] = React.useState(false);
@@ -91,19 +91,31 @@ export default function Dashboard() {
     setMounted(true);
   }, []);
 
-  const handleViewChange = (view: string) => {
+  const handleViewChange = (view) => {
+    console.log('View changed to:', view);
     setContentVisible(false);
     setTimeout(() => {
       setCurrentView(view);
       if (view !== 'documents') {
-        setSelectedDocument('');
+        setSelectedDocument(null);
       }
       setContentVisible(true);
     }, 200);
   };
 
-  const handleDocumentSelect = (documentType: string) => {
-    setSelectedDocument(documentType);
+  const handleDocumentSelect = (documentTitle) => {
+    console.log('Document selected:', documentTitle);
+    setSelectedDocument(documentTitle);
+    setCurrentView('form');
+  };
+
+  const handleBackFromDocuments = () => {
+    setCurrentView('dashboard');
+  };
+
+  const handleBackFromForm = () => {
+    setSelectedDocument(null);
+    setCurrentView('documents');
   };
 
   React.useEffect(() => {
@@ -224,68 +236,30 @@ export default function Dashboard() {
   }
 
   const renderContent = () => {
-    const getModernContentWrapper = (content: React.ReactNode, TransitionComponent: any, transitionProps: any) => {
-      return (
-        <TransitionComponent {...transitionProps}>
-          <Box
-            sx={{
-              background: 'transparent',
-              borderRadius: 0,
-              border: 'none',
-              boxShadow: 'none',
-              p: 0,
-              position: 'relative',
-              overflow: 'visible',
-            }}
-          >
-            {content}
-          </Box>
-        </TransitionComponent>
-      );
-    };
-
-    if (currentView === 'dashboard') {
-      return getModernContentWrapper(
-        <DashboardHome onViewChange={handleViewChange} />,
-        Grow,
-        { in: contentVisible, timeout: 800 }
-      );
+    switch (currentView) {
+      case 'dashboard':
+        return <DashboardHome onViewChange={handleViewChange} />;
+      case 'documents':
+        return (
+          <DocumentSelection 
+            onDocumentSelect={handleDocumentSelect}
+            onBack={handleBackFromDocuments}
+          />
+        );
+      case 'form':
+        return (
+          <DocumentForm 
+            selectedDocument={selectedDocument} 
+            onBack={handleBackFromForm}
+          />
+        );
+      case 'riwayat':
+        return <RiwayatPage />;
+      case 'settings':
+        return <SettingsPage />;
+      default:
+        return <DashboardHome onViewChange={handleViewChange} />;
     }
-    
-    if (currentView === 'documents') {
-      const content = selectedDocument ? (
-        <DocumentForm 
-          selectedDocument={selectedDocument} 
-          onBack={() => setSelectedDocument('')}
-        />
-      ) : (
-        <DocumentSelection onDocumentSelect={handleDocumentSelect} />
-      );
-
-      return getModernContentWrapper(
-        content,
-        Slide,
-        { direction: "up", in: contentVisible, timeout: 600 }
-      );
-    }
-
-    if (currentView === 'riwayat') {
-      return getModernContentWrapper(
-        <RiwayatPage />,
-        Zoom,
-        { in: contentVisible, timeout: 700 }
-      );
-    }
-    
-    if (currentView === 'settings') {
-      return getModernContentWrapper(
-        <SettingsPage />,
-        Fade,
-        { in: contentVisible, timeout: 800 }
-      );
-    }
-    
-    return null;
   };
 
   return (

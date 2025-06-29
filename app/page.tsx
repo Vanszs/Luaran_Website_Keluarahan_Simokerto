@@ -17,6 +17,8 @@ import AppTheme from '../shared-theme/AppTheme';
 import ColorModeSelect from '../shared-theme/ColorModeSelect';
 import Image from 'next/image';
 import logoImage from '../public/logo.png';
+import { Theme } from '@mui/material/styles';
+
 
 // Animations
 const float = keyframes`
@@ -352,14 +354,14 @@ export default function SignIn() {
             top: '1.5rem',
             right: '1.5rem',
             zIndex: 10,
-            backgroundColor: theme => theme.palette.mode === 'dark' ? 
+            backgroundColor: (theme: Theme) => theme.palette.mode === 'dark' ? 
               'rgba(255, 255, 255, 0.1)' : 
               'rgba(0, 0, 0, 0.06)',
             borderRadius: '50%',
             transition: 'all 0.3s ease',
             backdropFilter: 'blur(10px)',
             '&:hover': {
-              backgroundColor: theme => theme.palette.mode === 'dark' ? 
+              backgroundColor: (theme: Theme) => theme.palette.mode === 'dark' ? 
                 'rgba(255, 255, 255, 0.15)' : 
                 'rgba(0, 0, 0, 0.1)',
               transform: 'scale(1.05)',

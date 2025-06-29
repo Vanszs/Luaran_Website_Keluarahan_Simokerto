@@ -11,7 +11,6 @@ import {
   Stack,
   useTheme,
   alpha,
-  Container,
   TextField,
   InputAdornment,
   Tabs,
@@ -20,274 +19,105 @@ import {
   Button,
   Fade,
   Paper,
-  IconButton,
-  Tooltip,
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import {
-  FamilyRestroom,
   HomeWork,
   Business,
-  Work,
-  LocalHospital,
-  AccountBox,
-  Search,
-  AccessTime,
-  Star,
   VolunteerActivism,
   ChildCare,
-  ArrowForward,
   Security,
+  LocalHospital,
   Description,
-  FilterList,
+  Search,
+  AccessTime,
+  AccountBox,
+  ArrowForward,
 } from '@mui/icons-material';
 
-// CONSISTENT 3D SECTION CONTAINER - MATCH OTHER COMPONENTS
 const SectionContainer = styled(Paper)(({ theme }) => ({
   background: theme.palette.mode === 'dark'
     ? 'linear-gradient(145deg, rgba(15, 23, 42, 0.95) 0%, rgba(30, 41, 59, 0.98) 50%, rgba(51, 65, 85, 0.95) 100%)'
-    : `
-        linear-gradient(145deg, 
-          rgba(255, 255, 255, 0.98) 0%, 
-          rgba(248, 250, 252, 0.95) 20%,
-          rgba(224, 242, 254, 0.9) 40%,
-          rgba(241, 245, 249, 0.95) 60%,
-          rgba(231, 229, 228, 0.9) 80%,
-          rgba(254, 247, 205, 0.95) 100%
-        )
-      `,
+    : `linear-gradient(145deg, rgba(255, 255, 255, 0.98) 0%, rgba(248, 250, 252, 0.95) 20%, rgba(224, 242, 254, 0.9) 40%, rgba(241, 245, 249, 0.95) 60%, rgba(231, 229, 228, 0.9) 80%, rgba(254, 247, 205, 0.95) 100%)`,
   backdropFilter: 'blur(20px)',
   borderRadius: '24px',
   border: theme.palette.mode === 'dark'
     ? `2px solid rgba(148, 163, 184, 0.25)`
     : `3px solid rgba(37, 99, 235, 0.15)`,
   boxShadow: theme.palette.mode === 'dark'
-    ? `
-        0 20px 64px rgba(0, 0, 0, 0.6),
-        0 12px 32px rgba(0, 0, 0, 0.4),
-        inset 0 2px 0 rgba(255, 255, 255, 0.1),
-        inset 0 -2px 0 rgba(0, 0, 0, 0.2)
-      `
-    : `
-        0 24px 80px rgba(37, 99, 235, 0.1),
-        0 16px 48px rgba(16, 185, 129, 0.08),
-        0 8px 24px rgba(124, 58, 237, 0.06),
-        inset 0 2px 0 rgba(255, 255, 255, 0.9),
-        inset 0 -2px 0 rgba(37, 99, 235, 0.05)
-      `,
+    ? `0 20px 64px rgba(0, 0, 0, 0.6), 0 12px 32px rgba(0, 0, 0, 0.4), inset 0 2px 0 rgba(255, 255, 255, 0.1), inset 0 -2px 0 rgba(0, 0, 0, 0.2)`
+    : `0 24px 80px rgba(37, 99, 235, 0.1), 0 16px 48px rgba(16, 185, 129, 0.08), 0 8px 24px rgba(124, 58, 237, 0.06), inset 0 2px 0 rgba(255, 255, 255, 0.9), inset 0 -2px 0 rgba(37, 99, 235, 0.05)`,
   transition: 'all 300ms cubic-bezier(0.4, 0, 0.2, 1) !important',
   position: 'relative',
   overflow: 'hidden',
-  
-  '&:hover': {
-    transform: theme.palette.mode === 'dark' 
-      ? 'translateY(-3px)' 
-      : 'translateY(-5px)',
-    boxShadow: theme.palette.mode === 'dark'
-      ? `
-          0 28px 80px rgba(0, 0, 0, 0.7),
-          0 16px 40px rgba(0, 0, 0, 0.5),
-          inset 0 2px 0 rgba(255, 255, 255, 0.15)
-        `
-      : `
-          0 32px 100px rgba(37, 99, 235, 0.14),
-          0 20px 60px rgba(16, 185, 129, 0.1),
-          0 12px 32px rgba(124, 58, 237, 0.08),
-          inset 0 2px 0 rgba(255, 255, 255, 1),
-          inset 0 -2px 0 rgba(37, 99, 235, 0.08)
-        `,
-  },
-  
-  // STUNNING 3D EFFECTS - CONSISTENT WITH OTHER COMPONENTS
-  ...(theme.palette.mode === 'light' && {
-    '&::before': {
-      content: '""',
-      position: 'absolute',
-      top: 0,
-      left: 0,
-      right: 0,
-      bottom: 0,
-      background: `
-        radial-gradient(circle at 25% 25%, rgba(37, 99, 235, 0.12) 0%, transparent 50%),
-        radial-gradient(circle at 75% 25%, rgba(16, 185, 129, 0.1) 0%, transparent 50%),
-        radial-gradient(circle at 50% 75%, rgba(124, 58, 237, 0.08) 0%, transparent 50%),
-        linear-gradient(135deg, 
-          rgba(255, 255, 255, 0.6) 0%, 
-          rgba(255, 255, 255, 0.3) 50%,
-          rgba(255, 255, 255, 0.1) 100%
-        )
-      `,
-      borderRadius: '24px',
-      pointerEvents: 'none',
-      zIndex: 1,
-      transition: 'all 300ms cubic-bezier(0.4, 0, 0.2, 1) !important',
-    },
-    '&::after': {
-      content: '""',
-      position: 'absolute',
-      top: 3,
-      left: 3,
-      right: 3,
-      bottom: 3,
-      background: `
-        linear-gradient(135deg, 
-          rgba(255, 255, 255, 0.4) 0%, 
-          rgba(255, 255, 255, 0.2) 50%,
-          rgba(255, 255, 255, 0.1) 100%
-        )
-      `,
-      borderRadius: '21px',
-      pointerEvents: 'none',
-      zIndex: 0,
-      transition: 'all 300ms cubic-bezier(0.4, 0, 0.2, 1) !important',
-    }
-  }),
-}));
-
-// MODERN DOCUMENT CARD - SIMPLIFIED & CONSISTENT
-const ModernDocumentCard = styled(Card)(({ theme }) => ({
-  borderRadius: '18px',
-  border: theme.palette.mode === 'dark'
-    ? `2px solid rgba(148, 163, 184, 0.25)`
-    : `3px solid rgba(37, 99, 235, 0.15)`,
-  background: theme.palette.mode === 'dark'
-    ? 'linear-gradient(135deg, rgba(30, 41, 59, 0.95) 0%, rgba(51, 65, 85, 0.9) 100%)'
-    : `
-        linear-gradient(135deg, 
-          rgba(255, 255, 255, 0.98) 0%, 
-          rgba(248, 250, 252, 0.95) 50%,
-          rgba(224, 242, 254, 0.9) 100%
-        )
-      `,
-  boxShadow: theme.palette.mode === 'dark'
-    ? `
-        0 8px 32px rgba(0, 0, 0, 0.3),
-        0 4px 16px rgba(0, 0, 0, 0.2),
-        inset 0 1px 0 rgba(255, 255, 255, 0.1)
-      `
-    : `
-        0 12px 40px rgba(37, 99, 235, 0.08),
-        0 6px 20px rgba(16, 185, 129, 0.05),
-        0 3px 10px rgba(124, 58, 237, 0.03),
-        inset 0 2px 0 rgba(255, 255, 255, 0.7),
-        inset 0 -1px 0 rgba(37, 99, 235, 0.02)
-      `,
-  color: theme.palette.text.primary,
-  transition: 'all 300ms cubic-bezier(0.4, 0, 0.2, 1) !important',
-  cursor: 'pointer',
-  position: 'relative',
-  overflow: 'hidden',
-  height: '100%',
-  display: 'flex',
-  flexDirection: 'column',
-  
-  '&:hover': {
-    transform: theme.palette.mode === 'dark' 
-      ? 'translateY(-4px) scale(1.02)' 
-      : 'translateY(-6px) scale(1.03)',
-    borderColor: theme.palette.primary.main,
-    boxShadow: theme.palette.mode === 'dark'
-      ? `
-          0 20px 60px rgba(59, 130, 246, 0.3),
-          0 10px 30px rgba(59, 130, 246, 0.2),
-          inset 0 2px 0 rgba(255, 255, 255, 0.15)
-        `
-      : `
-          0 24px 80px rgba(37, 99, 235, 0.12),
-          0 12px 40px rgba(16, 185, 129, 0.08),
-          0 6px 20px rgba(124, 58, 237, 0.05),
-          inset 0 2px 0 rgba(255, 255, 255, 0.9),
-          inset 0 -2px 0 rgba(37, 99, 235, 0.05)
-        `,
-  },
-  
-  // BEAUTIFUL HIGHLIGHT FOR LIGHT MODE
-  ...(theme.palette.mode === 'light' && {
-    '&::before': {
-      content: '""',
-      position: 'absolute',
-      top: 0,
-      left: 0,
-      right: 0,
-      height: '50%',
-      background: `
-        linear-gradient(180deg, 
-          rgba(255, 255, 255, 0.5) 0%, 
-          rgba(255, 255, 255, 0.2) 50%,
-          rgba(255, 255, 255, 0) 100%
-        )
-      `,
-      borderRadius: '18px 18px 0 0',
-      pointerEvents: 'none',
-      zIndex: 1,
-      transition: 'all 300ms cubic-bezier(0.4, 0, 0.2, 1) !important',
-    }
-  }),
 }));
 
 const documents = [
   {
     id: 1,
     title: 'Surat Keterangan Domisili',
-    description: 'Surat keterangan tempat tinggal untuk keperluan administratif seperti pendaftaran sekolah, bank, atau pekerjaan',
-    icon: <HomeWork />,
+    description: 'Verifikasi tempat tinggal untuk administrasi',
     category: 'kependudukan',
-    estimatedTime: '2-3 hari kerja',
+    icon: <HomeWork />,
+    estimatedTime: '2-3 hari',
     color: '#2563eb',
-    isPopular: true,
-    requirements: ['KTP', 'KK', 'Surat RT/RW']
+    requirements: ['KTP', 'KK', 'Surat RT/RW'],
+    categoryLabel: 'Kependudukan'
   },
   {
     id: 2,
     title: 'Surat Keterangan Usaha',
-    description: 'Surat keterangan untuk legalitas usaha dan keperluan perizinan bisnis',
-    icon: <Business />,
+    description: 'Legalisasi kegiatan usaha dan perizinan bisnis',
     category: 'usaha',
-    estimatedTime: '3-5 hari kerja',
+    icon: <Business />,
+    estimatedTime: '3-5 hari',
     color: '#7c3aed',
-    isPopular: true,
-    requirements: ['KTP', 'KK', 'Foto Usaha']
+    requirements: ['KTP', 'KK', 'Foto Usaha'],
+    categoryLabel: 'Usaha'
   },
   {
     id: 3,
     title: 'Surat Keterangan Tidak Mampu',
-    description: 'Surat keterangan kondisi ekonomi untuk bantuan sosial, beasiswa, atau keringanan biaya',
-    icon: <VolunteerActivism />,
+    description: 'Verifikasi kondisi ekonomi untuk bantuan sosial',
     category: 'sosial',
-    estimatedTime: '2-3 hari kerja',
+    icon: <VolunteerActivism />,
+    estimatedTime: '2-3 hari',
     color: '#059669',
-    isPopular: true,
-    requirements: ['KTP', 'KK', 'Foto Rumah']
+    requirements: ['KTP', 'KK', 'Foto Rumah'],
+    categoryLabel: 'Sosial'
   },
   {
     id: 4,
     title: 'Surat Pengantar SKCK',
-    description: 'Surat pengantar untuk pengurusan SKCK di kepolisian',
-    icon: <Security />,
+    description: 'Pengantar untuk pengurusan SKCK di kepolisian',
     category: 'kependudukan',
-    estimatedTime: '1 hari kerja',
+    icon: <Security />,
+    estimatedTime: '1 hari',
     color: '#dc2626',
-    requirements: ['KTP', 'KK', 'Pas Foto']
+    requirements: ['KTP', 'KK', 'Pas Foto'],
+    categoryLabel: 'Kependudukan'
   },
   {
     id: 5,
     title: 'Surat Keterangan Kelahiran',
-    description: 'Surat keterangan kelahiran untuk pengurusan akta kelahiran',
-    icon: <ChildCare />,
+    description: 'Keterangan kelahiran untuk akta kelahiran',
     category: 'kependudukan',
-    estimatedTime: '1-2 hari kerja',
+    icon: <ChildCare />,
+    estimatedTime: '1-2 hari',
     color: '#d97706',
-    requirements: ['KTP Ortu', 'KK', 'Surat Lahir RS']
+    requirements: ['KTP Ortu', 'KK', 'Surat RS'],
+    categoryLabel: 'Kependudukan'
   },
   {
     id: 6,
     title: 'Surat Keterangan Kematian',
-    description: 'Surat keterangan kematian untuk pengurusan akta kematian',
-    icon: <LocalHospital />,
+    description: 'Keterangan kematian untuk akta kematian',
     category: 'kependudukan',
-    estimatedTime: '1-2 hari kerja',
+    icon: <LocalHospital />,
+    estimatedTime: '1-2 hari',
     color: '#0891b2',
-    requirements: ['KTP Almarhum', 'Surat Dokter']
+    requirements: ['KTP', 'Surat Dokter'],
+    categoryLabel: 'Kependudukan'
   },
 ];
 
@@ -298,7 +128,34 @@ const categories = [
   { id: 'sosial', label: 'Sosial', icon: <VolunteerActivism />, count: documents.filter(d => d.category === 'sosial').length },
 ];
 
-export default function DocumentSelection({ onDocumentSelect }) {
+const MinimalistDocumentCard = styled(Card)(({ theme }) => ({
+  borderRadius: '12px',
+  border: theme.palette.mode === 'dark'
+    ? `1px solid rgba(148, 163, 184, 0.2)`
+    : `1px solid rgba(148, 163, 184, 0.15)`,
+  background: theme.palette.mode === 'dark'
+    ? 'rgba(30, 41, 59, 0.8)'
+    : 'rgba(255, 255, 255, 0.95)',
+  boxShadow: theme.palette.mode === 'dark'
+    ? '0 4px 12px rgba(0, 0, 0, 0.2)'
+    : '0 2px 8px rgba(0, 0, 0, 0.04)',
+  color: theme.palette.text.primary,
+  transition: 'all 200ms ease-in-out',
+  cursor: 'pointer',
+  height: '100%',
+  display: 'flex',
+  flexDirection: 'column',
+  
+  '&:hover': {
+    transform: 'translateY(-2px)',
+    borderColor: theme.palette.primary.main,
+    boxShadow: theme.palette.mode === 'dark'
+      ? '0 8px 24px rgba(59, 130, 246, 0.2)'
+      : '0 4px 16px rgba(37, 99, 235, 0.08)',
+  },
+}));
+
+export default function DocumentSelection({ onDocumentSelect, onBack }) {
   const theme = useTheme();
   const [selectedCategory, setSelectedCategory] = useState('semua');
   const [searchQuery, setSearchQuery] = useState('');
@@ -328,339 +185,233 @@ export default function DocumentSelection({ onDocumentSelect }) {
     <Box sx={{ 
       width: '100%', 
       p: 2,
-      // BEAUTIFUL GRADIENT BACKGROUND FOR LIGHT MODE
       background: theme.palette.mode === 'dark'
         ? 'transparent'
         : 'linear-gradient(135deg, #e0f2fe 0%, #f8fafc 25%, #f1f5f9 50%, #e7e5e4 75%, #fef7cd 100%)',
       minHeight: '100vh',
       transition: 'background 300ms ease-in-out !important'
     }}>
-      {/* ENHANCED HEADER - MATCH WELCOME STYLE */}
-      <SectionContainer elevation={0} sx={{ mb: 4 }}>
-        <CardContent sx={{ p: 4, position: 'relative', zIndex: 2 }}>
-          <Grid container spacing={2} alignItems="center">
-            <Grid item xs={12}>
-              <Stack direction="row" spacing={3} alignItems="center" justifyContent="space-between">
-                <Stack direction="row" spacing={2} alignItems="center" sx={{ flex: 1 }}>
-                  <Box
-                    sx={{
-                      width: 60,
-                      height: 60,
-                      borderRadius: 3,
-                      background: theme.palette.mode === 'dark'
-                        ? `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`
-                        : `linear-gradient(135deg, #2563eb 0%, #059669 50%, #7c3aed 100%)`,
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      color: '#ffffff',
-                      boxShadow: theme.palette.mode === 'dark'
-                        ? '0 8px 24px rgba(0, 0, 0, 0.4)'
-                        : '0 12px 32px rgba(37, 99, 235, 0.2), 0 6px 16px rgba(16, 185, 129, 0.1)',
-                      border: theme.palette.mode === 'dark'
-                        ? 'none'
-                        : `3px solid rgba(255, 255, 255, 0.8)`,
-                    }}
-                  >
-                    <Description sx={{ fontSize: 28 }} />
-                  </Box>
-                  
-                  <Box sx={{ flex: 1 }}>
-                    <Typography variant="h4" sx={{ 
-                      fontWeight: 700, 
-                      mb: 1,
-                      color: theme.palette.text.primary,
-                      fontSize: '1.75rem',
-                      textShadow: theme.palette.mode === 'dark' 
-                        ? '0 2px 4px rgba(0, 0, 0, 0.3)' 
-                        : '0 2px 4px rgba(37, 99, 235, 0.1)',
-                    }}>
-                      Layanan Dokumen Digital
-                    </Typography>
-                    
-                    <Typography variant="body1" sx={{ 
-                      fontSize: '1rem', 
-                      fontWeight: 500,
-                      mb: 1.5,
-                      color: theme.palette.text.secondary,
-                    }}>
-                      Pilih dokumen yang ingin Anda ajukan untuk layanan administrasi Kelurahan Simokerto
-                    </Typography>
-                    
-                    <Stack direction="row" spacing={2} alignItems="center">
-                      <Chip
-                        label={`${filteredDocuments.length} Layanan`}
-                        color="primary"
-                        sx={{ 
-                          fontWeight: 600,
-                          fontSize: '0.875rem',
-                          height: 32,
-                          px: 2,
-                          background: theme.palette.mode === 'dark'
-                            ? theme.palette.primary.main
-                            : 'linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)',
-                          boxShadow: theme.palette.mode === 'dark'
-                            ? 'none'
-                            : '0 4px 12px rgba(37, 99, 235, 0.2)',
-                        }}
-                      />
-                      <Typography variant="body2" sx={{ 
-                        fontSize: '0.875rem',
-                        color: theme.palette.text.secondary,
-                        fontWeight: 500,
-                      }}>
-                        Tersedia Online 24/7
-                      </Typography>
-                    </Stack>
-                  </Box>
-                </Stack>
-              </Stack>
-            </Grid>
-          </Grid>
+      <SectionContainer elevation={0} sx={{ mb: 3 }}>
+        <CardContent sx={{ p: 3, position: 'relative', zIndex: 2 }}>
+          <Stack spacing={2}>
+            <Typography variant="h5" sx={{ 
+              fontWeight: 700, 
+              color: theme.palette.text.primary,
+              fontSize: '1.25rem',
+              textAlign: 'center',
+            }}>
+              Layanan Dokumen Digital
+            </Typography>
+            
+            <Typography variant="body2" sx={{ 
+              color: theme.palette.text.secondary,
+              textAlign: 'center',
+              fontSize: '0.875rem',
+            }}>
+              Pilih dokumen yang ingin Anda ajukan
+            </Typography>
+          </Stack>
         </CardContent>
       </SectionContainer>
 
-      {/* ENHANCED SEARCH - MATCH RIWAYAT STYLE */}
-      <SectionContainer elevation={0} sx={{ mb: 4 }}>
-        <CardContent sx={{ p: 4, position: 'relative', zIndex: 2 }}>
+      <SectionContainer elevation={0} sx={{ mb: 3 }}>
+        <CardContent sx={{ p: 3, position: 'relative', zIndex: 2 }}>
           <TextField
             fullWidth
-            placeholder="Cari berdasarkan nama dokumen atau deskripsi..."
+            placeholder="Cari dokumen..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
-                  <Search sx={{ 
-                    fontSize: 24, 
-                    color: theme.palette.text.secondary 
-                  }} />
+                  <Search sx={{ fontSize: 20, color: 'text.secondary' }} />
                 </InputAdornment>
               ),
             }}
             sx={{
               '& .MuiOutlinedInput-root': {
-                borderRadius: '16px',
-                fontSize: '1rem',
+                borderRadius: '12px',
+                fontSize: '0.875rem',
+                height: 48,
                 backgroundColor: theme.palette.mode === 'dark'
                   ? 'rgba(15, 23, 42, 0.8)'
-                  : 'rgba(255, 255, 255, 0.9)',
+                  : 'rgba(255, 255, 255, 0.95)',
                 border: theme.palette.mode === 'dark'
-                  ? '2px solid rgba(148, 163, 184, 0.2)'
-                  : '3px solid rgba(51, 65, 85, 0.1)',
+                  ? '2px solid rgba(148, 163, 184, 0.3)'
+                  : '2px solid rgba(148, 163, 184, 0.2)',
                 boxShadow: theme.palette.mode === 'dark'
-                  ? '0 4px 12px rgba(0, 0, 0, 0.2)'
-                  : '0 4px 16px rgba(37, 99, 235, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.8)',
-                transition: 'all 300ms ease-in-out !important',
+                  ? '0 4px 12px rgba(0, 0, 0, 0.3)'
+                  : '0 4px 16px rgba(37, 99, 235, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.8)',
+                transition: 'all 300ms ease-in-out',
                 '& fieldset': {
                   border: 'none',
                 },
                 '&:hover': {
                   borderColor: theme.palette.mode === 'dark'
-                    ? 'rgba(96, 165, 250, 0.4)'
-                    : 'rgba(37, 99, 235, 0.3)',
+                    ? 'rgba(96, 165, 250, 0.5)'
+                    : 'rgba(37, 99, 235, 0.4)',
                   transform: 'translateY(-1px)',
+                  boxShadow: theme.palette.mode === 'dark'
+                    ? '0 6px 16px rgba(96, 165, 250, 0.2)'
+                    : '0 6px 20px rgba(37, 99, 235, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.9)',
                 },
                 '&.Mui-focused': {
                   borderColor: theme.palette.primary.main,
                   transform: 'translateY(-2px)',
                   boxShadow: theme.palette.mode === 'dark'
-                    ? '0 8px 24px rgba(96, 165, 250, 0.2)'
-                    : '0 8px 24px rgba(37, 99, 235, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.9)',
+                    ? '0 8px 24px rgba(96, 165, 250, 0.3)'
+                    : '0 8px 24px rgba(37, 99, 235, 0.15), inset 0 1px 0 rgba(255, 255, 255, 1)',
+                },
+              },
+              '& .MuiInputBase-input': {
+                color: theme.palette.text.primary,
+                fontSize: '0.875rem',
+                fontWeight: 500,
+                '&::placeholder': {
+                  color: theme.palette.text.secondary,
+                  opacity: 0.7,
                 },
               },
             }}
-            size="medium"
           />
         </CardContent>
       </SectionContainer>
 
-      {/* CATEGORY TABS */}
-      <SectionContainer elevation={0} sx={{ mb: 4 }}>
-        <CardContent sx={{ p: 3, position: 'relative', zIndex: 2 }}>
-          <Tabs 
-            value={selectedCategory} 
-            onChange={(e, newValue) => setSelectedCategory(newValue)}
-            variant="scrollable"
-            scrollButtons="auto"
-            sx={{
-              '& .MuiTab-root': {
-                textTransform: 'none',
-                fontWeight: 600,
-                minHeight: 48,
-                fontSize: '0.875rem',
-              },
-              '& .Mui-selected': {
-                color: theme.palette.primary.main,
-              },
-              '& .MuiTabs-indicator': {
-                backgroundColor: theme.palette.primary.main,
-                height: 3,
-                borderRadius: 2,
-              }
-            }}
-          >
-            {categories.map((category) => (
-              <Tab 
-                key={category.id}
-                value={category.id}
-                label={
-                  <Stack direction="row" spacing={1} alignItems="center">
-                    {React.cloneElement(category.icon, { sx: { fontSize: 20 } })}
-                    <span>{category.label}</span>
-                    <Chip 
-                      label={category.count} 
-                      size="small" 
-                      sx={{ 
-                        height: 20, 
-                        fontSize: '0.7rem',
-                        background: alpha(theme.palette.primary.main, 0.1),
-                        color: theme.palette.primary.main,
-                      }} 
-                    />
-                  </Stack>
-                }
-              />
-            ))}
-          </Tabs>
-        </CardContent>
-      </SectionContainer>
-
-      {/* ENHANCED DOCUMENT GRID */}
       <SectionContainer elevation={0}>
-        <CardContent sx={{ p: 4, position: 'relative', zIndex: 2 }}>
-          <Grid container spacing={3}>
+        <CardContent sx={{ p: 3, position: 'relative', zIndex: 2 }}>
+          <Grid container spacing={2}>
             {filteredDocuments.length === 0 ? (
               <Grid item xs={12}>
-                <Box sx={{ textAlign: 'center', py: 8 }}>
-                  <Search sx={{ fontSize: 64, color: 'text.secondary', mb: 2 }} />
-                  <Typography variant="h6" color="text.secondary" sx={{ mb: 1 }}>
+                <Box sx={{ textAlign: 'center', py: 6 }}>
+                  <Search sx={{ fontSize: 64, color: 'text.secondary', mb: 3 }} />
+                  <Typography variant="h6" color="text.primary" sx={{ mb: 1, fontWeight: 600 }}>
                     Tidak ada dokumen ditemukan
                   </Typography>
-                  <Typography variant="body2" color="text.secondary">
+                  <Typography variant="body2" color="text.secondary" sx={{ mb: 4 }}>
                     Coba ubah kata kunci pencarian atau pilih kategori lain
                   </Typography>
+                  
+                  {onBack && (
+                    <Button
+                      variant="outlined"
+                      onClick={onBack}
+                      sx={{
+                        borderRadius: 2,
+                        textTransform: 'none',
+                        fontWeight: 600,
+                        height: 40,
+                        px: 3,
+                        borderWidth: 2,
+                        '&:hover': {
+                          borderWidth: 2,
+                          transform: 'translateY(-1px)',
+                        }
+                      }}
+                    >
+                      Kembali ke Dashboard
+                    </Button>
+                  )}
                 </Box>
               </Grid>
             ) : (
               filteredDocuments.map((doc, index) => (
                 <Grid item xs={12} sm={6} lg={4} key={doc.id}>
-                  <Fade in timeout={300 + index * 100}>
-                    <ModernDocumentCard
-                      onClick={() => handleDocumentClick(doc)}
-                    >
-                      <CardContent sx={{ p: 3, flexGrow: 1, position: 'relative', zIndex: 2 }}>
+                  <Fade in timeout={200 + index * 50}>
+                    <MinimalistDocumentCard onClick={() => handleDocumentClick(doc)}>
+                      <CardContent sx={{ p: 2.5, flexGrow: 1 }}>
                         <Stack spacing={2}>
-                          {/* Header with Icon */}
-                          <Stack direction="row" spacing={2} alignItems="flex-start">
+                          <Stack direction="row" spacing={1.5} alignItems="flex-start">
                             <Box
                               sx={{
-                                width: 48,
-                                height: 48,
-                                borderRadius: 2,
-                                background: theme.palette.mode === 'dark'
-                                  ? alpha(doc.color, 0.2)
-                                  : `linear-gradient(135deg, ${alpha(doc.color, 0.15)} 0%, ${alpha(doc.color, 0.25)} 100%)`,
+                                width: 36,
+                                height: 36,
+                                borderRadius: 1.5,
+                                background: alpha(doc.color, 0.1),
                                 display: 'flex',
                                 alignItems: 'center',
                                 justifyContent: 'center',
                                 color: doc.color,
-                                border: theme.palette.mode === 'dark'
-                                  ? 'none'
-                                  : `2px solid ${alpha(doc.color, 0.3)}`,
-                                boxShadow: theme.palette.mode === 'dark'
-                                  ? 'none'
-                                  : `0 4px 12px ${alpha(doc.color, 0.15)}`,
                                 flexShrink: 0,
                               }}
                             >
-                              {React.cloneElement(doc.icon, { sx: { fontSize: 24 } })}
+                              {React.cloneElement(doc.icon, { sx: { fontSize: 18 } })}
                             </Box>
                             
                             <Box sx={{ flex: 1, minWidth: 0 }}>
                               <Typography variant="h6" sx={{ 
-                                fontWeight: 700, 
+                                fontWeight: 600, 
                                 mb: 0.5,
                                 lineHeight: 1.3,
-                                fontSize: '1rem',
+                                fontSize: '0.9rem',
                                 color: 'text.primary'
                               }}>
                                 {doc.title}
                               </Typography>
-                              <Stack direction="row" spacing={1} alignItems="center">
-                                <Chip
-                                  label={doc.category}
-                                  size="small"
-                                  sx={{ 
-                                    textTransform: 'capitalize',
-                                    fontSize: '0.7rem',
-                                    height: 20,
-                                  }}
-                                />
-                                {doc.isPopular && (
-                                  <Chip
-                                    icon={<Star sx={{ fontSize: 12 }} />}
-                                    label="Populer"
-                                    size="small"
-                                    sx={{
-                                      fontSize: '0.7rem',
-                                      height: 20,
-                                      backgroundColor: alpha('#f59e0b', 0.1),
-                                      color: '#f59e0b',
-                                    }}
-                                  />
-                                )}
-                              </Stack>
+                              
+                              <Chip
+                                label={doc.categoryLabel}
+                                size="small"
+                                sx={{ 
+                                  fontSize: '0.65rem',
+                                  height: 18,
+                                  bgcolor: alpha(doc.color, 0.1),
+                                  color: doc.color,
+                                  fontWeight: 500,
+                                }}
+                              />
                             </Box>
                           </Stack>
 
-                          {/* Description */}
                           <Typography variant="body2" color="text.secondary" sx={{ 
                             lineHeight: 1.4,
-                            fontSize: '0.875rem',
+                            fontSize: '0.8rem',
                             display: '-webkit-box',
-                            WebkitLineClamp: 3,
+                            WebkitLineClamp: 2,
                             WebkitBoxOrient: 'vertical',
                             overflow: 'hidden',
-                            flexGrow: 1
                           }}>
                             {doc.description}
                           </Typography>
 
-                          {/* Footer Info */}
-                          <Stack spacing={2}>
+                          <Stack spacing={1.5}>
                             <Stack direction="row" alignItems="center" spacing={1}>
-                              <AccessTime sx={{ fontSize: 16, color: 'text.secondary' }} />
-                              <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.8rem' }}>
+                              <AccessTime sx={{ fontSize: 12, color: 'text.secondary' }} />
+                              <Typography variant="caption" color="text.secondary" sx={{ 
+                                fontSize: '0.7rem',
+                                fontWeight: 500,
+                              }}>
                                 {doc.estimatedTime}
                               </Typography>
                             </Stack>
 
-                            <Stack direction="row" spacing={1} alignItems="center" sx={{ flexWrap: 'wrap', gap: 0.5 }}>
-                              {doc.requirements.slice(0, 3).map((req, idx) => (
-                                <Chip
-                                  key={idx}
-                                  label={req}
-                                  size="small"
-                                  variant="outlined"
-                                  sx={{ 
-                                    fontSize: '0.7rem',
-                                    height: 22,
-                                  }}
-                                />
-                              ))}
-                              {doc.requirements.length > 3 && (
-                                <Chip
-                                  label={`+${doc.requirements.length - 3}`}
-                                  size="small"
-                                  variant="outlined"
-                                  sx={{ 
-                                    fontSize: '0.7rem',
-                                    height: 22,
-                                  }}
-                                />
-                              )}
-                            </Stack>
+                            <Box>
+                              <Typography variant="caption" color="text.secondary" sx={{ 
+                                fontSize: '0.65rem',
+                                fontWeight: 600,
+                                display: 'block',
+                                mb: 0.5,
+                                textTransform: 'uppercase',
+                                letterSpacing: 0.5,
+                              }}>
+                                Persyaratan
+                              </Typography>
+                              <Stack direction="row" spacing={0.5} sx={{ flexWrap: 'wrap', gap: 0.5 }}>
+                                {doc.requirements.map((req, idx) => (
+                                  <Chip
+                                    key={idx}
+                                    label={req}
+                                    size="small"
+                                    sx={{ 
+                                      fontSize: '0.6rem',
+                                      height: 18,
+                                      bgcolor: alpha(theme.palette.text.secondary, 0.1),
+                                      color: 'text.secondary',
+                                      '& .MuiChip-label': { px: 0.5 },
+                                    }}
+                                  />
+                                ))}
+                              </Stack>
+                            </Box>
                           </Stack>
                         </Stack>
                       </CardContent>
@@ -669,23 +420,19 @@ export default function DocumentSelection({ onDocumentSelect }) {
                         <Button 
                           fullWidth 
                           variant="outlined" 
-                          endIcon={<ArrowForward />}
+                          endIcon={<ArrowForward sx={{ fontSize: 16 }} />}
                           sx={{ 
-                            borderRadius: 2,
+                            borderRadius: 1.5,
                             textTransform: 'none',
-                            borderWidth: 2,
-                            fontWeight: 600,
-                            height: 40,
-                            '&:hover': {
-                              borderWidth: 2,
-                              transform: 'translateY(-1px)',
-                            }
+                            fontWeight: 500,
+                            height: 36,
+                            fontSize: '0.8rem',
                           }}
                         >
                           Pilih Dokumen
                         </Button>
                       </CardActions>
-                    </ModernDocumentCard>
+                    </MinimalistDocumentCard>
                   </Fade>
                 </Grid>
               ))

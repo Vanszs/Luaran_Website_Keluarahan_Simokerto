@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { styled, alpha } from '@mui/material/styles';
+import { styled, alpha, useTheme } from '@mui/material/styles';
 import {
   Box,
   CardContent,
@@ -28,7 +28,13 @@ import {
   Card,
   LinearProgress,
   Snackbar,
-  Divider
+  Divider,
+  ToggleButton,
+  ToggleButtonGroup,
+  FormLabel,
+  RadioGroup,
+  FormControlLabel,
+  Radio,
 } from '@mui/material';
 import {
   ArrowBack,
@@ -39,7 +45,9 @@ import {
   Warning,
   Info,
   CloudUpload,
-  Draft
+  Draft,
+  CloudQueue,
+  Store,
 } from '@mui/icons-material';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
@@ -181,6 +189,7 @@ const documentTemplates = {
       { name: 'keterangan_tambahan', label: 'Keterangan Tambahan', type: 'textarea', required: false, step: 2 }
     ],
     requirements: ['KTP Asli', 'Kartu Keluarga', 'Surat RT/RW'],
+    
     estimatedTime: '2-3 hari kerja',
     description: 'Surat keterangan tempat tinggal untuk keperluan administratif'
   },
@@ -224,6 +233,7 @@ const documentTemplates = {
 };
 
 export default function DocumentForm({ selectedDocument, onBack }) {
+  const theme = useTheme(); // ADD MISSING THEME HOOK
   const [formData, setFormData] = useState({});
   const [errors, setErrors] = useState({});
   const [currentStep, setCurrentStep] = useState(0);
@@ -233,6 +243,7 @@ export default function DocumentForm({ selectedDocument, onBack }) {
   const [showSuccess, setShowSuccess] = useState(false);
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'info' });
   const [documentId, setDocumentId] = useState('');
+  const [processType, setProcessType] = useState('online');
 
   const template = documentTemplates[selectedDocument];
 
@@ -383,7 +394,11 @@ export default function DocumentForm({ selectedDocument, onBack }) {
       setIsDraft(false);
       
       setShowSuccess(true);
-      setSnackbar({ open: true, message: 'Dokumen berhasil diajukan!', severity: 'success' });
+      setSnackbar({ 
+        open: true, 
+        message: `Dokumen berhasil diajukan untuk proses ${processType}!`, 
+        severity: 'success' 
+      });
     } catch (error) {
       setSnackbar({ open: true, message: 'Terjadi kesalahan saat mengirim dokumen', severity: 'error' });
     } finally {
@@ -532,6 +547,95 @@ export default function DocumentForm({ selectedDocument, onBack }) {
             Silakan periksa kembali data yang telah Anda isi sebelum mengirim dokumen.
           </Alert>
 
+          {/* PROCESS TYPE SELECTION */}
+          <Paper sx={{ p: 3, mb: 3, bgcolor: 'background.default', borderRadius: 2 }}>
+            <FormControl component="fieldset">
+              <FormLabel component="legend" sx={{ mb: 2, fontWeight: 600, color: 'text.primary' }}>
+                Pilih Jenis Pemrosesan
+              </FormLabel>
+              <RadioGroup
+                value={processType}
+                onChange={(e) => setProcessType(e.target.value)}
+                sx={{ gap: 2 }}
+              >
+                <Paper sx={{ 
+                  p: 2, 
+                  border: processType === 'online' 
+                    ? `2px solid ${theme.palette.primary.main}` 
+                    : `1px solid ${theme.palette.divider}`,
+                  borderRadius: 2,
+                  backgroundColor: processType === 'online' 
+                    ? alpha(theme.palette.primary.main, 0.05) 
+                    : 'transparent',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease'
+                }}>
+                  <FormControlLabel
+                    value="online"
+                    control={<Radio />}
+                    label={
+                      <Stack direction="row" spacing={2} alignItems="center">
+                        <CloudQueue sx={{ 
+                          fontSize: 24, 
+                          color: processType === 'online' ? 'primary.main' : 'text.secondary' 
+                        }} />
+                        <Box>
+                          <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
+                            Proses Online
+                          </Typography>
+                          <Typography variant="body2" color="text.secondary" sx={{ fontSize: '0.8rem' }}>
+                            • Dokumen dapat diunduh dan dicetak sendiri<br/>
+                            • Tanda tangan digital<br/>
+                            • Proses lebih cepat
+                          </Typography>
+                        </Box>
+                      </Stack>
+                    }
+                    sx={{ width: '100%', m: 0 }}
+                  />
+                </Paper>
+
+                <Paper sx={{ 
+                  p: 2, 
+                  border: processType === 'offline' 
+                    ? `2px solid ${theme.palette.primary.main}` 
+                    : `1px solid ${theme.palette.divider}`,
+                  borderRadius: 2,
+                  backgroundColor: processType === 'offline' 
+                    ? alpha(theme.palette.primary.main, 0.05) 
+                    : 'transparent',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease'
+                }}>
+                  <FormControlLabel
+                    value="offline"
+                    control={<Radio />}
+                    label={
+                      <Stack direction="row" spacing={2} alignItems="center">
+                        <Store sx={{ 
+                          fontSize: 24, 
+                          color: processType === 'offline' ? 'primary.main' : 'text.secondary' 
+                        }} />
+                        <Box>
+                          <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
+                            Proses Offline
+                          </Typography>
+                          <Typography variant="body2" color="text.secondary" sx={{ fontSize: '0.8rem' }}>
+                            • Dokumen diambil di kelurahan<br/>
+                            • Tanda tangan basah resmi<br/>
+                            • Lebih formal untuk keperluan tertentu
+                          </Typography>
+                        </Box>
+                      </Stack>
+                    }
+                    sx={{ width: '100%', m: 0 }}
+                  />
+                </Paper>
+              </RadioGroup>
+            </FormControl>
+          </Paper>
+
+          {/* EXISTING PREVIEW CONTENT */}
           <Grid container spacing={2}>
             {template.fields.map((field) => {
               const value = formData[field.name];
@@ -802,6 +906,33 @@ export default function DocumentForm({ selectedDocument, onBack }) {
                 {documentId}
               </Typography>
             </Paper>
+            
+            {/* PROCESS TYPE INFO */}
+            <Paper sx={{ 
+              p: 2, 
+              mb: 3, 
+              bgcolor: alpha(theme.palette.info.main, 0.1),
+              border: `1px solid ${alpha(theme.palette.info.main, 0.2)}`
+            }}>
+              <Stack direction="row" spacing={2} alignItems="center" justifyContent="center">
+                {processType === 'online' ? (
+                  <>
+                    <CloudQueue sx={{ color: 'info.main' }} />
+                    <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                      Proses Online - Dokumen dapat diunduh setelah selesai
+                    </Typography>
+                  </>
+                ) : (
+                  <>
+                    <Store sx={{ color: 'info.main' }} />
+                    <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                      Proses Offline - Dokumen diambil di Kelurahan Simokerto
+                    </Typography>
+                  </>
+                )}
+              </Stack>
+            </Paper>
+
             <Alert severity="info" sx={{ textAlign: 'left' }}>
               Dokumen akan diproses dalam waktu <strong>{template.estimatedTime}</strong>. 
               Anda dapat melihat status pengajuan di menu Riwayat.
