@@ -129,6 +129,11 @@ function getFileRequirements(requirements) {
 const documentTemplates = {
   'Surat Keterangan Domisili': {
     steps: ['Informasi Pribadi', 'Detail Domisili', 'Keperluan', 'Cek ulang data'],
+    requirements: ['KTP Asli', 'Kartu Keluarga', 'Surat RT/RW'],
+    estimatedTime: '2-3 hari kerja',
+    description: 'Surat keterangan tempat tinggal untuk keperluan administratif',
+    category: 'Kependudukan',
+    color: '#2563eb',
     fields: [
       { name: 'nama', label: 'Nama Lengkap', type: 'text', required: true, step: 0 },
       { name: 'nik', label: 'NIK (16 digit)', type: 'text', required: true, step: 0, pattern: '^[0-9]{16}$' },
@@ -144,14 +149,35 @@ const documentTemplates = {
       { name: 'kecamatan', label: 'Kecamatan', type: 'text', required: true, step: 1, default: 'Simokerto' },
       { name: 'kota', label: 'Kota', type: 'text', required: true, step: 1, default: 'Surabaya' },
       { name: 'keperluan', label: 'Keperluan Surat', type: 'textarea', required: true, step: 2, placeholder: 'Jelaskan dengan detail keperluan surat ini...' },
-    ],
-    requirements: ['KTP Asli', 'Kartu Keluarga', 'Surat RT/RW'],
-    
-    estimatedTime: '2-3 hari kerja',
-    description: 'Surat keterangan tempat tinggal untuk keperluan administratif'
+    ]
   },
-  'SKTM (Surat Keterangan Tidak Mampu)': {
+  'Surat Keterangan Usaha': {
+    steps: ['Data Pemilik', 'Detail Usaha', 'Keperluan', 'Preview'],
+    requirements: ['KTP', 'KK', 'Foto Usaha'],
+    estimatedTime: '3-5 hari kerja',
+    description: 'Legalisasi kegiatan usaha dan perizinan bisnis',
+    category: 'Usaha',
+    color: '#7c3aed',
+    fields: [
+      { name: 'nama', label: 'Nama Lengkap Pemilik', type: 'text', required: true, step: 0 },
+      { name: 'nik', label: 'NIK (16 digit)', type: 'text', required: true, step: 0, pattern: '^[0-9]{16}$' },
+      { name: 'alamat_pemilik', label: 'Alamat Pemilik', type: 'textarea', required: true, step: 0 },
+      { name: 'nama_usaha', label: 'Nama Usaha', type: 'text', required: true, step: 1 },
+      { name: 'jenis_usaha', label: 'Jenis Usaha', type: 'select', required: true, step: 1, options: ['Warung Kelontong', 'Toko', 'Rumah Makan', 'Jasa', 'Bengkel', 'Salon/Barbershop', 'Lainnya'] },
+      { name: 'alamat_usaha', label: 'Alamat Usaha', type: 'textarea', required: true, step: 1 },
+      { name: 'modal_usaha', label: 'Modal Usaha (Rp)', type: 'number', required: true, step: 1 },
+      { name: 'lama_usaha', label: 'Lama Usaha (tahun)', type: 'number', required: true, step: 1 },
+      { name: 'jumlah_karyawan', label: 'Jumlah Karyawan', type: 'number', required: true, step: 1 },
+      { name: 'keperluan', label: 'Keperluan', type: 'textarea', required: true, step: 2 }
+    ]
+  },
+  'Surat Keterangan Tidak Mampu': {
     steps: ['Data Diri', 'Kondisi Ekonomi', 'Keperluan', 'Cek Ulang Data'],
+    requirements: ['KTP', 'KK', 'Foto Rumah'],
+    estimatedTime: '2-3 hari kerja',
+    description: 'Verifikasi kondisi ekonomi untuk bantuan sosial',
+    category: 'Sosial',
+    color: '#059669',
     fields: [
       { name: 'nama', label: 'Nama Lengkap', type: 'text', required: true, step: 0 },
       { name: 'nik', label: 'NIK (16 digit)', type: 'text', required: true, step: 0, pattern: '^[0-9]{16}$' },
@@ -164,30 +190,206 @@ const documentTemplates = {
       { name: 'kondisi_rumah', label: 'Kondisi Rumah', type: 'select', required: true, step: 1, options: ['Milik Sendiri (Sederhana)', 'Kontrak', 'Menumpang', 'Rumah Orang Tua', 'Lainnya'] },
       { name: 'keperluan_surat', label: 'Keperluan Surat', type: 'textarea', required: true, step: 2 },
       { name: 'keterangan_tambahan', label: 'Keterangan Tambahan', type: 'textarea', required: false, step: 2 }
-    ],
-    requirements: ['KTP Asli', 'Kartu Keluarga', 'Surat RT/RW', 'Foto Rumah', 'Slip Gaji (jika ada)'],
-    estimatedTime: '2-3 hari kerja',
-    description: 'Surat keterangan kondisi ekonomi tidak mampu untuk bantuan sosial'
+    ]
   },
-  'Surat Keterangan Usaha (SKU)': {
-    steps: ['Data Pemilik', 'Detail Usaha', 'Keperluan', 'Preview'],
+  'Surat Pengantar SKCK': {
+    steps: ['Data Diri', 'Keperluan', 'Preview'],
+    requirements: ['KTP', 'KK', 'Pas Foto'],
+    estimatedTime: '1 hari kerja',
+    description: 'Pengantar untuk pengurusan SKCK di kepolisian',
+    category: 'Kependudukan',
+    color: '#dc2626',
     fields: [
-      { name: 'nama', label: 'Nama Lengkap Pemilik', type: 'text', required: true, step: 0 },
+      { name: 'nama', label: 'Nama Lengkap', type: 'text', required: true, step: 0 },
       { name: 'nik', label: 'NIK (16 digit)', type: 'text', required: true, step: 0, pattern: '^[0-9]{16}$' },
-      { name: 'alamat_pemilik', label: 'Alamat Pemilik', type: 'textarea', required: true, step: 0 },
-      { name: 'nama_usaha', label: 'Nama Usaha', type: 'text', required: true, step: 1 },
-      { name: 'jenis_usaha', label: 'Jenis Usaha', type: 'select', required: true, step: 1, options: ['Warung Kelontong', 'Toko', 'Rumah Makan', 'Jasa', 'Bengkel', 'Salon/Barbershop', 'Lainnya'] },
-      { name: 'alamat_usaha', label: 'Alamat Usaha', type: 'textarea', required: true, step: 1 },
-      { name: 'modal_usaha', label: 'Modal Usaha (Rp)', type: 'number', required: true, step: 1 },
-      { name: 'lama_usaha', label: 'Lama Usaha (tahun)', type: 'number', required: true, step: 1 },
-      { name: 'jumlah_karyawan', label: 'Jumlah Karyawan', type: 'number', required: true, step: 1 },
-      { name: 'keperluan', label: 'Keperluan', type: 'textarea', required: true, step: 2 }
-    ],
-    requirements: ['KTP Asli', 'Kartu Keluarga', 'Foto Tempat Usaha', 'Surat RT/RW'],
-    estimatedTime: '3-5 hari kerja',
-    description: 'Surat keterangan untuk kegiatan usaha dan perizinan'
+      { name: 'alamat', label: 'Alamat Lengkap', type: 'textarea', required: true, step: 0 },
+      { name: 'keperluan', label: 'Keperluan', type: 'textarea', required: true, step: 1 }
+    ]
+  },
+  'Surat Keterangan Kelahiran': {
+    steps: ['Data Anak', 'Data Orang Tua', 'Keterangan Lahir', 'Preview'],
+    requirements: ['KTP Ortu', 'KK', 'Surat RS'],
+    estimatedTime: '1-2 hari kerja',
+    description: 'Keterangan kelahiran untuk akta kelahiran',
+    category: 'Kependudukan',
+    color: '#d97706',
+    fields: [
+      { name: 'nama_anak', label: 'Nama Anak', type: 'text', required: true, step: 0 },
+      { name: 'tanggal_lahir', label: 'Tanggal Lahir', type: 'date', required: true, step: 0 },
+      { name: 'tempat_lahir', label: 'Tempat Lahir', type: 'text', required: true, step: 0 },
+      { name: 'nama_ortu', label: 'Nama Orang Tua', type: 'text', required: true, step: 1 },
+      { name: 'alamat_ortu', label: 'Alamat Orang Tua', type: 'textarea', required: true, step: 1 },
+      { name: 'keterangan', label: 'Keterangan Tambahan', type: 'textarea', required: false, step: 2 }
+    ]
+  },
+  'Surat Keterangan Kematian': {
+    steps: ['Data Almarhum', 'Keterangan Kematian', 'Data Pelapor', 'Preview'],
+    requirements: ['KTP', 'Surat Dokter'],
+    estimatedTime: '1-2 hari kerja',
+    description: 'Keterangan kematian untuk akta kematian',
+    category: 'Kependudukan',
+    color: '#0891b2',
+    fields: [
+      { name: 'nama_almarhum', label: 'Nama Almarhum', type: 'text', required: true, step: 0 },
+      { name: 'tanggal_kematian', label: 'Tanggal Kematian', type: 'date', required: true, step: 1 },
+      { name: 'tempat_kematian', label: 'Tempat Kematian', type: 'text', required: true, step: 1 },
+      { name: 'nama_pelapor', label: 'Nama Pelapor', type: 'text', required: true, step: 2 },
+      { name: 'hubungan', label: 'Hubungan dengan Almarhum', type: 'text', required: true, step: 2 }
+    ]
   }
 };
+
+// Modernized Header Section for All Document Types
+function renderHeaderSection(template, selectedDocument, currentStep, isDraft, theme) {
+  return (
+    <SectionContainer elevation={0} sx={{ mb: 4, p: 0 }}>
+      <CardContent sx={{ p: { xs: 2, sm: 3, md: 4 }, position: 'relative', zIndex: 1 }}>
+        <Stack spacing={2}>
+          <Stack direction="row" alignItems="center" justifyContent="space-between">
+            <Box>
+              <Typography variant="h5" sx={{
+                fontWeight: 800,
+                color: template.color || (theme.palette.mode === 'dark' ? theme.palette.primary.light : theme.palette.primary.main),
+                letterSpacing: 0.2,
+                mb: 0.5,
+                fontSize: { xs: '1.2rem', sm: '1.4rem' }
+              }}>
+                {selectedDocument}
+              </Typography>
+              <Typography variant="body2" color="text.secondary" sx={{
+                fontWeight: 500,
+                fontSize: '0.98rem',
+                mb: 0.5,
+                opacity: 0.85
+              }}>
+                {template?.description}
+              </Typography>
+              <Chip
+                label={template.category}
+                size="small"
+                sx={{
+                  fontWeight: 600,
+                  fontSize: '0.7rem',
+                  height: 22,
+                  mt: 0.5,
+                  bgcolor: alpha(template.color || theme.palette.primary.main, 0.12),
+                  color: template.color || theme.palette.primary.main,
+                  border: `1px solid ${alpha(template.color || theme.palette.primary.main, 0.22)}`,
+                }}
+              />
+            </Box>
+            {isDraft && (
+              <Chip
+                icon={<Drafts />}
+                label="Draft Tersimpan"
+                color="warning"
+                variant="soft"
+                sx={{
+                  fontWeight: 600,
+                  fontSize: '0.85rem',
+                  borderRadius: 2,
+                  px: 1.5,
+                  height: 32,
+                  background: theme.palette.mode === 'dark'
+                    ? 'rgba(251,191,36,0.12)'
+                    : 'rgba(251,191,36,0.09)',
+                  color: theme.palette.warning.main,
+                  border: `1.5px solid ${theme.palette.warning.main}22`,
+                }}
+              />
+            )}
+          </Stack>
+          <Grid container spacing={2}>
+            <Grid item xs={12} md={4}>
+              <Paper elevation={0} sx={{
+                p: 2,
+                borderRadius: 2,
+                bgcolor: theme.palette.mode === 'dark'
+                  ? alpha(theme.palette.success.main, 0.08)
+                  : alpha(theme.palette.success.main, 0.06),
+                border: `1px solid ${alpha(theme.palette.success.main, 0.13)}`,
+                minHeight: 70,
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'center',
+              }}>
+                <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600, mb: 0.5 }}>
+                  Estimasi Waktu
+                </Typography>
+                <Typography variant="body1" sx={{
+                  fontWeight: 700,
+                  color: theme.palette.success.main,
+                  fontSize: '1.05rem'
+                }}>
+                  {template.estimatedTime}
+                </Typography>
+              </Paper>
+            </Grid>
+            <Grid item xs={12} md={8}>
+              <Paper elevation={0} sx={{
+                p: 2,
+                borderRadius: 2,
+                bgcolor: theme.palette.mode === 'dark'
+                  ? alpha(theme.palette.primary.main, 0.08)
+                  : alpha(theme.palette.primary.main, 0.06),
+                border: `1px solid ${alpha(theme.palette.primary.main, 0.13)}`,
+                minHeight: 70,
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'center',
+              }}>
+                <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600, mb: 0.5 }}>
+                  Persyaratan Dokumen
+                </Typography>
+                <Stack direction="row" spacing={1} sx={{ flexWrap: 'wrap', gap: 1 }}>
+                  {template.requirements.map((req, idx) => (
+                    <Chip
+                      key={idx}
+                      label={req}
+                      size="small"
+                      variant="soft"
+                      sx={{
+                        fontWeight: 600,
+                        fontSize: '0.78rem',
+                        borderRadius: 1.5,
+                        bgcolor: theme.palette.mode === 'dark'
+                          ? alpha(template.color || theme.palette.primary.main, 0.13)
+                          : alpha(template.color || theme.palette.primary.main, 0.09),
+                        color: template.color || theme.palette.primary.main,
+                        border: `1px solid ${alpha(template.color || theme.palette.primary.main, 0.22)}`,
+                        height: 26,
+                      }}
+                    />
+                  ))}
+                </Stack>
+              </Paper>
+            </Grid>
+          </Grid>
+          <Stack>
+            <Stepper activeStep={currentStep} alternativeLabel>
+              {template.steps.map((label, idx) => (
+                <Step key={label}>
+                  <StepLabel
+                    sx={{
+                      '& .MuiStepLabel-label': {
+                        fontWeight: 600,
+                        fontSize: '0.95rem',
+                        color: theme.palette.text.primary,
+                        opacity: 0.95
+                      }
+                    }}
+                  >
+                    {label}
+                  </StepLabel>
+                </Step>
+              ))}
+            </Stepper>
+          </Stack>
+        </Stack>
+      </CardContent>
+    </SectionContainer>
+  );
+}
 
 export default function DocumentForm({ selectedDocument, onBack }) {
   const theme = useTheme();
@@ -856,142 +1058,6 @@ export default function DocumentForm({ selectedDocument, onBack }) {
     return renderStepContent();
   };
 
-  const renderHeaderSection = () => (
-    <SectionContainer elevation={0} sx={{ mb: 4, p: 0 }}>
-      <CardContent sx={{ p: { xs: 2, sm: 3, md: 4 }, position: 'relative', zIndex: 1 }}>
-        <Stack spacing={2}>
-          <Stack direction="row" alignItems="center" justifyContent="space-between">
-            <Box>
-              <Typography variant="h5" sx={{
-                fontWeight: 800,
-                color: theme.palette.mode === 'dark' ? theme.palette.primary.light : theme.palette.primary.main,
-                letterSpacing: 0.2,
-                mb: 0.5,
-                fontSize: { xs: '1.2rem', sm: '1.4rem' }
-              }}>
-                {selectedDocument}
-              </Typography>
-              <Typography variant="body2" color="text.secondary" sx={{
-                fontWeight: 500,
-                fontSize: '0.98rem',
-                mb: 0.5,
-                opacity: 0.85
-              }}>
-                {template?.description}
-              </Typography>
-            </Box>
-            {isDraft && (
-              <Chip
-                icon={<Drafts />}
-                label="Draft Tersimpan"
-                color="warning"
-                variant="soft"
-                sx={{
-                  fontWeight: 600,
-                  fontSize: '0.85rem',
-                  borderRadius: 2,
-                  px: 1.5,
-                  height: 32,
-                  background: theme.palette.mode === 'dark'
-                    ? 'rgba(251,191,36,0.12)'
-                    : 'rgba(251,191,36,0.09)',
-                  color: theme.palette.warning.main,
-                  border: `1.5px solid ${theme.palette.warning.main}22`,
-                }}
-              />
-            )}
-          </Stack>
-          <Grid container spacing={2}>
-            <Grid item xs={12} md={4}>
-              <Paper elevation={0} sx={{
-                p: 2,
-                borderRadius: 2,
-                bgcolor: theme.palette.mode === 'dark'
-                  ? alpha(theme.palette.success.main, 0.08)
-                  : alpha(theme.palette.success.main, 0.06),
-                border: `1px solid ${alpha(theme.palette.success.main, 0.13)}`,
-                minHeight: 70,
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'center',
-              }}>
-                <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600, mb: 0.5 }}>
-                  Estimasi Waktu
-                </Typography>
-                <Typography variant="body1" sx={{
-                  fontWeight: 700,
-                  color: theme.palette.success.main,
-                  fontSize: '1.05rem'
-                }}>
-                  {template.estimatedTime}
-                </Typography>
-              </Paper>
-            </Grid>
-            <Grid item xs={12} md={8}>
-              <Paper elevation={0} sx={{
-                p: 2,
-                borderRadius: 2,
-                bgcolor: theme.palette.mode === 'dark'
-                  ? alpha(theme.palette.primary.main, 0.08)
-                  : alpha(theme.palette.primary.main, 0.06),
-                border: `1px solid ${alpha(theme.palette.primary.main, 0.13)}`,
-                minHeight: 70,
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'center',
-              }}>
-                <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600, mb: 0.5 }}>
-                  Persyaratan Dokumen
-                </Typography>
-                <Stack direction="row" spacing={1} sx={{ flexWrap: 'wrap', gap: 1 }}>
-                  {template.requirements.map((req, idx) => (
-                    <Chip
-                      key={idx}
-                      label={req}
-                      size="small"
-                      variant="soft"
-                      sx={{
-                        fontWeight: 600,
-                        fontSize: '0.78rem',
-                        borderRadius: 1.5,
-                        bgcolor: theme.palette.mode === 'dark'
-                          ? alpha(theme.palette.primary.main, 0.13)
-                          : alpha(theme.palette.primary.main, 0.09),
-                        color: theme.palette.primary.main,
-                        border: `1px solid ${alpha(theme.palette.primary.main, 0.22)}`,
-                        height: 26,
-                      }}
-                    />
-                  ))}
-                </Stack>
-              </Paper>
-            </Grid>
-          </Grid>
-          <Stack>
-            <Stepper activeStep={currentStep} alternativeLabel>
-              {template.steps.map((label, idx) => (
-                <Step key={label}>
-                  <StepLabel
-                    sx={{
-                      '& .MuiStepLabel-label': {
-                        fontWeight: 600,
-                        fontSize: '0.95rem',
-                        color: theme.palette.text.primary,
-                        opacity: 0.95
-                      }
-                    }}
-                  >
-                    {label}
-                  </StepLabel>
-                </Step>
-              ))}
-            </Stepper>
-          </Stack>
-        </Stack>
-      </CardContent>
-    </SectionContainer>
-  );
-
   if (!template) {
     return (
       <Box sx={{ p: 2, textAlign: 'center' }}>
@@ -1011,7 +1077,7 @@ export default function DocumentForm({ selectedDocument, onBack }) {
           : 'linear-gradient(135deg, #e0f2fe 0%, #f8fafc 25%, #f1f5f9 50%, #e7e5e4 75%, #fef7cd 100%)',
         minHeight: '100vh',
       }}>
-        {renderHeaderSection()}
+        {template && renderHeaderSection(template, selectedDocument, currentStep, isDraft, theme)}
         <SectionContainer elevation={0}>
           <CardContent sx={{ p: 4, position: 'relative', zIndex: 2 }}>
             {getStepContent()}
