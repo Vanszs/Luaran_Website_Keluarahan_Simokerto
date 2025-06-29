@@ -232,6 +232,50 @@ const documents = [
     icon: <BusinessIcon />,
     processType: 'offline'
   },
+  {
+    id: 9,
+    type: 'SKCK',
+    fullType: 'Surat Keterangan Catatan Kepolisian',
+    documentNumber: 'SKCK/013/2024',
+    date: '2024-02-01',
+    status: 'diproses',
+    description: 'Keperluan magang',
+    icon: <WorkIcon />,
+    processType: 'offline'
+  },
+  {
+    id: 10,
+    type: 'SKTM',
+    fullType: 'Surat Keterangan Tidak Mampu',
+    documentNumber: 'SKTM/003/2024',
+    date: '2024-02-02',
+    status: 'menunggu',
+    description: 'Pengajuan bantuan pendidikan',
+    icon: <FamilyRestroomIcon />,
+    processType: 'online'
+  },
+  {
+    id: 11,
+    type: 'SKU',
+    fullType: 'Surat Keterangan Usaha',
+    documentNumber: 'SKU/025/2024',
+    date: '2024-02-03',
+    status: 'selesai',
+    description: 'Perpanjangan izin usaha',
+    icon: <BusinessIcon />,
+    processType: 'offline'
+  },
+  {
+    id: 12,
+    type: 'SKS',
+    fullType: 'Surat Keterangan Sekolah',
+    documentNumber: 'SKS/068/2024',
+    date: '2024-02-04',
+    status: 'diproses',
+    description: 'Pindah sekolah',
+    icon: <SchoolIcon />,
+    processType: 'online'
+  }
 ];
 
 const getStatusConfig = (status, theme) => {
@@ -283,7 +327,7 @@ export default function RiwayatPage() {
   const theme = useTheme();
   const [searchTerm, setSearchTerm] = React.useState('');
   const [currentPage, setCurrentPage] = React.useState(1);
-  const [itemsPerPage] = React.useState(10);
+  const itemsPerPage = 10;
   const [rejectionDialog, setRejectionDialog] = React.useState({ open: false, reason: '', documentNumber: '' });
   const [cancelDialog, setCancelDialog] = React.useState({ open: false, documentId: null, documentNumber: '' });
 
@@ -302,7 +346,7 @@ export default function RiwayatPage() {
   };
 
   const filteredDocuments = filterDocuments();
-  
+
   const totalPages = Math.ceil(filteredDocuments.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const paginatedDocuments = filteredDocuments.slice(startIndex, startIndex + itemsPerPage);

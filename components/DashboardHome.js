@@ -467,14 +467,6 @@ export default function DashboardHome({ onViewChange }) {
     },
     {
       id: 4,
-      title: 'Pengambilan',
-      description: 'Ambil dokumen dengan tanda terima',
-      icon: <HomeWorkIcon />,
-      color: theme.palette.mode === 'dark' ? '#34d399' : '#059669',
-      type: 'reminder'
-    },
-    {
-      id: 5,
       title: 'Kontak',
       description: 'WA: 0811-2345-6789\nTelp: (031) 123-4567',
       icon: <NotificationsIcon />,
@@ -482,6 +474,14 @@ export default function DashboardHome({ onViewChange }) {
       type: 'contact'
     }
   ];
+
+  // Hanya tampilkan 3 dokumen terbaru di dashboard
+  const allDocumentHistory = [
+    ...documentHistory,
+    // ...tambahkan dummy data jika ingin menguji lebih dari 10 item...
+  ];
+  const sortedHistory = [...allDocumentHistory].sort((a, b) => new Date(b.date) - new Date(a.date));
+  const pagedHistory = sortedHistory.slice(0, 3);
 
   return (
     <Box sx={{ 
@@ -789,7 +789,7 @@ export default function DashboardHome({ onViewChange }) {
                   </Stack>
 
                   <Stack spacing={2}>
-                    {documentHistory.map((doc, index) => (
+                    {pagedHistory.map((doc, index) => (
                       <DocumentCard key={doc.id} elevation={0}>
                         <CardContent sx={{ p: 2.5, position: 'relative', zIndex: 2 }}>
                           <Stack direction="row" justifyContent="space-between" alignItems="center">
@@ -891,156 +891,118 @@ export default function DashboardHome({ onViewChange }) {
         <Grid item xs={12}>
           <SectionContainer elevation={0}>
             <CardContent sx={{ p: 3, position: 'relative', zIndex: 2 }}>
-              <Stack direction="row" alignItems="center" spacing={2} sx={{ mb: 3 }}>
-                <NotificationsIcon sx={{ 
-                  fontSize: 20,
-                  color: theme.palette.primary.main,
-                }} />
-                <Typography variant="h6" sx={{ 
-                  fontWeight: 600,
-                  color: theme.palette.text.primary,
-                  fontSize: '1rem',
-                }}>
-                  Informasi Layanan
-                </Typography>
-              </Stack>
-
+              <Typography variant="h6" sx={{
+                fontWeight: 700,
+                color: theme.palette.text.primary,
+                fontSize: '1.1rem',
+                mb: 2,
+                textAlign: 'center',
+                letterSpacing: 0.2,
+              }}>
+                Informasi Layanan
+              </Typography>
               <Grid container spacing={2}>
-                {informationItems.map((item) => (
-                  <Grid item xs={12} sm={6} md={4} lg={2.4} key={item.id}>
-                    <Box 
-                      sx={{
-                        p: 1.5,
-                        borderRadius: 1.5,
-                        background: theme.palette.mode === 'dark'
-                          ? alpha(item.color, 0.1)
-                          : alpha(item.color, 0.08),
-                        border: theme.palette.mode === 'dark'
-                          ? `1px solid ${alpha(item.color, 0.2)}`
-                          : `1px solid ${alpha(item.color, 0.15)}`,
-                        transition: 'all 0.2s ease',
-                        height: '100%',
-                        '&:hover': {
-                          transform: 'translateY(-1px)',
-                          boxShadow: theme.palette.mode === 'dark'
-                            ? `0 4px 12px ${alpha(item.color, 0.2)}`
-                            : `0 3px 8px ${alpha(item.color, 0.12)}`,
-                        }
-                      }}
-                    >
-                      <Stack spacing={1} sx={{ height: '100%' }}>
-                        <Stack direction="row" alignItems="center" spacing={1}>
-                          <Box
-                            sx={{
-                              width: 24,
-                              height: 24,
-                              borderRadius: 1,
-                              background: alpha(item.color, 0.15),
-                              display: 'flex',
-                              alignItems: 'center',
-                              justifyContent: 'center',
-                              color: item.color,
-                              flexShrink: 0,
-                            }}
-                          >
-                            {React.cloneElement(item.icon, { sx: { fontSize: 12 } })}
-                          </Box>
-                          
-                          <Typography 
-                            variant="subtitle2" 
-                            sx={{ 
-                              fontWeight: 600, 
-                              color: item.color,
-                              fontSize: '0.75rem',
-                              lineHeight: 1.2,
-                            }}
-                          >
-                            {item.title}
-                          </Typography>
-                        </Stack>
-                        
-                        <Typography 
-                          variant="body2" 
-                          color="text.secondary" 
-                          sx={{ 
-                            fontSize: '0.65rem',
-                            lineHeight: 1.3,
-                            whiteSpace: 'pre-line',
-                            flexGrow: 1,
-                            display: '-webkit-box',
-                            WebkitLineClamp: 3,
-                            WebkitBoxOrient: 'vertical',
-                            overflow: 'hidden',
-                          }}
-                        >
-                          {item.description}
-                        </Typography>
-
-                        <Chip
-                          label={
-                            item.type === 'info' ? 'Info' :
-                            item.type === 'tip' ? 'Tips' :
-                            item.type === 'reminder' ? 'Pengingat' :
-                            item.type === 'contact' ? 'Kontak' : 'Lainnya'
-                          }
-                          size="small"
-                          sx={{
-                            background: alpha(item.color, 0.15),
-                            color: item.color,
-                            fontWeight: 500,
-                            fontSize: '0.6rem',
-                            height: 16,
-                            alignSelf: 'flex-start',
-                            '& .MuiChip-label': {
-                              px: 0.5,
-                            }
-                          }}
-                        />
-                      </Stack>
-                    </Box>
-                  </Grid>
-                ))}
-              </Grid>
-
-              <Box sx={{ mt: 2, pt: 2, borderTop: `1px solid ${alpha(theme.palette.divider, 0.3)}` }}>
-                <Grid container spacing={2}>
-                  <Grid item xs={6}>
-                    <Button
-                      variant="outlined"
-                      fullWidth
-                      size="small"
-                      startIcon={<AssignmentIcon sx={{ fontSize: 12 }} />}
-                      sx={{
-                        borderRadius: 1.5,
-                        textTransform: 'none',
-                        fontWeight: 500,
-                        fontSize: '0.7rem',
-                        height: 28,
-                      }}
-                    >
-                      Panduan
-                    </Button>
-                  </Grid>
-                  
-                  <Grid item xs={6}>
-                    <Button
-                      variant="contained"
-                      fullWidth
-                      size="small"
-                      startIcon={<NotificationsIcon sx={{ fontSize: 12 }} />}
-                      sx={{
-                        borderRadius: 1.5,
-                        textTransform: 'none',
-                        fontWeight: 500,
-                        fontSize: '0.7rem',
-                        height: 28,
-                      }}
-                    >
-                      Bantuan
-                    </Button>
-                  </Grid>
+                {/* Jam Operasional */}
+                <Grid item xs={12} sm={6} md={4} lg={3}>
+                  <Paper elevation={0} sx={{
+                    p: 2,
+                    borderRadius: 2,
+                    bgcolor: theme.palette.mode === 'dark'
+                      ? alpha(theme.palette.info.main, 0.07)
+                      : alpha(theme.palette.info.main, 0.06),
+                    border: `1px solid ${alpha(theme.palette.info.main, 0.13)}`,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: 1,
+                    minHeight: 90,
+                  }}>
+                    <Stack direction="row" alignItems="center" spacing={1}>
+                      <AccessTimeIcon sx={{ fontSize: 18, color: theme.palette.info.main }} />
+                      <Typography variant="subtitle2" sx={{ fontWeight: 600, color: theme.palette.info.main, fontSize: '0.85rem' }}>
+                        Jam Operasional
+                      </Typography>
+                    </Stack>
+                    <Typography variant="body2" sx={{ color: theme.palette.text.primary, fontWeight: 500, fontSize: '0.9rem', mt: 0.5 }}>
+                      Sen-Jum: 08:00-15:00<br />Sabtu: 08:00-12:00
+                    </Typography>
+                  </Paper>
                 </Grid>
-              </Box>
+                {/* Persyaratan */}
+                <Grid item xs={12} sm={6} md={4} lg={3}>
+                  <Paper elevation={0} sx={{
+                    p: 2,
+                    borderRadius: 2,
+                    bgcolor: theme.palette.mode === 'dark'
+                      ? alpha(theme.palette.warning.main, 0.07)
+                      : alpha(theme.palette.warning.main, 0.06),
+                    border: `1px solid ${alpha(theme.palette.warning.main, 0.13)}`,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: 1,
+                    minHeight: 90,
+                  }}>
+                    <Stack direction="row" alignItems="center" spacing={1}>
+                      <AssignmentIcon sx={{ fontSize: 18, color: theme.palette.warning.main }} />
+                      <Typography variant="subtitle2" sx={{ fontWeight: 600, color: theme.palette.warning.main, fontSize: '0.85rem' }}>
+                        Persyaratan
+                      </Typography>
+                    </Stack>
+                    <Typography variant="body2" sx={{ color: theme.palette.text.primary, fontWeight: 500, fontSize: '0.9rem', mt: 0.5 }}>
+                      Siapkan KTP, KK & dokumen pendukung
+                    </Typography>
+                  </Paper>
+                </Grid>
+                {/* Waktu Proses */}
+                <Grid item xs={12} sm={6} md={4} lg={3}>
+                  <Paper elevation={0} sx={{
+                    p: 2,
+                    borderRadius: 2,
+                    bgcolor: theme.palette.mode === 'dark'
+                      ? alpha(theme.palette.success.main, 0.07)
+                      : alpha(theme.palette.success.main, 0.06),
+                    border: `1px solid ${alpha(theme.palette.success.main, 0.13)}`,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: 1,
+                    minHeight: 90,
+                  }}>
+                    <Stack direction="row" alignItems="center" spacing={1}>
+                      <SchoolIcon sx={{ fontSize: 18, color: theme.palette.success.main }} />
+                      <Typography variant="subtitle2" sx={{ fontWeight: 600, color: theme.palette.success.main, fontSize: '0.85rem' }}>
+                        Waktu Proses
+                      </Typography>
+                    </Stack>
+                    <Typography variant="body2" sx={{ color: theme.palette.text.primary, fontWeight: 500, fontSize: '0.9rem', mt: 0.5 }}>
+                      SKTM: 3-5 hari • Domisili: 2-3 hari<br />SKU: 5-7 hari
+                    </Typography>
+                  </Paper>
+                </Grid>
+                {/* Kontak */}
+                <Grid item xs={12} sm={6} md={4} lg={3}>
+                  <Paper elevation={0} sx={{
+                    p: 2,
+                    borderRadius: 2,
+                    bgcolor: theme.palette.mode === 'dark'
+                      ? alpha(theme.palette.error.main, 0.07)
+                      : alpha(theme.palette.error.main, 0.06),
+                    border: `1px solid ${alpha(theme.palette.error.main, 0.13)}`,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: 1,
+                    minHeight: 90,
+                  }}>
+                    <Stack direction="row" alignItems="center" spacing={1}>
+                      <NotificationsIcon sx={{ fontSize: 18, color: theme.palette.error.main }} />
+                      <Typography variant="subtitle2" sx={{ fontWeight: 600, color: theme.palette.error.main, fontSize: '0.85rem' }}>
+                        Kontak
+                      </Typography>
+                    </Stack>
+                    <Typography variant="body2" sx={{ color: theme.palette.text.primary, fontWeight: 500, fontSize: '0.9rem', mt: 0.5 }}>
+                      WA: 0811-2345-6789<br />Telp: (031) 123-4567
+                    </Typography>
+                  </Paper>
+                </Grid>
+              </Grid>
             </CardContent>
           </SectionContainer>
         </Grid>

@@ -376,7 +376,7 @@ export default function SettingsPage() {
 
                 <Divider sx={{ my: 2 }} />
 
-                <Stack spacing={2}>
+                {/* <Stack spacing={2}>
                   <FormControlLabel
                     control={
                       <Switch
@@ -418,7 +418,7 @@ export default function SettingsPage() {
                     }
                     sx={{ alignItems: 'flex-start' }}
                   />
-                </Stack>
+                </Stack> */}
 
                 <Button
                   variant="contained"

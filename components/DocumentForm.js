@@ -2,53 +2,52 @@
 
 import React, { useState, useEffect } from 'react';
 import { styled, alpha, useTheme } from '@mui/material/styles';
-import {
-  Box,
-  CardContent,
-  Typography,
-  TextField,
-  Button,
-  Grid,
-  MenuItem,
-  FormControl,
-  InputLabel,
-  Select,
-  Paper,
-  Stepper,
-  Step,
-  StepLabel,
-  Stack,
-  Alert,
-  Chip,
-  CircularProgress,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Card,
-  LinearProgress,
-  Snackbar,
-  Divider,
-  ToggleButton,
-  ToggleButtonGroup,
-  FormLabel,
-  RadioGroup,
-  FormControlLabel,
-  Radio,
-} from '@mui/material';
-import {
-  ArrowBack,
-  Save,
-  Send,
-  Preview,
-  CheckCircle,
-  Warning,
-  Info,
-  CloudUpload,
-  Draft,
-  CloudQueue,
-  Store,
-} from '@mui/icons-material';
+import Box from '@mui/material/Box';
+import CardContent from '@mui/material/CardContent';
+import Typography from '@mui/material/Typography';
+import TextField from '@mui/material/TextField';
+import Button from '@mui/material/Button';
+import Grid from '@mui/material/Grid';
+import MenuItem from '@mui/material/MenuItem';
+import FormControl from '@mui/material/FormControl';
+import InputLabel from '@mui/material/InputLabel';
+import Select from '@mui/material/Select';
+import Paper from '@mui/material/Paper';
+import Stepper from '@mui/material/Stepper';
+import Step from '@mui/material/Step';
+import StepLabel from '@mui/material/StepLabel';
+import Stack from '@mui/material/Stack';
+import Alert from '@mui/material/Alert';
+import Chip from '@mui/material/Chip';
+import CircularProgress from '@mui/material/CircularProgress';
+import Dialog from '@mui/material/Dialog';
+import DialogTitle from '@mui/material/DialogTitle';
+import DialogContent from '@mui/material/DialogContent';
+import DialogActions from '@mui/material/DialogActions';
+import LinearProgress from '@mui/material/LinearProgress';
+import Snackbar from '@mui/material/Snackbar';
+import Divider from '@mui/material/Divider';
+import ToggleButton from '@mui/material/ToggleButton';
+import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
+import FormLabel from '@mui/material/FormLabel';
+import RadioGroup from '@mui/material/RadioGroup';
+import FormControlLabel from '@mui/material/FormControlLabel';
+import Radio from '@mui/material/Radio';
+import IconButton from '@mui/material/IconButton';
+
+import ArrowBack from '@mui/icons-material/ArrowBack';
+import Save from '@mui/icons-material/Save';
+import Send from '@mui/icons-material/Send';
+import Preview from '@mui/icons-material/Preview';
+import CheckCircle from '@mui/icons-material/CheckCircle';
+import Warning from '@mui/icons-material/Warning';
+import Info from '@mui/icons-material/Info';
+import CloudUpload from '@mui/icons-material/CloudUpload';
+import Drafts from '@mui/icons-material/Drafts';
+import CloudQueue from '@mui/icons-material/CloudQueue';
+import Store from '@mui/icons-material/Store';
+import UploadFileIcon from '@mui/icons-material/UploadFile';
+
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
@@ -167,10 +166,23 @@ const StyledTextField = styled(TextField)(({ theme }) => ({
   },
 }));
 
+const fileRequirementsKeywords = [
+  'ktp', 'kartu keluarga', 'kk', 'foto', 'pas foto', 'surat', 'buku nikah', 'dokumen', 'scan'
+];
+
+// Helper untuk deteksi kebutuhan upload file dari requirements
+function getFileRequirements(requirements) {
+  return requirements.filter(req =>
+    fileRequirementsKeywords.some(keyword =>
+      req.toLowerCase().includes(keyword)
+    )
+  );
+}
+
 // Document Templates Configuration
 const documentTemplates = {
   'Surat Keterangan Domisili': {
-    steps: ['Informasi Pribadi', 'Detail Domisili', 'Keperluan', 'Preview'],
+    steps: ['Informasi Pribadi', 'Detail Domisili', 'Keperluan', 'Cek ulang data'],
     fields: [
       { name: 'nama', label: 'Nama Lengkap', type: 'text', required: true, step: 0 },
       { name: 'nik', label: 'NIK (16 digit)', type: 'text', required: true, step: 0, pattern: '^[0-9]{16}$' },
@@ -186,7 +198,6 @@ const documentTemplates = {
       { name: 'kecamatan', label: 'Kecamatan', type: 'text', required: true, step: 1, default: 'Simokerto' },
       { name: 'kota', label: 'Kota', type: 'text', required: true, step: 1, default: 'Surabaya' },
       { name: 'keperluan', label: 'Keperluan Surat', type: 'textarea', required: true, step: 2, placeholder: 'Jelaskan dengan detail keperluan surat ini...' },
-      { name: 'keterangan_tambahan', label: 'Keterangan Tambahan', type: 'textarea', required: false, step: 2 }
     ],
     requirements: ['KTP Asli', 'Kartu Keluarga', 'Surat RT/RW'],
     
@@ -194,7 +205,7 @@ const documentTemplates = {
     description: 'Surat keterangan tempat tinggal untuk keperluan administratif'
   },
   'SKTM (Surat Keterangan Tidak Mampu)': {
-    steps: ['Data Diri', 'Kondisi Ekonomi', 'Keperluan', 'Preview'],
+    steps: ['Data Diri', 'Kondisi Ekonomi', 'Keperluan', 'Cek Ulang Data'],
     fields: [
       { name: 'nama', label: 'Nama Lengkap', type: 'text', required: true, step: 0 },
       { name: 'nik', label: 'NIK (16 digit)', type: 'text', required: true, step: 0, pattern: '^[0-9]{16}$' },
@@ -244,8 +255,10 @@ export default function DocumentForm({ selectedDocument, onBack }) {
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'info' });
   const [documentId, setDocumentId] = useState('');
   const [processType, setProcessType] = useState('online');
+  const [uploadedFiles, setUploadedFiles] = useState({});
 
   const template = documentTemplates[selectedDocument];
+  const fileRequirements = template ? getFileRequirements(template.requirements || []) : [];
 
   // Auto-save draft every 30 seconds
   useEffect(() => {
@@ -356,6 +369,13 @@ export default function DocumentForm({ selectedDocument, onBack }) {
     }
   };
 
+  const handleFileChange = (req, e) => {
+    setUploadedFiles(prev => ({
+      ...prev,
+      [req]: e.target.files[0]
+    }));
+  };
+
   const handleNext = () => {
     if (validateCurrentStep()) {
       if (currentStep < template.steps.length - 1) {
@@ -431,6 +451,9 @@ export default function DocumentForm({ selectedDocument, onBack }) {
     const value = formData[field.name] || '';
     const error = errors[field.name];
 
+    // Perbaiki placeholder agar tidak bertumpuk dengan label
+    const inputLabelProps = { shrink: true };
+
     switch (field.type) {
       case 'date':
         return (
@@ -444,6 +467,7 @@ export default function DocumentForm({ selectedDocument, onBack }) {
                 required: field.required,
                 error: !!error,
                 helperText: error,
+                InputLabelProps: inputLabelProps,
                 sx: {
                   '& .MuiOutlinedInput-root': {
                     borderRadius: '12px',
@@ -466,6 +490,7 @@ export default function DocumentForm({ selectedDocument, onBack }) {
                 required: field.required,
                 error: !!error,
                 helperText: error,
+                InputLabelProps: inputLabelProps,
                 sx: {
                   '& .MuiOutlinedInput-root': {
                     borderRadius: '12px',
@@ -513,12 +538,13 @@ export default function DocumentForm({ selectedDocument, onBack }) {
                 <Typography variant="body2" sx={{ mr: 1 }}>Rp</Typography>
               ) : null
             }}
+            InputLabelProps={inputLabelProps}
           />
         );
 
       default:
         return (
-          <StyledTextField
+          <TextField
             fullWidth
             label={field.label}
             value={value}
@@ -529,118 +555,309 @@ export default function DocumentForm({ selectedDocument, onBack }) {
             error={!!error}
             helperText={error}
             placeholder={field.placeholder}
+            InputLabelProps={inputLabelProps}
           />
         );
     }
   };
 
   const renderStepContent = () => {
+    const showUploadSection = fileRequirements.length > 0 && currentStep === 0;
+    const stepFields = template.fields.filter(field => field.step === currentStep);
+
+    return (
+      <Box>
+        <Typography variant="h6" sx={{ mb: 3, fontWeight: 700 }}>
+          {template.steps[currentStep]}
+        </Typography>
+        <Grid container spacing={3}>
+          {stepFields.map((field, idx) => (
+            <Grid
+              item
+              xs={12}
+              md={
+                field.name === 'pekerjaan' ? 12 :
+                stepFields.length === 3 && idx === 2 ? 12 :
+                field.type === 'textarea' ? 12 : 6
+              }
+              key={field.name}
+            >
+              {/* Tambahkan pilihan online/offline di bawah field keperluan */}
+              {field.name === 'keperluan' || field.name === 'keperluan_surat' ? (
+                <>
+                  {renderField(field)}
+                  {/* Keterangan pemilihan pengambilan dokumen */}
+                  <Box sx={{ mt: 2, mb: 1 }}>
+                    <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 1 }}>
+                      Pilih Pengambilan Dokumen
+                    </Typography>
+                    <Typography variant="body2" sx={{ color: 'text.secondary', mb: 2 }}>
+                      Pilih cara Anda ingin menerima dokumen setelah selesai diproses.
+                    </Typography>
+                    <Stack direction="row" spacing={2}>
+                      <Box
+                        sx={{
+                          flex: 1,
+                          borderRadius: 2,
+                          border: processType === 'online'
+                            ? `2px solid ${theme.palette.primary.main}`
+                            : `1.5px solid ${theme.palette.divider}`,
+                          background: processType === 'online'
+                            ? (theme.palette.mode === 'dark'
+                              ? 'rgba(59,130,246,0.10)'
+                              : 'rgba(224,242,254,0.5)')
+                            : (theme.palette.mode === 'dark'
+                              ? 'rgba(59,130,246,0.04)'
+                              : 'rgba(224,242,254,0.15)'),
+                          minHeight: 56,
+                          display: 'flex',
+                          alignItems: 'center',
+                          cursor: 'pointer',
+                          px: 2,
+                          py: 1,
+                          transition: 'all 0.2s cubic-bezier(0.4,0,0.2,1)',
+                          boxShadow: processType === 'online'
+                            ? (theme.palette.mode === 'dark'
+                              ? `0 2px 8px ${theme.palette.primary.main}22`
+                              : `0 2px 8px ${theme.palette.primary.main}22`)
+                            : 'none',
+                          '&:hover': {
+                            border: `2px solid ${theme.palette.primary.main}`,
+                            background: theme.palette.mode === 'dark'
+                              ? 'rgba(59,130,246,0.13)'
+                              : 'rgba(224,242,254,0.7)',
+                          },
+                        }}
+                        onClick={() => setProcessType('online')}
+                      >
+                        <CloudQueue sx={{ mr: 1, color: theme.palette.primary.main }} />
+                        <Box>
+                          <Typography
+                            variant="subtitle2"
+                            sx={{
+                              fontWeight: 700,
+                              color: processType === 'online'
+                                ? theme.palette.primary.main
+                                : theme.palette.text.primary,
+                            }}
+                          >
+                            Online
+                          </Typography>
+                          <Typography
+                            variant="body2"
+                            sx={{
+                              color: theme.palette.text.secondary,
+                              fontSize: '0.85rem',
+                            }}
+                          >
+                            Dokumen akan tersedia untuk diunduh setelah selesai diproses.
+                          </Typography>
+                        </Box>
+                      </Box>
+                      <Box
+                        sx={{
+                          flex: 1,
+                          borderRadius: 2,
+                          border: processType === 'offline'
+                            ? `2px solid ${theme.palette.warning.main}`
+                            : `1.5px solid ${theme.palette.divider}`,
+                          background: processType === 'offline'
+                            ? (theme.palette.mode === 'dark'
+                              ? 'rgba(251,191,36,0.10)'
+                              : 'rgba(254,247,205,0.5)')
+                            : (theme.palette.mode === 'dark'
+                              ? 'rgba(251,191,36,0.04)'
+                              : 'rgba(254,247,205,0.15)'),
+                          minHeight: 56,
+                          display: 'flex',
+                          alignItems: 'center',
+                          cursor: 'pointer',
+                          px: 2,
+                          py: 1,
+                          transition: 'all 0.2s cubic-bezier(0.4,0,0.2,1)',
+                          boxShadow: processType === 'offline'
+                            ? (theme.palette.mode === 'dark'
+                              ? `0 2px 8px ${theme.palette.warning.main}22`
+                              : `0 2px 8px ${theme.palette.warning.main}22`)
+                            : 'none',
+                          '&:hover': {
+                            border: `2px solid ${theme.palette.warning.main}`,
+                            background: theme.palette.mode === 'dark'
+                              ? 'rgba(251,191,36,0.13)'
+                              : 'rgba(254,247,205,0.7)',
+                          },
+                        }}
+                        onClick={() => setProcessType('offline')}
+                      >
+                        <Store sx={{ mr: 1, color: theme.palette.warning.main }} />
+                        <Box>
+                          <Typography
+                            variant="subtitle2"
+                            sx={{
+                              fontWeight: 700,
+                              color: processType === 'offline'
+                                ? theme.palette.warning.main
+                                : theme.palette.text.primary,
+                            }}
+                          >
+                            Offline
+                          </Typography>
+                          <Typography
+                            variant="body2"
+                            sx={{
+                              color: theme.palette.text.secondary,
+                              fontSize: '0.85rem',
+                            }}
+                          >
+                            Dokumen dapat diambil langsung di kantor kelurahan setelah selesai diproses.
+                          </Typography>
+                        </Box>
+                      </Box>
+                    </Stack>
+                  </Box>
+                </>
+              ) : (
+                renderField(field)
+              )}
+            </Grid>
+          ))}
+          {showUploadSection && (
+            <Grid item xs={12}>
+              <Box sx={{ mt: 4 }}>
+                <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 1 }}>
+                  Upload Dokumen Pendukung
+                </Typography>
+                <Grid container spacing={2}>
+                  <Grid item xs={12} md={6}>
+                    <Button
+                      variant={uploadedFiles['KTP Asli'] ? "contained" : "outlined"}
+                      component="label"
+                      startIcon={<UploadFileIcon />}
+                      sx={{
+                        borderRadius: 2,
+                        width: '100%',
+                        justifyContent: 'center',
+                        textAlign: 'center',
+                        textTransform: 'none',
+                        fontWeight: 500,
+                        fontSize: '0.95rem',
+                        mb: 1,
+                        py: 1.5,
+                      }}
+                    >
+                      {uploadedFiles['KTP Asli'] ? `Uploaded: ${uploadedFiles['KTP Asli'].name}` : `Upload KTP Asli`}
+                      <input
+                        type="file"
+                        hidden
+                        accept="image/*,.pdf"
+                        onChange={(e) => handleFileChange('KTP Asli', e)}
+                      />
+                    </Button>
+                    {uploadedFiles['KTP Asli'] && (
+                      <Typography variant="caption" color="text.secondary">
+                        {uploadedFiles['KTP Asli'].name}
+                      </Typography>
+                    )}
+                  </Grid>
+                  <Grid item xs={12} md={6}>
+                    <Button
+                      variant={uploadedFiles['Kartu Keluarga'] ? "contained" : "outlined"}
+                      component="label"
+                      startIcon={<UploadFileIcon />}
+                      sx={{
+                        borderRadius: 2,
+                        width: '100%',
+                        justifyContent: 'center',
+                        textAlign: 'center',
+                        textTransform: 'none',
+                        fontWeight: 500,
+                        fontSize: '0.95rem',
+                        mb: 1,
+                        py: 1.5,
+                      }}
+                    >
+                      {uploadedFiles['Kartu Keluarga'] ? `Uploaded: ${uploadedFiles['Kartu Keluarga'].name}` : `Upload Kartu Keluarga`}
+                      <input
+                        type="file"
+                        hidden
+                        accept="image/*,.pdf"
+                        onChange={(e) => handleFileChange('Kartu Keluarga', e)}
+                      />
+                    </Button>
+                    {uploadedFiles['Kartu Keluarga'] && (
+                      <Typography variant="caption" color="text.secondary">
+                        {uploadedFiles['Kartu Keluarga'].name}
+                      </Typography>
+                    )}
+                  </Grid>
+                  {fileRequirements
+                    .filter(req => req !== 'KTP Asli' && req !== 'Kartu Keluarga')
+                    .map((req) => (
+                      <Grid item xs={12} key={req}>
+                        <Button
+                          variant={uploadedFiles[req] ? "contained" : "outlined"}
+                          component="label"
+                          startIcon={<UploadFileIcon />}
+                          sx={{
+                            borderRadius: 999,
+                            width: '100%',
+                            justifyContent: 'center',
+                            textAlign: 'center',
+                            textTransform: 'none',
+                            fontWeight: 500,
+                            fontSize: '0.95rem',
+                            mb: 1,
+                            py: 1.5,
+                          }}
+                        >
+                          {uploadedFiles[req] ? `Uploaded: ${uploadedFiles[req].name}` : `Upload ${req}`}
+                          <input
+                            type="file"
+                            hidden
+                            accept="image/*,.pdf"
+                            onChange={(e) => handleFileChange(req, e)}
+                          />
+                        </Button>
+                        {uploadedFiles[req] && (
+                          <Typography variant="caption" color="text.secondary">
+                            {uploadedFiles[req].name}
+                          </Typography>
+                        )}
+                      </Grid>
+                    ))}
+                </Grid>
+              </Box>
+            </Grid>
+          )}
+        </Grid>
+        <Box sx={{ mt: 3 }}>
+          <Button
+            variant="outlined"
+            color="info"
+            onClick={() => setCurrentStep((prev) => Math.min(prev + 1, template.steps.length - 1))}
+            sx={{ borderRadius: 2, mr: 2 }}
+          >
+            Next (Debug)
+          </Button>
+        </Box>
+      </Box>
+    );
+  };
+
+  const getStepContent = () => {
     if (currentStep === template.steps.length - 1) {
-      // Preview Step
       return (
         <Box>
           <Typography variant="h6" sx={{ mb: 3, fontWeight: 700 }}>
-            Preview Dokumen
+            Cek Ulang Data Pengajuan
           </Typography>
-          
           <Alert severity="info" sx={{ mb: 3 }}>
-            Silakan periksa kembali data yang telah Anda isi sebelum mengirim dokumen.
+            Silakan cek ulang semua data yang telah Anda isi sebelum mengirim dokumen. Pastikan tidak ada kesalahan.
           </Alert>
-
-          {/* PROCESS TYPE SELECTION */}
-          <Paper sx={{ p: 3, mb: 3, bgcolor: 'background.default', borderRadius: 2 }}>
-            <FormControl component="fieldset">
-              <FormLabel component="legend" sx={{ mb: 2, fontWeight: 600, color: 'text.primary' }}>
-                Pilih Jenis Pemrosesan
-              </FormLabel>
-              <RadioGroup
-                value={processType}
-                onChange={(e) => setProcessType(e.target.value)}
-                sx={{ gap: 2 }}
-              >
-                <Paper sx={{ 
-                  p: 2, 
-                  border: processType === 'online' 
-                    ? `2px solid ${theme.palette.primary.main}` 
-                    : `1px solid ${theme.palette.divider}`,
-                  borderRadius: 2,
-                  backgroundColor: processType === 'online' 
-                    ? alpha(theme.palette.primary.main, 0.05) 
-                    : 'transparent',
-                  cursor: 'pointer',
-                  transition: 'all 0.2s ease'
-                }}>
-                  <FormControlLabel
-                    value="online"
-                    control={<Radio />}
-                    label={
-                      <Stack direction="row" spacing={2} alignItems="center">
-                        <CloudQueue sx={{ 
-                          fontSize: 24, 
-                          color: processType === 'online' ? 'primary.main' : 'text.secondary' 
-                        }} />
-                        <Box>
-                          <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
-                            Proses Online
-                          </Typography>
-                          <Typography variant="body2" color="text.secondary" sx={{ fontSize: '0.8rem' }}>
-                            • Dokumen dapat diunduh dan dicetak sendiri<br/>
-                            • Tanda tangan digital<br/>
-                            • Proses lebih cepat
-                          </Typography>
-                        </Box>
-                      </Stack>
-                    }
-                    sx={{ width: '100%', m: 0 }}
-                  />
-                </Paper>
-
-                <Paper sx={{ 
-                  p: 2, 
-                  border: processType === 'offline' 
-                    ? `2px solid ${theme.palette.primary.main}` 
-                    : `1px solid ${theme.palette.divider}`,
-                  borderRadius: 2,
-                  backgroundColor: processType === 'offline' 
-                    ? alpha(theme.palette.primary.main, 0.05) 
-                    : 'transparent',
-                  cursor: 'pointer',
-                  transition: 'all 0.2s ease'
-                }}>
-                  <FormControlLabel
-                    value="offline"
-                    control={<Radio />}
-                    label={
-                      <Stack direction="row" spacing={2} alignItems="center">
-                        <Store sx={{ 
-                          fontSize: 24, 
-                          color: processType === 'offline' ? 'primary.main' : 'text.secondary' 
-                        }} />
-                        <Box>
-                          <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
-                            Proses Offline
-                          </Typography>
-                          <Typography variant="body2" color="text.secondary" sx={{ fontSize: '0.8rem' }}>
-                            • Dokumen diambil di kelurahan<br/>
-                            • Tanda tangan basah resmi<br/>
-                            • Lebih formal untuk keperluan tertentu
-                          </Typography>
-                        </Box>
-                      </Stack>
-                    }
-                    sx={{ width: '100%', m: 0 }}
-                  />
-                </Paper>
-              </RadioGroup>
-            </FormControl>
-          </Paper>
-
-          {/* EXISTING PREVIEW CONTENT */}
           <Grid container spacing={2}>
             {template.fields.map((field) => {
               const value = formData[field.name];
-              if (!value) return null;
-
+              if (value === undefined || value === '') return null;
               return (
                 <Grid item xs={12} sm={6} key={field.name}>
                   <Paper sx={{ p: 2, bgcolor: 'background.default' }}>
@@ -656,29 +873,41 @@ export default function DocumentForm({ selectedDocument, onBack }) {
                 </Grid>
               );
             })}
+            {fileRequirements.length > 0 && (
+              <Grid item xs={12}>
+                <Paper sx={{ p: 2, bgcolor: 'background.default' }}>
+                  <Typography variant="caption" color="text.secondary" sx={{ mb: 1, display: 'block' }}>
+                    Dokumen Pendukung
+                  </Typography>
+                  <Stack direction="row" spacing={2} flexWrap="wrap" gap={2}>
+                    {fileRequirements.map((req) =>
+                      uploadedFiles[req] ? (
+                        <Chip
+                          key={req}
+                          label={uploadedFiles[req].name}
+                          color="primary"
+                          variant="outlined"
+                          sx={{ mb: 1 }}
+                        />
+                      ) : (
+                        <Chip
+                          key={req}
+                          label={`Belum upload ${req}`}
+                          color="warning"
+                          variant="outlined"
+                          sx={{ mb: 1 }}
+                        />
+                      )
+                    )}
+                  </Stack>
+                </Paper>
+              </Grid>
+            )}
           </Grid>
         </Box>
       );
     }
-
-    // Regular form steps
-    const stepFields = template.fields.filter(field => field.step === currentStep);
-    
-    return (
-      <Box>
-        <Typography variant="h6" sx={{ mb: 3, fontWeight: 700 }}>
-          {template.steps[currentStep]}
-        </Typography>
-        
-        <Grid container spacing={3}>
-          {stepFields.map((field) => (
-            <Grid item xs={12} md={field.type === 'textarea' ? 12 : 6} key={field.name}>
-              {renderField(field)}
-            </Grid>
-          ))}
-        </Grid>
-      </Box>
-    );
+    return renderStepContent();
   };
 
   if (!template) {
@@ -695,13 +924,11 @@ export default function DocumentForm({ selectedDocument, onBack }) {
     <LocalizationProvider dateAdapter={AdapterDayjs}>
       <Box sx={{ 
         p: 2,
-        // BEAUTIFUL GRADIENT BACKGROUND FOR LIGHT MODE
         background: theme => theme.palette.mode === 'dark'
           ? 'transparent'
           : 'linear-gradient(135deg, #e0f2fe 0%, #f8fafc 25%, #f1f5f9 50%, #e7e5e4 75%, #fef7cd 100%)',
         minHeight: '100vh',
       }}>
-        {/* ENHANCED HEADER */}
         <SectionContainer elevation={0} sx={{ mb: 4 }}>
           <CardContent sx={{ p: 4, position: 'relative', zIndex: 2 }}>
             <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 3 }}>
@@ -725,7 +952,7 @@ export default function DocumentForm({ selectedDocument, onBack }) {
               
               {isDraft && (
                 <Chip
-                  icon={<Draft />}
+                  icon={<Drafts />}
                   label="Draft Tersimpan"
                   color="warning"
                   variant="outlined"
@@ -733,7 +960,6 @@ export default function DocumentForm({ selectedDocument, onBack }) {
               )}
             </Stack>
 
-            {/* Document Info */}
             <Grid container spacing={2} sx={{ mb: 3 }}>
               <Grid item xs={12} md={4}>
                 <Paper sx={{ p: 2, bgcolor: 'background.default' }}>
@@ -759,7 +985,6 @@ export default function DocumentForm({ selectedDocument, onBack }) {
               </Grid>
             </Grid>
 
-            {/* Progress Stepper */}
             <Stepper activeStep={currentStep} sx={{ mb: 3 }}>
               {template.steps.map((label, index) => (
                 <Step key={label}>
@@ -768,7 +993,6 @@ export default function DocumentForm({ selectedDocument, onBack }) {
               ))}
             </Stepper>
 
-            {/* Progress Bar */}
             <Box sx={{ mb: 2 }}>
               <LinearProgress 
                 variant="determinate" 
@@ -782,30 +1006,12 @@ export default function DocumentForm({ selectedDocument, onBack }) {
           </CardContent>
         </SectionContainer>
 
-        {/* ENHANCED FORM CONTENT */}
         <SectionContainer elevation={0}>
           <CardContent sx={{ p: 4, position: 'relative', zIndex: 2 }}>
-            {renderStepContent()}
+            {getStepContent()}
 
-            {/* Form Actions */}
             <Stack direction="row" spacing={2} justifyContent="space-between" sx={{ mt: 4 }}>
               <Stack direction="row" spacing={2}>
-                <Button
-                  variant="outlined"
-                  startIcon={<Save />}
-                  onClick={saveDraft}
-                  disabled={Object.keys(formData).length === 0}
-                  sx={{
-                    borderRadius: 2,
-                    borderWidth: 2,
-                    '&:hover': {
-                      borderWidth: 2,
-                      transform: 'translateY(-1px)',
-                    }
-                  }}
-                >
-                  Simpan Draft
-                </Button>
                 <Button
                   variant="outlined"
                   color="warning"
@@ -889,7 +1095,6 @@ export default function DocumentForm({ selectedDocument, onBack }) {
           </CardContent>
         </SectionContainer>
 
-        {/* Success Dialog */}
         <Dialog open={showSuccess} maxWidth="sm" fullWidth>
           <DialogTitle sx={{ textAlign: 'center', pt: 4 }}>
             <CheckCircle sx={{ fontSize: 64, color: 'success.main', mb: 2 }} />
@@ -907,7 +1112,6 @@ export default function DocumentForm({ selectedDocument, onBack }) {
               </Typography>
             </Paper>
             
-            {/* PROCESS TYPE INFO */}
             <Paper sx={{ 
               p: 2, 
               mb: 3, 
@@ -952,7 +1156,6 @@ export default function DocumentForm({ selectedDocument, onBack }) {
           </DialogActions>
         </Dialog>
 
-        {/* Snackbar for notifications */}
         <Snackbar
           open={snackbar.open}
           autoHideDuration={4000}
