@@ -326,7 +326,7 @@ export default function RiwayatPage() {
 
   const renderActionButtons = (doc) => {
     const isOnline = doc.processType === 'online';
-    
+
     const containerStyle = {
       minWidth: 140,
       height: 36,
@@ -334,7 +334,9 @@ export default function RiwayatPage() {
       justifyContent: 'center',
       alignItems: 'center',
     };
-    
+
+    const capsuleWidth = 100; // Samakan dengan single button aksi
+
     switch (doc.status) {
       case 'selesai':
         if (isOnline) {
@@ -354,7 +356,7 @@ export default function RiwayatPage() {
                       backgroundColor: alpha(theme.palette.primary.main, 0.2),
                     }
                   }}
-                  title="Lihat Detail"
+                  title="Lihat"
                 >
                   <VisibilityIcon sx={{ fontSize: 14 }} />
                 </IconButton>
@@ -401,7 +403,7 @@ export default function RiwayatPage() {
               <Stack 
                 direction="row" 
                 sx={{ 
-                  width: 120,
+                  width: capsuleWidth,
                   height: 32,
                   backgroundColor: alpha(theme.palette.primary.main, 0.08),
                   borderRadius: '16px',
@@ -415,72 +417,53 @@ export default function RiwayatPage() {
                   }
                 }}
               >
-                <Button
+                <IconButton
                   size="small"
-                  startIcon={<VisibilityIcon sx={{ fontSize: 12 }} />}
                   sx={{
                     flex: 1,
                     height: '100%',
-                    minWidth: 'auto',
+                    minWidth: 0,
                     color: theme.palette.primary.main,
                     backgroundColor: 'transparent',
                     borderRadius: '16px 0 0 16px',
-                    fontSize: '0.65rem',
-                    fontWeight: 600,
-                    textTransform: 'none',
-                    px: 1,
                     borderRight: `1px solid ${alpha(theme.palette.primary.main, 0.2)}`,
                     '&:hover': {
                       backgroundColor: alpha(theme.palette.primary.main, 0.1),
-                    },
-                    '& .MuiButton-startIcon': {
-                      marginRight: '2px',
-                      marginLeft: 0,
                     }
                   }}
-                  title="Lihat Detail"
+                  title="Lihat"
                 >
-                  View
-                </Button>
-                
-                <Button
+                  <VisibilityIcon sx={{ fontSize: 16 }} />
+                </IconButton>
+                <IconButton
                   size="small"
-                  startIcon={<PickupIcon sx={{ fontSize: 12 }} />}
                   sx={{
                     flex: 1,
                     height: '100%',
-                    minWidth: 'auto',
+                    minWidth: 0,
                     color: theme.palette.warning.main,
                     backgroundColor: 'transparent',
                     borderRadius: '0 16px 16px 0',
-                    fontSize: '0.65rem',
-                    fontWeight: 600,
-                    textTransform: 'none',
-                    px: 1,
                     '&:hover': {
                       backgroundColor: alpha(theme.palette.warning.main, 0.1),
-                    },
-                    '& .MuiButton-startIcon': {
-                      marginRight: '2px',
-                      marginLeft: 0,
                     }
                   }}
                   title="Ambil di Kelurahan"
                 >
-                  Pickup
-                </Button>
+                  <PickupIcon sx={{ fontSize: 16 }} />
+                </IconButton>
               </Stack>
             </Box>
           );
         }
-      
+
       case 'menunggu':
         return (
           <Box sx={containerStyle}>
             <Stack 
               direction="row" 
               sx={{ 
-                width: 120,
+                width: capsuleWidth,
                 height: 32,
                 backgroundColor: alpha(theme.palette.primary.main, 0.08),
                 borderRadius: '16px',
@@ -494,72 +477,53 @@ export default function RiwayatPage() {
                 }
               }}
             >
-              <Button
+              <IconButton
                 size="small"
-                startIcon={<VisibilityIcon sx={{ fontSize: 12 }} />}
                 sx={{
                   flex: 1,
                   height: '100%',
-                  minWidth: 'auto',
+                  minWidth: 0,
                   color: theme.palette.primary.main,
                   backgroundColor: 'transparent',
                   borderRadius: '16px 0 0 16px',
-                  fontSize: '0.65rem',
-                  fontWeight: 600,
-                  textTransform: 'none',
-                  px: 1,
                   borderRight: `1px solid ${alpha(theme.palette.primary.main, 0.2)}`,
                   '&:hover': {
                     backgroundColor: alpha(theme.palette.primary.main, 0.1),
-                  },
-                  '& .MuiButton-startIcon': {
-                    marginRight: '2px',
-                    marginLeft: 0,
                   }
                 }}
-                title="Lihat Detail"
+                title="Lihat"
               >
-                View
-              </Button>
-              
-              <Button
+                <VisibilityIcon sx={{ fontSize: 16 }} />
+              </IconButton>
+              <IconButton
                 size="small"
-                startIcon={<CancelIcon sx={{ fontSize: 12 }} />}
                 onClick={() => handleCancelRequest(doc.id, doc.documentNumber)}
                 sx={{
                   flex: 1,
                   height: '100%',
-                  minWidth: 'auto',
+                  minWidth: 0,
                   color: theme.palette.error.main,
                   backgroundColor: 'transparent',
                   borderRadius: '0 16px 16px 0',
-                  fontSize: '0.65rem',
-                  fontWeight: 600,
-                  textTransform: 'none',
-                  px: 1,
                   '&:hover': {
                     backgroundColor: alpha(theme.palette.error.main, 0.1),
-                  },
-                  '& .MuiButton-startIcon': {
-                    marginRight: '2px',
-                    marginLeft: 0,
                   }
                 }}
                 title="Batalkan Pengajuan"
               >
-                Cancel
-              </Button>
+                <CancelIcon sx={{ fontSize: 16 }} />
+              </IconButton>
             </Stack>
           </Box>
         );
-      
+
       case 'ditolak':
         return (
           <Box sx={containerStyle}>
             <Stack 
               direction="row" 
               sx={{ 
-                width: 120,
+                width: capsuleWidth,
                 height: 32,
                 backgroundColor: alpha(theme.palette.primary.main, 0.08),
                 borderRadius: '16px',
@@ -573,65 +537,46 @@ export default function RiwayatPage() {
                 }
               }}
             >
-              <Button
+              <IconButton
                 size="small"
-                startIcon={<VisibilityIcon sx={{ fontSize: 12 }} />}
                 sx={{
                   flex: 1,
                   height: '100%',
-                  minWidth: 'auto',
+                  minWidth: 0,
                   color: theme.palette.primary.main,
                   backgroundColor: 'transparent',
                   borderRadius: '16px 0 0 16px',
-                  fontSize: '0.65rem',
-                  fontWeight: 600,
-                  textTransform: 'none',
-                  px: 1,
                   borderRight: `1px solid ${alpha(theme.palette.primary.main, 0.2)}`,
                   '&:hover': {
                     backgroundColor: alpha(theme.palette.primary.main, 0.1),
-                  },
-                  '& .MuiButton-startIcon': {
-                    marginRight: '2px',
-                    marginLeft: 0,
                   }
                 }}
-                title="Lihat Detail"
+                title="Lihat"
               >
-                View
-              </Button>
-              
-              <Button
+                <VisibilityIcon sx={{ fontSize: 16 }} />
+              </IconButton>
+              <IconButton
                 size="small"
-                startIcon={<InfoIcon sx={{ fontSize: 12 }} />}
                 onClick={() => handleViewRejectionReason(doc.rejectionReason, doc.documentNumber)}
                 sx={{
                   flex: 1,
                   height: '100%',
-                  minWidth: 'auto',
+                  minWidth: 0,
                   color: theme.palette.error.main,
                   backgroundColor: 'transparent',
                   borderRadius: '0 16px 16px 0',
-                  fontSize: '0.65rem',
-                  fontWeight: 600,
-                  textTransform: 'none',
-                  px: 1,
                   '&:hover': {
                     backgroundColor: alpha(theme.palette.error.main, 0.1),
-                  },
-                  '& .MuiButton-startIcon': {
-                    marginRight: '2px',
-                    marginLeft: 0,
                   }
                 }}
                 title="Lihat Alasan Penolakan"
               >
-                Info
-              </Button>
+                <InfoIcon sx={{ fontSize: 16 }} />
+              </IconButton>
             </Stack>
           </Box>
         );
-      
+
       default:
         return (
           <Box sx={containerStyle}>
@@ -641,7 +586,7 @@ export default function RiwayatPage() {
               startIcon={<VisibilityIcon sx={{ fontSize: 14 }} />}
               sx={{ 
                 color: theme.palette.primary.main,
-                width: 100,
+                width: capsuleWidth,
                 height: 32,
                 fontSize: '0.7rem',
                 fontWeight: 600,
@@ -661,9 +606,9 @@ export default function RiwayatPage() {
                   marginLeft: 0,
                 }
               }}
-              title="Lihat Detail"
+              title="Lihat"
             >
-              Lihat Detail
+              Lihat
             </Button>
           </Box>
         );
