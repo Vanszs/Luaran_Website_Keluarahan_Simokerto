@@ -27,6 +27,7 @@ import {
   ArrowForward,
   Groups,
 } from '@mui/icons-material';
+import { useMockApi } from '../hooks/useMockApi';
 
 interface DashboardHomeProps {
   onViewChange: (view: string) => void;
@@ -139,6 +140,7 @@ const SectionContainer = styled(Paper)(({ theme }) => ({
 export default function DashboardHome({ onViewChange }: DashboardHomeProps) {
   const theme = useTheme();
   const [currentTime, setCurrentTime] = React.useState(new Date());
+  const { submissions, users } = useMockApi();
 
   React.useEffect(() => {
     const timer = setInterval(() => {
@@ -168,14 +170,14 @@ export default function DashboardHome({ onViewChange }: DashboardHomeProps) {
       description: "Lihat data pengajuan",
       icon: Description,
       action: "pengajuan",
-      count: "10",
+      count: String(submissions.length),
     },
     {
       title: "Data Akun Warga",
       description: "Manajemen akun warga",
       icon: Groups,
       action: "users",
-      count: "1250",
+      count: String(users.length),
     },
     {
       title: "Pengaturan",
@@ -187,10 +189,10 @@ export default function DashboardHome({ onViewChange }: DashboardHomeProps) {
   ];
 
   const stats = [
-    { title: 'Total User Warga', value: '1250', icon: <Groups />, color: theme.palette.info.main },
-    { title: 'Pengajuan Baru', value: '24', icon: <Description />, color: theme.palette.primary.main },
-    { title: 'Diproses', value: '8', icon: <Pending />, color: theme.palette.warning.main },
-    { title: 'Selesai', value: '14', icon: <CheckCircle />, color: theme.palette.success.main },
+    { title: 'Total User Warga', value: String(users.length), icon: <Groups />, color: theme.palette.info.main },
+    { title: 'Pengajuan Baru', value: String(submissions.filter(s => s.status === 'pending').length), icon: <Description />, color: theme.palette.primary.main },
+    { title: 'Diproses', value: String(submissions.filter(s => s.status === 'processing').length), icon: <Pending />, color: theme.palette.warning.main },
+    { title: 'Selesai', value: String(submissions.filter(s => s.status === 'approved').length), icon: <CheckCircle />, color: theme.palette.success.main },
   ];
 
   return (

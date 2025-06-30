@@ -10,7 +10,7 @@ import AppTheme from '../../shared-theme/AppTheme';
 import AppNavbar from '../../components/AppNavbar';
 import AdminSideMenu from '../../components/AdminSideMenu';
 import AdminDashboardHome from '../../components/AdminDashboardHome';
-import RequestCategoriesPage from '../../components/RequestCategoriesPage';
+import AdminSubmissionsPage from '../../components/AdminSubmissionsPage';
 import TemplateManagementPage from '../../components/TemplateManagementPage';
 import DocumentSelection from '../../components/DocumentSelection';
 import DocumentForm from '../../components/DocumentForm';
@@ -243,7 +243,7 @@ export default function Dashboard() {
       case 'dashboard':
         return <AdminDashboardHome onViewChange={handleViewChange} />;
       case 'pengajuan':
-        return <RequestCategoriesPage />;
+        return <AdminSubmissionsPage />;
       case 'documents':
         return (
           <DocumentSelection
