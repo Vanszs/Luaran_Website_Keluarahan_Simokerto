@@ -19,6 +19,7 @@ import SettingsPage from '../../components/SettingsPage';
 import UserManagementPage from '../../components/UserManagementPage';
 import Image from 'next/image';
 import { Fade, Grow, Slide, CircularProgress, Zoom, Container, Paper } from '@mui/material';
+import ColorModeSelect from '../../shared-theme/ColorModeSelect.js';
 
 // Enhanced modern animations
 const float = keyframes`

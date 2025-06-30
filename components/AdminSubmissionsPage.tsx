@@ -27,6 +27,7 @@ export default function AdminSubmissionsPage() {
       )
       .filter(s => (statusFilter ? s.status === statusFilter : true))
       .map(s => ({ ...s, id: s.id }));
+
   }, [submissions, search, statusFilter]);
 
   const columns: GridColDef[] = [

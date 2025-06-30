@@ -249,7 +249,8 @@ export default function DashboardHome({ onViewChange }: DashboardHomeProps) {
                   
                   <Stack direction="row" spacing={2} alignItems="center">
                     <Chip
-                      label="Warga Simokerto"
+                      label="Admin Kelurahan"
+
                       color="primary"
                       sx={{ 
                         fontWeight: 600,
