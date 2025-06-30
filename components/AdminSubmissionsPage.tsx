@@ -10,14 +10,21 @@ import {
   Stack,
   Button,
   Chip,
+  CircularProgress,
+  Snackbar,
+  Alert,
 } from '@mui/material';
 import { DataGrid, GridColDef } from '@mui/x-data-grid';
-import { useMockApi } from '../hooks/useMockApi';
+import { useMockApi, Submission } from '../hooks/useMockApi';
+import DetailSubmissionDialog from './DetailSubmissionDialog';
 
 export default function AdminSubmissionsPage() {
   const { submissions } = useMockApi();
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
+  const [selected, setSelected] = useState<Submission | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [snackbar, setSnackbar] = useState<{open:boolean;message:string;severity:'success'|'error'}>({open:false,message:'',severity:'success'});
 
   const rows = useMemo(() => {
     return submissions
@@ -45,7 +52,11 @@ export default function AdminSubmissionsPage() {
       field: 'actions',
       headerName: 'Aksi',
       width: 150,
-      renderCell: () => <Button size="small">Detail</Button>,
+      renderCell: params => (
+        <Button size="small" onClick={() => setSelected(submissions.find(s => s.id === params.row.id) || null)}>
+          Detail
+        </Button>
+      ),
       sortable: false,
       filterable: false,
     },
@@ -54,6 +65,7 @@ export default function AdminSubmissionsPage() {
   const pendingCount = submissions.filter(s => s.status === 'pending').length;
 
   return (
+    <>
     <Paper sx={{ p: 4 }}>
       <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
         <Typography variant="h5" fontWeight={700} sx={{ flexGrow: 1 }}>
@@ -74,14 +86,25 @@ export default function AdminSubmissionsPage() {
         <Button variant="outlined">Reject Selected</Button>
       </Stack>
       <div style={{ height: 420, width: '100%' }}>
-        <DataGrid
-          rows={rows}
-          columns={columns}
-          checkboxSelection
-          disableRowSelectionOnClick
-          hideFooterSelectedRowCount
-        />
+        {loading ? (
+          <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
+            <CircularProgress />
+          </Box>
+        ) : (
+          <DataGrid
+            rows={rows}
+            columns={columns}
+            checkboxSelection
+            disableRowSelectionOnClick
+            hideFooterSelectedRowCount
+          />
+        )}
       </div>
     </Paper>
+    <DetailSubmissionDialog open={Boolean(selected)} submission={selected} onClose={() => setSelected(null)} />
+    <Snackbar open={snackbar.open} autoHideDuration={3000} onClose={() => setSnackbar({ ...snackbar, open: false })} anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}>
+      <Alert severity={snackbar.severity} onClose={() => setSnackbar({ ...snackbar, open: false })}>{snackbar.message}</Alert>
+    </Snackbar>
+    </>
   );
 }

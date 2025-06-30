@@ -38,5 +38,41 @@ export function useMockApi() {
     });
   };
 
-  return { submissions, users, templates, getSubmissions, getUsers, getTemplates };
+  const approveSubmission = async (id: string, documentNumber: string) => {
+    setSubmissions(prev =>
+      prev.map(s =>
+        s.id === id
+          ? { ...s, status: 'approved', documentNumber, processedAt: new Date().toISOString() }
+          : s
+      )
+    );
+    return true;
+  };
+
+  const rejectSubmission = async (id: string, reason: string) => {
+    setSubmissions(prev =>
+      prev.map(s =>
+        s.id === id
+          ? { ...s, status: 'rejected', notes: reason, processedAt: new Date().toISOString() }
+          : s
+      )
+    );
+    return true;
+  };
+
+  const refreshSubmissions = async () => {
+    setSubmissions(prev => [...prev]);
+  };
+
+  return {
+    submissions,
+    users,
+    templates,
+    getSubmissions,
+    getUsers,
+    getTemplates,
+    approveSubmission,
+    rejectSubmission,
+    refreshSubmissions,
+  };
 }
