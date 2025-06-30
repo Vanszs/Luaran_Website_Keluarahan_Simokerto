@@ -13,7 +13,7 @@ import Link from '@mui/material/Link';
 import LinearProgress from '@mui/material/LinearProgress';
 import { styled, keyframes } from '@mui/material/styles';
 import AppTheme from '../../shared-theme/AppTheme';
-import ColorModeSelect from '../../shared-theme/ColorModeSelect';
+import ColorModeSelect from '../../shared-theme/ColorModeSelect.js';
 import Image from 'next/image';
 
 // Animations
@@ -316,7 +316,7 @@ export default function Register() {
             left: 0,
             right: 0,
             bottom: 0,
-            background: theme => theme.palette.mode === 'dark'
+            background: (theme: any) => theme.palette.mode === 'dark'
               ? 'linear-gradient(135deg, #0d1117 0%, #161b22 100%)'
               : 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)',
             display: 'flex',
@@ -420,15 +420,15 @@ export default function Register() {
             top: '1.5rem',
             right: '1.5rem',
             zIndex: 10,
-            backgroundColor: theme => theme.palette.mode === 'dark' ? 
-              'rgba(255, 255, 255, 0.1)' : 
+            backgroundColor: (theme: any) => theme.palette.mode === 'dark' ?
+              'rgba(255, 255, 255, 0.1)' :
               'rgba(0, 0, 0, 0.06)',
             borderRadius: '50%',
             transition: 'all 0.3s ease',
             backdropFilter: 'blur(10px)',
             '&:hover': {
-              backgroundColor: theme => theme.palette.mode === 'dark' ? 
-                'rgba(255, 255, 255, 0.15)' : 
+              backgroundColor: (theme: any) => theme.palette.mode === 'dark' ?
+                'rgba(255, 255, 255, 0.15)' :
                 'rgba(0, 0, 0, 0.1)',
               transform: 'scale(1.05)',
             },

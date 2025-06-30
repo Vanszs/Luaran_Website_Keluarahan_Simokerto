@@ -7,12 +7,7 @@ import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import OutlinedInput from '@mui/material/OutlinedInput';
 
-interface ForgotPasswordProps {
-  open: boolean;
-  handleClose: () => void;
-}
-
-export default function ForgotPassword({ open, handleClose }: ForgotPasswordProps) {
+export default function ForgotPassword({ open, handleClose }) {
   return (
     <Dialog
       open={open}
@@ -20,7 +15,7 @@ export default function ForgotPassword({ open, handleClose }: ForgotPasswordProp
       slotProps={{
         paper: {
           component: 'form',
-          onSubmit: (event: React.FormEvent<HTMLFormElement>) => {
+          onSubmit: event => {
             event.preventDefault();
             handleClose();
           },
