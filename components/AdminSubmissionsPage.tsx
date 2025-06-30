@@ -26,7 +26,8 @@ export default function AdminSubmissionsPage() {
         s.id.toLowerCase().includes(search.toLowerCase())
       )
       .filter(s => (statusFilter ? s.status === statusFilter : true))
-      .map((s, index) => ({ id: s.id, ...s }));
+      .map(s => ({ ...s, id: s.id }));
+
   }, [submissions, search, statusFilter]);
 
   const columns: GridColDef[] = [
