@@ -14,7 +14,7 @@ import Fade from '@mui/material/Fade';
 import Link from '@mui/material/Link';
 import { styled, keyframes } from '@mui/material/styles';
 import AppTheme from '../shared-theme/AppTheme';
-import ColorModeSelect from '../shared-theme/ColorModeSelect';
+import ColorModeSelect from '../shared-theme/ColorModeSelect.js';
 import Image from 'next/image';
 import logoImage from '../public/logo.png';
 import { Theme } from '@mui/material/styles';

@@ -9,7 +9,7 @@ import MuiToolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import IconButton from '@mui/material/IconButton';
 import MenuRoundedIcon from '@mui/icons-material/MenuRounded';
-import ColorModeSelect from '../shared-theme/ColorModeSelect';
+import ColorModeSelect from '../shared-theme/ColorModeSelect.js';
 import Image from 'next/image';
 import { alpha, useTheme } from '@mui/material/styles';
 
