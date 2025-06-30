@@ -16,6 +16,7 @@ import RiwayatPage from '../../components/RiwayatPage';
 import SettingsPage from '../../components/SettingsPage';
 import Image from 'next/image';
 import { Fade, Grow, Slide, CircularProgress, Zoom, Container, Paper } from '@mui/material';
+import ColorModeSelect from '../../shared-theme/ColorModeSelect.js';
 
 // Enhanced modern animations
 const float = keyframes`
