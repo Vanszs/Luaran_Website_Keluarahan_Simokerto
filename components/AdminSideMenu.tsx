@@ -15,6 +15,8 @@ import {
   Groups,
   Description,
   Settings,
+  Logout,
+  DriveFolderUpload,
 } from '@mui/icons-material';
 
 interface AdminSideMenuProps {
@@ -30,14 +32,19 @@ export default function AdminSideMenu({ currentView, onViewChange }: AdminSideMe
       icon: <Dashboard />,
     },
     {
-      id: 'documents',
+      id: 'pengajuan',
       label: 'Pengajuan',
       icon: <Description />,
     },
     {
       id: 'users',
-      label: 'Data Warga',
+      label: 'Data Akun Warga',
       icon: <Groups />,
+    },
+    {
+      id: 'templates',
+      label: 'Kelola Template',
+      icon: <DriveFolderUpload />,
     },
     {
       id: 'settings',
@@ -63,7 +70,7 @@ export default function AdminSideMenu({ currentView, onViewChange }: AdminSideMe
     >
       <Box sx={{ p: 2 }}>
         <Typography variant="h6" noWrap component="div">
-          Admin Panel
+          Portal Admin
         </Typography>
       </Box>
       <Divider />
@@ -93,6 +100,17 @@ export default function AdminSideMenu({ currentView, onViewChange }: AdminSideMe
           </ListItem>
         ))}
       </List>
+
+      <Box sx={{ mt: 'auto', p: 2 }}>
+        <ListItem disablePadding>
+          <ListItemButton onClick={() => onViewChange('logout')}>
+            <ListItemIcon>
+              <Logout />
+            </ListItemIcon>
+            <ListItemText primary="Logout" />
+          </ListItemButton>
+        </ListItem>
+      </Box>
     </Drawer>
   );
 }

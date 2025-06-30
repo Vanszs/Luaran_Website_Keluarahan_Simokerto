@@ -10,6 +10,8 @@ import AppTheme from '../../shared-theme/AppTheme';
 import AppNavbar from '../../components/AppNavbar';
 import AdminSideMenu from '../../components/AdminSideMenu';
 import AdminDashboardHome from '../../components/AdminDashboardHome';
+import RequestCategoriesPage from '../../components/RequestCategoriesPage';
+import TemplateManagementPage from '../../components/TemplateManagementPage';
 import DocumentSelection from '../../components/DocumentSelection';
 import DocumentForm from '../../components/DocumentForm';
 import RiwayatPage from '../../components/RiwayatPage';
@@ -240,9 +242,11 @@ export default function Dashboard() {
     switch (currentView) {
       case 'dashboard':
         return <AdminDashboardHome onViewChange={handleViewChange} />;
+      case 'pengajuan':
+        return <RequestCategoriesPage />;
       case 'documents':
         return (
-          <DocumentSelection 
+          <DocumentSelection
             onDocumentSelect={handleDocumentSelect}
             onBack={handleBackFromDocuments}
           />
@@ -260,6 +264,10 @@ export default function Dashboard() {
         return <SettingsPage />;
       case 'users':
         return <UserManagementPage />;
+      case 'templates':
+        return <TemplateManagementPage />;
+      case 'logout':
+        return <AdminDashboardHome onViewChange={handleViewChange} />;
       default:
         return <AdminDashboardHome onViewChange={handleViewChange} />;
     }

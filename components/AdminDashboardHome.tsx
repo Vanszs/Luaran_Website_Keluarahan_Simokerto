@@ -161,33 +161,33 @@ export default function DashboardHome({ onViewChange }: DashboardHomeProps) {
       description: "Ringkasan aktivitas",
       icon: DashboardIcon,
       action: "dashboard",
-      count: "4"
+      count: "4",
     },
     {
       title: "Pengajuan",
-      description: "Kelola permohonan surat",
+      description: "Lihat data pengajuan",
       icon: Description,
-      action: "documents",
-      count: "10"
+      action: "pengajuan",
+      count: "10",
     },
     {
-      title: "Data Warga",
-      description: "Manajemen warga",
+      title: "Data Akun Warga",
+      description: "Manajemen akun warga",
       icon: Groups,
       action: "users",
-      count: "1250"
+      count: "1250",
     },
     {
       title: "Pengaturan",
       description: "Atur sistem",
       icon: Settings,
       action: "settings",
-      count: "1"
-    }
+      count: "1",
+    },
   ];
 
   const stats = [
-    { title: 'Total Warga', value: '1250', icon: <Groups />, color: theme.palette.info.main },
+    { title: 'Total User Warga', value: '1250', icon: <Groups />, color: theme.palette.info.main },
     { title: 'Pengajuan Baru', value: '24', icon: <Description />, color: theme.palette.primary.main },
     { title: 'Diproses', value: '8', icon: <Pending />, color: theme.palette.warning.main },
     { title: 'Selesai', value: '14', icon: <CheckCircle />, color: theme.palette.success.main },
