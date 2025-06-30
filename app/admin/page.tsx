@@ -8,12 +8,15 @@ import { keyframes, alpha } from '@mui/material/styles';
 import { useTheme } from '@mui/material/styles';
 import AppTheme from '../../shared-theme/AppTheme';
 import AppNavbar from '../../components/AppNavbar';
-import SideMenu from '../../components/SideMenu';
-import DashboardHome from '../../components/DashboardHome';
+import AdminSideMenu from '../../components/AdminSideMenu';
+import AdminDashboardHome from '../../components/AdminDashboardHome';
+import AdminSubmissionsPage from '../../components/AdminSubmissionsPage';
+import TemplateManagementPage from '../../components/TemplateManagementPage';
 import DocumentSelection from '../../components/DocumentSelection';
 import DocumentForm from '../../components/DocumentForm';
 import RiwayatPage from '../../components/RiwayatPage';
 import SettingsPage from '../../components/SettingsPage';
+import UserManagementPage from '../../components/UserManagementPage';
 import Image from 'next/image';
 import { Fade, Grow, Slide, CircularProgress, Zoom, Container, Paper } from '@mui/material';
 
@@ -238,10 +241,12 @@ export default function Dashboard() {
   const renderContent = () => {
     switch (currentView) {
       case 'dashboard':
-        return <DashboardHome onViewChange={handleViewChange} />;
+        return <AdminDashboardHome onViewChange={handleViewChange} />;
+      case 'pengajuan':
+        return <AdminSubmissionsPage />;
       case 'documents':
         return (
-          <DocumentSelection 
+          <DocumentSelection
             onDocumentSelect={handleDocumentSelect}
             onBack={handleBackFromDocuments}
           />
@@ -257,8 +262,14 @@ export default function Dashboard() {
         return <RiwayatPage />;
       case 'settings':
         return <SettingsPage />;
+      case 'users':
+        return <UserManagementPage />;
+      case 'templates':
+        return <TemplateManagementPage />;
+      case 'logout':
+        return <AdminDashboardHome onViewChange={handleViewChange} />;
       default:
-        return <DashboardHome onViewChange={handleViewChange} />;
+        return <AdminDashboardHome onViewChange={handleViewChange} />;
     }
   };
 
@@ -273,7 +284,7 @@ export default function Dashboard() {
           transition: 'background-color 300ms cubic-bezier(0.4, 0, 0.2, 1) !important'
         }}
       >
-        <SideMenu 
+        <AdminSideMenu
           currentView={currentView}
           onViewChange={handleViewChange}
         />
