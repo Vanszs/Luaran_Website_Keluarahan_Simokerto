@@ -13,7 +13,7 @@ import Link from '@mui/material/Link';
 import LinearProgress from '@mui/material/LinearProgress';
 import { styled, keyframes } from '@mui/material/styles';
 import AppTheme from '../../shared-theme/AppTheme';
-import ColorModeSelect from '../../shared-theme/ColorModeSelect';
+import ColorModeSelect from '../../shared-theme/ColorModeSelect.js';
 import Image from 'next/image';
 
 // Animations

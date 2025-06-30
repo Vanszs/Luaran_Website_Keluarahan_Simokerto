@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
-import { mockDocuments } from '../utils/mockData';
+import { mockDocuments, MockDocument } from '../utils/mockData';
 import { mockUsers, mockTemplates, MockUser, MockTemplate } from '../utils/mockAdminData';
 
-export interface Submission extends typeof mockDocuments[number] {
+export interface Submission extends MockDocument {
   mode: 'Online' | 'Offline';
 }
 
@@ -13,7 +13,7 @@ export function useMockApi() {
 
   useEffect(() => {
     // add mode to mock documents for demo
-    const withMode = mockDocuments.map((d, idx) => ({
+    const withMode: Submission[] = mockDocuments.map((d, idx) => ({
       ...d,
       mode: idx % 2 === 0 ? 'Online' : 'Offline',
     }));
