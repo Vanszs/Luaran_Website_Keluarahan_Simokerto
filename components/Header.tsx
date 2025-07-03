@@ -4,6 +4,7 @@ import NotificationsRoundedIcon from '@mui/icons-material/NotificationsRounded';
 import CustomDatePicker from './CustomDatePicker';
 import NavbarBreadcrumbs from './NavbarBreadcrumbs';
 import MenuButton from './MenuButton';
+// @ts-ignore - JS module without types
 import ColorModeIconDropdown from '../../shared-theme/ColorModeIconDropdown';
 
 import Search from './Search';

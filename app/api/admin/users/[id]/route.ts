@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import pool from '../../../../../utils/db';
+import { query } from '../../../../../utils/db';
+
+export const dynamic = 'force-dynamic';
 
 // PUT (update) user
 export async function PUT(
@@ -25,39 +27,32 @@ export async function PUT(
       );
     }
     
-    const connection = await pool.getConnection();
-    
-    try {
-      // Check if user exists
-      const [users] = await connection.execute(
-        'SELECT id FROM users WHERE id = ?',
-        [userId]
+    // Check if user exists
+    const users = await query(
+      'SELECT id FROM users WHERE id = ?',
+      [userId]
+    );
+
+    if ((users as any[]).length === 0) {
+      return NextResponse.json(
+        { message: 'User not found' },
+        { status: 404 }
       );
-      
-      if ((users as any[]).length === 0) {
-        return NextResponse.json(
-          { message: 'User not found' },
-          { status: 404 }
-        );
-      }
-      
-      // Update user with or without password
-      if (password) {
-        await connection.execute(
-          'UPDATE users SET name = ?, address = ?, password = ? WHERE id = ?',
-          [name, address, password, userId]
-        );
-      } else {
-        await connection.execute(
-          'UPDATE users SET name = ?, address = ? WHERE id = ?',
-          [name, address, userId]
-        );
-      }
-      
-      return NextResponse.json({ message: 'User updated successfully' });
-    } finally {
-      connection.release();
     }
+    // Update user with or without password
+    if (password) {
+      await query(
+        'UPDATE users SET name = ?, address = ?, password = ? WHERE id = ?',
+        [name, address, password, userId]
+      );
+    } else {
+      await query(
+        'UPDATE users SET name = ?, address = ? WHERE id = ?',
+        [name, address, userId]
+      );
+    }
+
+    return NextResponse.json({ message: 'User updated successfully' });
   } catch (error) {
     console.error('Error updating user:', error);
     return NextResponse.json(
@@ -81,32 +76,25 @@ export async function DELETE(
       );
     }
     
-    const connection = await pool.getConnection();
-    
-    try {
-      // Check if user exists
-      const [users] = await connection.execute(
-        'SELECT id FROM users WHERE id = ?',
-        [userId]
+    // Check if user exists
+    const users = await query(
+      'SELECT id FROM users WHERE id = ?',
+      [userId]
+    );
+
+    if ((users as any[]).length === 0) {
+      return NextResponse.json(
+        { message: 'User not found' },
+        { status: 404 }
       );
-      
-      if ((users as any[]).length === 0) {
-        return NextResponse.json(
-          { message: 'User not found' },
-          { status: 404 }
-        );
-      }
-      
-      // Delete user
-      await connection.execute(
-        'DELETE FROM users WHERE id = ?',
-        [userId]
-      );
-      
-      return NextResponse.json({ message: 'User deleted successfully' });
-    } finally {
-      connection.release();
     }
+    // Delete user
+    await query(
+      'DELETE FROM users WHERE id = ?',
+      [userId]
+    );
+
+    return NextResponse.json({ message: 'User deleted successfully' });
   } catch (error) {
     console.error('Error deleting user:', error);
     return NextResponse.json(

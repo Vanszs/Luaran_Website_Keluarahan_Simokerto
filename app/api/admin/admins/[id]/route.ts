@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import pool from '../../../../../utils/db';
+import { query } from '../../../../../utils/db';
 
 // PUT (update) admin
 export async function PUT(
@@ -33,39 +33,33 @@ export async function PUT(
       );
     }
     
-    const connection = await pool.getConnection();
-    
-    try {
-      // Check if admin exists
-      const [admins] = await connection.execute(
-        'SELECT id FROM admin WHERE id = ?',
-        [adminId]
+    // Check if admin exists
+    const admins = await query(
+      'SELECT id FROM admin WHERE id = ?',
+      [adminId]
+    );
+
+    if ((admins as any[]).length === 0) {
+      return NextResponse.json(
+        { message: 'Admin not found' },
+        { status: 404 }
       );
-      
-      if ((admins as any[]).length === 0) {
-        return NextResponse.json(
-          { message: 'Admin not found' },
-          { status: 404 }
-        );
-      }
+    }
       
       // Update admin with or without password
-      if (password) {
-        await connection.execute(
-          'UPDATE admin SET name = ?, role = ?, password = ? WHERE id = ?',
-          [name, role, password, adminId]
-        );
-      } else {
-        await connection.execute(
-          'UPDATE admin SET name = ?, role = ? WHERE id = ?',
-          [name, role, adminId]
-        );
-      }
+    if (password) {
+      await query(
+        'UPDATE admin SET name = ?, role = ?, password = ? WHERE id = ?',
+        [name, role, password, adminId]
+      );
+    } else {
+      await query(
+        'UPDATE admin SET name = ?, role = ? WHERE id = ?',
+        [name, role, adminId]
+      );
+    }
       
       return NextResponse.json({ message: 'Admin updated successfully' });
-    } finally {
-      connection.release();
-    }
   } catch (error) {
     console.error('Error updating admin:', error);
     return NextResponse.json(
@@ -89,32 +83,26 @@ export async function DELETE(
       );
     }
     
-    const connection = await pool.getConnection();
-    
-    try {
-      // Check if admin exists
-      const [admins] = await connection.execute(
-        'SELECT id FROM admin WHERE id = ?',
-        [adminId]
-      );
+    // Check if admin exists
+    const admins = await query(
+      'SELECT id FROM admin WHERE id = ?',
+      [adminId]
+    );
       
-      if ((admins as any[]).length === 0) {
-        return NextResponse.json(
-          { message: 'Admin not found' },
-          { status: 404 }
-        );
-      }
+    if ((admins as any[]).length === 0) {
+      return NextResponse.json(
+        { message: 'Admin not found' },
+        { status: 404 }
+      );
+    }
       
       // Delete admin
-      await connection.execute(
-        'DELETE FROM admin WHERE id = ?',
-        [adminId]
-      );
+    await query(
+      'DELETE FROM admin WHERE id = ?',
+      [adminId]
+    );
       
       return NextResponse.json({ message: 'Admin deleted successfully' });
-    } finally {
-      connection.release();
-    }
   } catch (error) {
     console.error('Error deleting admin:', error);
     return NextResponse.json(

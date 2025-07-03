@@ -1,20 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
-import pool from '../../../../../utils/db';
+import { query } from '../../../../../utils/db';
 
 // GET all pending admins
 export async function GET(request: NextRequest) {
   try {
-    const connection = await pool.getConnection();
-    
-    try {
-      const [admins] = await connection.execute(
-        'SELECT id, username, name, role, created_at FROM admin WHERE role IS NULL ORDER BY created_at DESC'
-      );
-      
-      return NextResponse.json(admins);
-    } finally {
-      connection.release();
-    }
+    const admins = await query(
+      'SELECT id, username, name, role, created_at FROM admin WHERE role IS NULL ORDER BY created_at DESC'
+    );
+
+    return NextResponse.json(admins);
   } catch (error) {
     console.error('Error fetching pending admins:', error);
     return NextResponse.json(

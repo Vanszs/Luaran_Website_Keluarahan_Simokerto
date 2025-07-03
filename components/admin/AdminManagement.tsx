@@ -30,6 +30,7 @@ import {
   Select,
   FormControl,
   InputLabel,
+  InputAdornment,
 } from '@mui/material';
 import {
   Add as AddIcon,
@@ -345,15 +346,15 @@ export default function AdminManagement() {
         </Button>
       </Box>
 
-      <Paper elevation={0} sx={{ 
-        p: 2, 
-        mb: 3, 
-        display: 'flex',
-        borderRadius: 3,
-        boxShadow: theme.palette.mode === 'dark'
-          ? '0 4px 12px rgba(0,0,0,0.2)'
-          : '0 4px 12px rgba(0,0,0,0.1)',
-      }}>
+      <Paper
+        elevation={0}
+        sx={{
+          p: 2,
+          mb: 3,
+          borderRadius: 2,
+          border: `1px solid ${theme.palette.divider}`,
+        }}
+      >
         <TextField
           fullWidth
           placeholder="Cari admin berdasarkan nama atau username..."
@@ -362,9 +363,33 @@ export default function AdminManagement() {
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           InputProps={{
-            startAdornment: <SearchIcon sx={{ mr: 1, color: 'text.secondary' }} />,
+            startAdornment: (
+              <InputAdornment position="start">
+                <SearchIcon fontSize="small" color="action" />
+              </InputAdornment>
+            ),
           }}
-          sx={{ maxWidth: 500 }}
+          sx={{
+            maxWidth: 500,
+            '& .MuiOutlinedInput-root': {
+              borderRadius: 2,
+              bgcolor: theme.palette.mode === 'dark'
+                ? alpha(theme.palette.common.white, 0.05)
+                : alpha(theme.palette.common.black, 0.03),
+              transition: 'all 0.3s ease',
+              '&:hover': {
+                bgcolor: theme.palette.mode === 'dark'
+                  ? alpha(theme.palette.common.white, 0.08)
+                  : alpha(theme.palette.common.black, 0.05),
+              },
+              '&.Mui-focused': {
+                boxShadow: `0 0 0 2px ${alpha(theme.palette.primary.main, 0.25)}`,
+                bgcolor: theme.palette.mode === 'dark'
+                  ? alpha(theme.palette.common.white, 0.1)
+                  : alpha(theme.palette.common.black, 0.06),
+              }
+            }
+          }}
         />
       </Paper>
 
