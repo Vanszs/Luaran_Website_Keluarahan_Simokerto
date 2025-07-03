@@ -178,14 +178,14 @@ export default function DashboardStats({ useMockData = false }: DashboardStatsPr
                       size="small"
                       sx={{
                         fontWeight: 500,
-                        backgroundColor: 
-                          report.status === 'Completed' ? alpha(theme.palette.success.main, 0.1) :
-                          report.status === 'In Progress' ? alpha(theme.palette.warning.main, 0.1) :
-                          alpha(theme.palette.info.main, 0.1),
-                        color: 
-                          report.status === 'Completed' ? theme.palette.success.main :
-                          report.status === 'In Progress' ? theme.palette.warning.main :
-                          theme.palette.info.main,
+                        backgroundColor:
+                          report.status === 'Completed' ? alpha((theme.palette.success as any).main, 0.1) :
+                          report.status === 'In Progress' ? alpha((theme.palette.warning as any).main, 0.1) :
+                          alpha((theme.palette.info as any).main, 0.1),
+                        color:
+                          report.status === 'Completed' ? (theme.palette.success as any).main :
+                          report.status === 'In Progress' ? (theme.palette.warning as any).main :
+                          (theme.palette.info as any).main,
                       }}
                     />
                   </TableCell>
