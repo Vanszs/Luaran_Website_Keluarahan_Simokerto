@@ -141,7 +141,7 @@ export default function AdminManagement() {
   };
 
   const handleDeleteAdmin = (admin: Admin) => {
-    if (admin.id === user?.id) {
+    if (admin.id === Number(user?.id)) {
       setSnackbar({
         open: true,
         message: 'Anda tidak dapat menghapus akun Anda sendiri',
@@ -516,8 +516,8 @@ export default function AdminManagement() {
                       size="small" 
                       onClick={() => handleEditAdmin(admin)}
                       color="primary"
-                      disabled={admin.id === user?.id && admin.role === 'superadmin'}
-                      title={admin.id === user?.id && admin.role === 'superadmin' ? 
+                      disabled={admin.id === Number(user?.id) && admin.role === 'superadmin'}
+                      title={admin.id === Number(user?.id) && admin.role === 'superadmin' ? 
                         "Anda tidak dapat mengedit akun superadmin Anda sendiri" : ""}
                     >
                       <EditIcon fontSize="small" />
@@ -526,8 +526,8 @@ export default function AdminManagement() {
                       size="small" 
                       onClick={() => handleDeleteAdmin(admin)}
                       color="error"
-                      disabled={admin.id === user?.id}
-                      title={admin.id === user?.id ? "Anda tidak dapat menghapus akun Anda sendiri" : ""}
+                      disabled={admin.id === Number(user?.id)}
+                      title={admin.id === Number(user?.id) ? "Anda tidak dapat menghapus akun Anda sendiri" : ""}
                       sx={{ ml: 1 }}
                     >
                       <DeleteIcon fontSize="small" />

@@ -26,7 +26,7 @@ export default function UserManagementPage() {
         u.nik.includes(search)
       )
       .filter(u => (statusFilter ? u.status === statusFilter : true))
-      .map(u => ({ id: u.id, ...u }));
+      .map(u => ({ ...u }));
   }, [users, search, statusFilter]);
 
   const columns: GridColDef[] = [

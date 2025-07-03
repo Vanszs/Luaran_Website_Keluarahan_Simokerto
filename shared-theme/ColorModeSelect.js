@@ -36,7 +36,10 @@ const ColorModeSelect = (props) => {
           ...props.sx
         }}
       >
-        {theme.palette.mode === 'dark' ? <LightMode /> : <DarkMode />}
+         {theme.palette.mode === 'dark' 
+          ? <LightMode sx={{ color: '#FFD600' }} /> // kuning terang di dark mode
+          : <DarkMode sx={{ color: '#1e293b' }} /> // biru tua/abu di light mode
+        }
       </IconButton>
     </Tooltip>
   );

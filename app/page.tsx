@@ -377,11 +377,15 @@ function LoginContent() {
   );
 }
 
+import { Suspense } from 'react';
+
 export default function SignIn() {
   return (
     <AuthProvider>
       <AppTheme>
-        <LoginContent />
+        <Suspense>
+          <LoginContent />
+        </Suspense>
       </AppTheme>
     </AuthProvider>
   );
