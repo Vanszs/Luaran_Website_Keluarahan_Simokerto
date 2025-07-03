@@ -26,8 +26,8 @@ async function initializeDatabase() {
     console.log('Switching to database...');
     await connection.query(`USE ${process.env.DB_NAME || 'lapor_maling'}`);
     
-    // Read the SQL file
-    const sqlPath = path.join(__dirname, '..', 'sql', 'fix-database.sql');
+    // Read the SQL file containing the full schema and seed data
+    const sqlPath = path.join(__dirname, '..', 'sql', 'lapor_maling.sql');
     const sqlScript = fs.readFileSync(sqlPath, 'utf8');
     
     console.log('Running database setup script...');
