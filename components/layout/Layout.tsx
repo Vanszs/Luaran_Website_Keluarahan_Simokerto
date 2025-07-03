@@ -77,7 +77,7 @@ const ModernAppBar = styled(AppBar, {
 })<{ open?: boolean }>(({ theme, open }) => ({
   background: theme.palette.mode === 'dark'
     ? 'rgba(15, 23, 42, 0.75)'
-    : 'rgba(255, 255, 255, 0.8)',
+    : 'rgba(255, 255, 255, 0.9)',
   backdropFilter: 'blur(6px)',
   borderBottom: `1px solid ${theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.08)'}`,
   boxShadow: theme.palette.mode === 'dark'

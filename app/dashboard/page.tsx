@@ -84,19 +84,24 @@ export default function AdminDashboard() {
         <Paper
           elevation={0}
           sx={{
-            p: 2,
+            p: 3,
             mb: 3,
-            borderRadius: 2,
+            borderRadius: 3,
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'center',
-            border: `1px solid ${theme.palette.divider}`
+            background: theme.palette.mode === 'dark'
+              ? 'linear-gradient(135deg, #1e293b 0%, #283c56 100%)'
+              : 'linear-gradient(135deg, #f8fafc 0%, #e0e7ff 100%)',
+            boxShadow: theme.palette.mode === 'dark'
+              ? '0 8px 24px rgba(0,0,0,0.2)'
+              : '0 8px 24px rgba(0,0,0,0.1)'
           }}
         >
           <Box>
-            <Typography variant="h5" fontWeight={600}>
-              {loading ? 
-                'Memuat data...' : 
+            <Typography variant="h4" fontWeight={700}>
+              {loading ?
+                'Memuat data...' :
                 `Selamat Datang, ${user?.name?.split(' ')[0] || 'Admin'}`
               }
             </Typography>

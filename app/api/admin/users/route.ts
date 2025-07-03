@@ -1,17 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { query, checkDatabaseConnection } from '../../../../utils/db';
+import { query } from '../../../../utils/db';
 
 export const dynamic = 'force-dynamic';
 
 // GET all users
 export async function GET(request: NextRequest) {
   try {
-    const isDatabaseAvailable = await checkDatabaseConnection();
-
-    if (!isDatabaseAvailable) {
-      return NextResponse.json([]);
-    }
-
     const users = await query(
       'SELECT id, username, name, address, created_at FROM users ORDER BY id DESC'
     );
@@ -39,15 +33,6 @@ export async function POST(request: NextRequest) {
       );
     }
     
-    const isDatabaseAvailable = await checkDatabaseConnection();
-
-    if (!isDatabaseAvailable) {
-      return NextResponse.json(
-        { message: 'Database unavailable' },
-        { status: 503 }
-      );
-    }
-
     // Check if username already exists
     const existingUsers = await query(
       'SELECT id FROM users WHERE username = ?',

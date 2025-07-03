@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { query, checkDatabaseConnection } from '../../../../../utils/db';
+import { query } from '../../../../../utils/db';
 
 export const dynamic = 'force-dynamic';
 
@@ -27,15 +27,6 @@ export async function PUT(
       );
     }
     
-    const isDatabaseAvailable = await checkDatabaseConnection();
-
-    if (!isDatabaseAvailable) {
-      return NextResponse.json(
-        { message: 'Database unavailable' },
-        { status: 503 }
-      );
-    }
-
     // Check if user exists
     const users = await query(
       'SELECT id FROM users WHERE id = ?',
@@ -85,15 +76,6 @@ export async function DELETE(
       );
     }
     
-    const isDatabaseAvailable = await checkDatabaseConnection();
-
-    if (!isDatabaseAvailable) {
-      return NextResponse.json(
-        { message: 'Database unavailable' },
-        { status: 503 }
-      );
-    }
-
     // Check if user exists
     const users = await query(
       'SELECT id FROM users WHERE id = ?',
