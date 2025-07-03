@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import pool from '../../../../../../utils/db';
+import { query } from '../../../../../../utils/db';
 
 // DELETE to reject admin
 export async function DELETE(
@@ -15,32 +15,26 @@ export async function DELETE(
       );
     }
     
-    const connection = await pool.getConnection();
-    
-    try {
-      // Check if admin exists and is pending
-      const [admins] = await connection.execute(
-        'SELECT id FROM admin WHERE id = ? AND role IS NULL',
-        [adminId]
-      );
+    // Check if admin exists and is pending
+    const admins = await query(
+      'SELECT id FROM admin WHERE id = ? AND role IS NULL',
+      [adminId]
+    );
       
-      if ((admins as any[]).length === 0) {
-        return NextResponse.json(
-          { message: 'Pending admin not found' },
-          { status: 404 }
-        );
-      }
+    if ((admins as any[]).length === 0) {
+      return NextResponse.json(
+        { message: 'Pending admin not found' },
+        { status: 404 }
+      );
+    }
       
       // Delete the admin
-      await connection.execute(
-        'DELETE FROM admin WHERE id = ?',
-        [adminId]
-      );
+    await query(
+      'DELETE FROM admin WHERE id = ?',
+      [adminId]
+    );
       
       return NextResponse.json({ message: 'Admin rejected successfully' });
-    } finally {
-      connection.release();
-    }
   } catch (error) {
     console.error('Error rejecting admin:', error);
     return NextResponse.json(

@@ -6,17 +6,12 @@ import {
   Grid,
   Paper,
   Typography,
-  Card,
-  CardContent,
   Avatar,
   useTheme,
-  alpha,
   Stack,
   Container,
   Tabs,
   Tab,
-  Chip,
-  Divider,
   CircularProgress,
 } from '@mui/material';
 import {
@@ -37,32 +32,8 @@ export default function AdminSubmissionsPage() {
   const { user } = useAuth();
   const [activeTab, setActiveTab] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
-  const [stats, setStats] = useState({
-    todayReports: 0,
-    totalReports: 0,
-    totalUsers: 0
-  });
-  
   useEffect(() => {
-    const fetchDashboardStats = async () => {
-      try {
-        const response = await fetch('/api/admin/stats');
-        if (response.ok) {
-          const data = await response.json();
-          setStats({
-            todayReports: data.todayReports,
-            totalReports: data.totalReports,
-            totalUsers: data.totalUsers
-          });
-        }
-      } catch (error) {
-        console.error('Failed to fetch dashboard stats:', error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    
-    fetchDashboardStats();
+    setIsLoading(false);
   }, []);
 
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
@@ -71,11 +42,11 @@ export default function AdminSubmissionsPage() {
 
   const renderTabContent = () => {
     switch (activeTab) {
-      case 0: return <DashboardStats stats={stats} />;
+      case 0: return <DashboardStats useMockData={false} />;
       case 1: return <UserManagement />;
       case 2: return user?.role === 'superadmin' ? <AdminManagement /> : <Box p={3}>You don't have permission to access this feature.</Box>;
       case 3: return <ReportsList />;
-      default: return <DashboardStats stats={stats} />;
+      default: return <DashboardStats useMockData={false} />;
     }
   };
 

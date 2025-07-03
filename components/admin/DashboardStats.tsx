@@ -11,8 +11,6 @@ import {
   TableContainer,
   TableHead,
   TableRow,
-  TextField,
-  InputAdornment,
   Chip,
   useTheme,
   alpha,
@@ -21,7 +19,6 @@ import {
   TablePagination,
 } from '@mui/material';
 import {
-  Search as SearchIcon,
   CalendarToday as CalendarIcon,
 } from '@mui/icons-material';
 import { useApiData } from '../../hooks/useMockApi';
@@ -46,7 +43,6 @@ interface DashboardStatsProps {
 
 export default function DashboardStats({ useMockData = false }: DashboardStatsProps) {
   const theme = useTheme();
-  const [searchTerm, setSearchTerm] = useState('');
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
 
@@ -68,24 +64,15 @@ export default function DashboardStats({ useMockData = false }: DashboardStatsPr
     }
   }, [data]);
 
-  // Filter reports based on search term (now safe since we ensure it's an array)
-  const filteredReports = recentReports.filter(report => {
-    return (
-      (report.user?.name || report.submittedBy || 'Warga')
-        .toLowerCase()
-        .includes(searchTerm.toLowerCase()) ||
-      report.address?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      report.description?.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-  });
+  const filteredReports = recentReports;
 
   // Pagination
-  const handleChangePage = (event: unknown, newPage: number) => {
+  const handleChangePage = (_event: unknown, newPage: number) => {
     setPage(newPage);
   };
 
-  const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setRowsPerPage(parseInt(event.target.value, 10));
+  const handleChangeRowsPerPage = (_event: React.ChangeEvent<HTMLInputElement>) => {
+    setRowsPerPage(parseInt(_event.target.value, 10));
     setPage(0);
   };
 
@@ -115,30 +102,6 @@ export default function DashboardStats({ useMockData = false }: DashboardStatsPr
         <Typography variant="h6" fontWeight={600}>
           Laporan Terbaru
         </Typography>
-
-        <TextField
-          placeholder="Cari laporan..."
-          size="small"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">
-                <SearchIcon fontSize="small" />
-              </InputAdornment>
-            ),
-            sx: { 
-              borderRadius: 2,
-              backgroundColor: theme.palette.mode === 'dark' ? alpha(theme.palette.common.white, 0.07) : alpha(theme.palette.common.black, 0.04),
-              '&:hover': {
-                backgroundColor: theme.palette.mode === 'dark' ? alpha(theme.palette.common.white, 0.1) : alpha(theme.palette.common.black, 0.07),
-              },
-            }
-          }}
-          sx={{ 
-            width: { xs: '100%', sm: 240 },
-          }}
-        />
       </Box>
       
       {loading && <LinearProgress />}
@@ -151,9 +114,19 @@ export default function DashboardStats({ useMockData = false }: DashboardStatsPr
         </Box>
       )}
 
-      <TableContainer>
+      <TableContainer component={Paper} elevation={0} sx={{
+        borderRadius: 3,
+        overflow: 'hidden',
+        boxShadow: theme.palette.mode === 'dark'
+          ? '0 4px 12px rgba(0,0,0,0.2)'
+          : '0 4px 12px rgba(0,0,0,0.1)',
+      }}>
         <Table>
-          <TableHead>
+          <TableHead sx={{
+            backgroundColor: theme.palette.mode === 'dark'
+              ? alpha(theme.palette.primary.main, 0.1)
+              : alpha(theme.palette.primary.main, 0.05)
+          }}>
             <TableRow>
               <TableCell>ID</TableCell>
               <TableCell>Pelapor</TableCell>
@@ -205,14 +178,14 @@ export default function DashboardStats({ useMockData = false }: DashboardStatsPr
                       size="small"
                       sx={{
                         fontWeight: 500,
-                        backgroundColor: 
-                          report.status === 'Completed' ? alpha(theme.palette.success.main, 0.1) :
-                          report.status === 'In Progress' ? alpha(theme.palette.warning.main, 0.1) :
-                          alpha(theme.palette.info.main, 0.1),
-                        color: 
-                          report.status === 'Completed' ? theme.palette.success.main :
-                          report.status === 'In Progress' ? theme.palette.warning.main :
-                          theme.palette.info.main,
+                        backgroundColor:
+                          report.status === 'Completed' ? alpha((theme.palette.success as any).main, 0.1) :
+                          report.status === 'In Progress' ? alpha((theme.palette.warning as any).main, 0.1) :
+                          alpha((theme.palette.info as any).main, 0.1),
+                        color:
+                          report.status === 'Completed' ? (theme.palette.success as any).main :
+                          report.status === 'In Progress' ? (theme.palette.warning as any).main :
+                          (theme.palette.info as any).main,
                       }}
                     />
                   </TableCell>

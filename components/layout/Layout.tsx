@@ -76,9 +76,9 @@ const ModernAppBar = styled(AppBar, {
   shouldForwardProp: (prop) => prop !== 'open',
 })<{ open?: boolean }>(({ theme, open }) => ({
   background: theme.palette.mode === 'dark'
-    ? 'rgba(15, 23, 42, 0.8)'
-    : 'rgba(255, 255, 255, 0.6)', // Reduced opacity for light theme
-  backdropFilter: 'blur(10px)', // Reduced blur effect
+    ? 'rgba(15, 23, 42, 0.75)'
+    : 'rgba(255, 255, 255, 0.95)',
+  backdropFilter: 'blur(6px)',
   borderBottom: `1px solid ${theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.08)'}`,
   boxShadow: theme.palette.mode === 'dark'
     ? '0 4px 20px rgba(0, 0, 0, 0.2)'
@@ -368,23 +368,34 @@ const Layout: React.FC<LayoutProps> = ({ children, title = 'PINTAR Admin' }) => 
           </Box>
           
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <ColorModeSelect sx={{ 
+            <ColorModeSelect sx={{
               borderRadius: 2,
+              backgroundColor: theme.palette.mode === 'dark'
+                ? 'rgba(255,255,255,0.08)'
+                : 'rgba(0,0,0,0.04)',
               '&:hover': {
                 transform: 'scale(1.05)',
+                backgroundColor: theme.palette.mode === 'dark'
+                  ? 'rgba(255,255,255,0.16)'
+                  : 'rgba(0,0,0,0.08)',
               },
             }} />
             
             <Tooltip title="Notifications" arrow>
-              <IconButton 
-                color="inherit" 
+              <IconButton
+                color="inherit"
                 onClick={handleNotificationMenuOpen}
-                sx={{ 
+                sx={{
                   borderRadius: 2,
                   transition: 'all 0.3s ease',
+                  backgroundColor: theme.palette.mode === 'dark'
+                    ? 'rgba(255,255,255,0.08)'
+                    : 'rgba(0,0,0,0.04)',
                   '&:hover': {
                     transform: 'scale(1.05)',
-                    bgcolor: 'rgba(255, 255, 255, 0.1)',
+                    backgroundColor: theme.palette.mode === 'dark'
+                      ? 'rgba(255,255,255,0.16)'
+                      : 'rgba(0,0,0,0.08)',
                   },
                 }}
               >
