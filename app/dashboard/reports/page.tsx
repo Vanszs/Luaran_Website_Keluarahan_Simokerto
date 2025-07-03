@@ -22,7 +22,8 @@ import {
   DialogActions,
   Button,
   Grid,
-  alpha
+  alpha,
+  InputAdornment
 } from '@mui/material';
 import {
   Search as SearchIcon,
@@ -120,103 +121,162 @@ export default function ReportsPage() {
   
   return (
     <Layout title="Laporan">
-      <Paper sx={{ p: 2, mb: 3, borderRadius: 2 }}>
-        <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-          <Typography variant="h5" fontWeight={600}>
-            Daftar Laporan
-          </Typography>
-        </Box>
-        
-        <TextField
-          placeholder="Cari berdasarkan nama, alamat, atau deskripsi"
-          variant="outlined"
-          fullWidth
-          size="small"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          InputProps={{
-            startAdornment: <SearchIcon sx={{ mr: 1, color: 'text.secondary' }} />,
+      <Box>
+        <Typography variant="h5" fontWeight={600} sx={{ mb: 3 }}>
+          Daftar Laporan
+        </Typography>
+
+        <Paper 
+          elevation={0} 
+          sx={{ 
+            borderRadius: 2,
+            border: `1px solid ${theme.palette.divider}`,
+            overflow: 'hidden',
           }}
-          sx={{ mb: 2 }}
-        />
-        
-        <TableContainer>
-          <Table size="small">
-            <TableHead>
-              <TableRow>
-                <TableCell>ID</TableCell>
-                <TableCell>Pelapor</TableCell>
-                <TableCell>Alamat</TableCell>
-                <TableCell>Tanggal</TableCell>
-                <TableCell>Status</TableCell>
-                <TableCell align="right">Aksi</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {loading ? (
-                <TableRow>
-                  <TableCell colSpan={6} align="center" sx={{ py: 3 }}>
-                    Memuat data...
-                  </TableCell>
+        >
+          {/* Enhanced Search Header */}
+          <Box sx={{ 
+            p: 2, 
+            borderBottom: `1px solid ${theme.palette.divider}`,
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            flexWrap: 'wrap',
+            gap: 2
+          }}>
+            <Typography variant="h6" fontWeight={600}>
+              Semua Laporan
+            </Typography>
+
+            <TextField
+              placeholder="Cari berdasarkan nama, alamat, atau deskripsi..."
+              size="small"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <SearchIcon fontSize="small" color="action" />
+                  </InputAdornment>
+                ),
+              }}
+              sx={{
+                width: { xs: '100%', sm: 350 },
+                '& .MuiOutlinedInput-root': {
+                  borderRadius: 2,
+                  bgcolor: theme.palette.mode === 'dark'
+                    ? alpha(theme.palette.common.white, 0.05)
+                    : alpha(theme.palette.common.black, 0.03),
+                  transition: 'all 0.3s ease',
+                  '&:hover': {
+                    bgcolor: theme.palette.mode === 'dark'
+                      ? alpha(theme.palette.common.white, 0.08)
+                      : alpha(theme.palette.common.black, 0.05),
+                  },
+                  '&.Mui-focused': {
+                    boxShadow: `0 0 0 2px ${alpha(theme.palette.primary.main, 0.25)}`,
+                    bgcolor: theme.palette.mode === 'dark'
+                      ? alpha(theme.palette.common.white, 0.1)
+                      : alpha(theme.palette.common.black, 0.06),
+                  }
+                }
+              }}
+            />
+          </Box>
+          
+          <TableContainer>
+            <Table size="small">
+              <TableHead>
+                <TableRow sx={{ bgcolor: theme.palette.mode === 'dark' 
+                  ? alpha(theme.palette.background.paper, 0.5) 
+                  : alpha(theme.palette.background.paper, 0.5) 
+                }}>
+                  <TableCell sx={{ fontWeight: 600, py: 2 }}>ID</TableCell>
+                  <TableCell sx={{ fontWeight: 600, py: 2 }}>Pelapor</TableCell>
+                  <TableCell sx={{ fontWeight: 600, py: 2 }}>Alamat</TableCell>
+                  <TableCell sx={{ fontWeight: 600, py: 2 }}>Tanggal</TableCell>
+                  <TableCell sx={{ fontWeight: 600, py: 2 }}>Status</TableCell>
+                  <TableCell sx={{ fontWeight: 600, py: 2 }} align="right">Aksi</TableCell>
                 </TableRow>
-              ) : paginatedReports.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={6} align="center" sx={{ py: 3 }}>
-                    Tidak ada data laporan
-                  </TableCell>
-                </TableRow>
-              ) : (
-                paginatedReports.map(report => (
-                  <TableRow key={report.id} hover>
-                    <TableCell>#{report.id}</TableCell>
-                    <TableCell>{report.user?.name}</TableCell>
-                    <TableCell sx={{ maxWidth: 200, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                      {report.address}
-                    </TableCell>
-                    <TableCell>
-                      {new Date(report.created_at).toLocaleDateString('id-ID', { 
-                        day: 'numeric', 
-                        month: 'short', 
-                        year: 'numeric' 
-                      })}
-                    </TableCell>
-                    <TableCell>
-                      <Chip 
-                        label={getStatusLabel(report.status)} 
-                        size="small"
-                        sx={{ 
-                          bgcolor: alpha(getStatusColor(report.status).main, 0.1),
-                          color: getStatusColor(report.status).main,
-                          fontWeight: 500
-                        }}
-                      />
-                    </TableCell>
-                    <TableCell align="right">
-                      <IconButton 
-                        size="small" 
-                        onClick={() => handleViewReport(report)}
-                        color="primary"
-                      >
-                        <ViewIcon fontSize="small" />
-                      </IconButton>
+              </TableHead>
+              <TableBody>
+                {loading ? (
+                  <TableRow>
+                    <TableCell colSpan={6} align="center" sx={{ py: 3 }}>
+                      Memuat data...
                     </TableCell>
                   </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
-        </TableContainer>
-        
-        <TablePagination
-          rowsPerPageOptions={[5, 10, 25]}
-          component="div"
-          count={filteredReports.length}
-          rowsPerPage={rowsPerPage}
-          page={page}
-          onPageChange={handleChangePage}
-          onRowsPerPageChange={handleChangeRowsPerPage}
-        />
-      </Paper>
+                ) : paginatedReports.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={6} align="center" sx={{ py: 3 }}>
+                      {searchTerm ? 'Tidak ada hasil yang sesuai dengan pencarian' : 'Tidak ada data laporan'}
+                    </TableCell>
+                  </TableRow>
+                ) : (
+                  paginatedReports.map(report => (
+                    <TableRow key={report.id} hover>
+                      <TableCell sx={{ fontSize: '0.875rem', py: 2 }}>#{report.id}</TableCell>
+                      <TableCell sx={{ fontSize: '0.875rem', py: 2 }}>{report.user?.name}</TableCell>
+                      <TableCell sx={{ fontSize: '0.875rem', py: 2 }}>
+                        <Typography 
+                          variant="body2" 
+                          sx={{ 
+                            maxWidth: 200, 
+                            overflow: 'hidden', 
+                            textOverflow: 'ellipsis', 
+                            whiteSpace: 'nowrap' 
+                          }}
+                        >
+                          {report.address}
+                        </Typography>
+                      </TableCell>
+                      <TableCell sx={{ fontSize: '0.875rem', py: 2 }}>
+                        {new Date(report.created_at).toLocaleDateString('id-ID', { 
+                          day: 'numeric', 
+                          month: 'short', 
+                          year: 'numeric' 
+                        })}
+                      </TableCell>
+                      <TableCell sx={{ py: 2 }}>
+                        <Chip 
+                          label={getStatusLabel(report.status)} 
+                          size="small"
+                          sx={{ 
+                            bgcolor: alpha(getStatusColor(report.status).main, 0.1),
+                            color: getStatusColor(report.status).main,
+                            fontWeight: 500
+                          }}
+                        />
+                      </TableCell>
+                      <TableCell sx={{ py: 2 }} align="right">
+                        <IconButton 
+                          size="small" 
+                          onClick={() => handleViewReport(report)}
+                          color="primary"
+                        >
+                          <ViewIcon fontSize="small" />
+                        </IconButton>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
+              </TableBody>
+            </Table>
+          </TableContainer>
+          
+          <TablePagination
+            rowsPerPageOptions={[5, 10, 25]}
+            component="div"
+            count={filteredReports.length}
+            rowsPerPage={rowsPerPage}
+            page={page}
+            onPageChange={handleChangePage}
+            onRowsPerPageChange={handleChangeRowsPerPage}
+            labelRowsPerPage="Baris per halaman:"
+            labelDisplayedRows={({ from, to, count }) => `${from}-${to} dari ${count}`}
+          />
+        </Paper>
+      </Box>
       
       {/* Report Detail Dialog */}
       <Dialog 

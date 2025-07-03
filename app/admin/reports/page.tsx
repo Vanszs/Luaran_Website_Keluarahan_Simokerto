@@ -2,14 +2,14 @@
 
 import React from 'react';
 import Layout from '../../../components/layout/Layout';
-import UserManagement from '../../../components/admin/UserManagement';
+import ReportsList from '../../../components/admin/ReportsList';
 import { Box } from '@mui/material';
 
-export default function AdminCitizensPage() {
+export default function AdminReportsPage() {
   return (
-    <Layout title="Citizens Management">
+    <Layout title="Reports Management">
       <Box sx={{ p: 1 }}>
-        <UserManagement />
+        <ReportsList />
       </Box>
     </Layout>
   );

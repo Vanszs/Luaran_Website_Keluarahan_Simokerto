@@ -14,12 +14,14 @@ import Alert from '@mui/material/Alert';
 import Snackbar from '@mui/material/Snackbar';
 import InputAdornment from '@mui/material/InputAdornment';
 import IconButton from '@mui/material/IconButton';
+import CircularProgress from '@mui/material/CircularProgress';
 import { styled, keyframes } from '@mui/material/styles';
 import { Visibility, VisibilityOff, LockOutlined, PersonOutline } from '@mui/icons-material';
 import AppTheme from '../shared-theme/AppTheme';
 import ColorModeSelect from '../shared-theme/ColorModeSelect';
 import Image from 'next/image';
 import { useAuth, AuthProvider } from '../contexts/AuthContext';
+import { useRouter } from 'next/navigation';
 
 // Animations
 const float = keyframes`
@@ -111,22 +113,57 @@ function LoginContent() {
   const [showPassword, setShowPassword] = React.useState(false);
   const [error, setError] = React.useState('');
   const [successMessage, setSuccessMessage] = React.useState('');
+  const [isLoading, setIsLoading] = React.useState(false);
   const { login } = useAuth();
+  const router = useRouter();
   const searchParams = useSearchParams();
 
   React.useEffect(() => {
     if (searchParams?.get('registered') === 'true') {
       setSuccessMessage('Registration successful! Your account is pending approval by an administrator.');
     }
+    if (searchParams?.get('logout') === 'true') {
+      setSuccessMessage('You have been successfully logged out.');
+    }
   }, [searchParams]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!username || !password) {
+      setError('Please enter both username and password');
+      return;
+    }
+    
+    setError('');
+    setIsLoading(true);
     
     try {
-      await login(username, password);
+      console.log(`Attempting login with username: ${username}`);
+      
+      const result = await login(username, password);
+      console.log('Login result:', result);
+      
+      if (result?.success) {
+        console.log('Login successful, redirecting based on role...');
+        
+        // Redirect based on user role
+        if (result.user.role === 'superadmin') {
+          console.log('Redirecting superadmin to /admin');
+          router.push('/admin');
+        } else {
+          console.log('Redirecting regular admin to /dashboard');
+          router.push('/dashboard');
+        }
+      } else {
+        console.error('Login failed with result:', result);
+        setError(result?.message || 'Login failed. Please try again.');
+      }
     } catch (err) {
+      console.error('Login error:', err);
+      // Provide a more detailed error message based on the error
       setError(err instanceof Error ? err.message : 'Login failed. Please try again.');
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -224,6 +261,7 @@ function LoginContent() {
                 ),
               }}
               sx={{ mb: 2 }}
+              disabled={isLoading}
             />
             <TextField
               margin="normal"
@@ -248,6 +286,7 @@ function LoginContent() {
                       aria-label="toggle password visibility"
                       onClick={() => setShowPassword(!showPassword)}
                       edge="end"
+                      disabled={isLoading}
                     >
                       {showPassword ? <VisibilityOff /> : <Visibility />}
                     </IconButton>
@@ -255,11 +294,13 @@ function LoginContent() {
                 ),
               }}
               sx={{ mb: 3 }}
+              disabled={isLoading}
             />
             <Button
               type="submit"
               fullWidth
               variant="contained"
+              disabled={isLoading}
               sx={{
                 py: 1.5,
                 borderRadius: 2,
@@ -277,7 +318,11 @@ function LoginContent() {
                 mb: 2,
               }}
             >
-              Login
+              {isLoading ? (
+                <CircularProgress size={24} color="inherit" />
+              ) : (
+                'Login'
+              )}
             </Button>
             
             <Box sx={{ textAlign: 'center' }}>

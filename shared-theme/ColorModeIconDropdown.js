@@ -41,7 +41,26 @@ export default function ColorModeIconDropdown() {
         <IconButton
           onClick={handleClick}
           size="small"
-          sx={{ ml: 1 }}
+          sx={{
+            ml: 1,
+            backgroundColor: mode === 'dark'
+              ? 'rgba(255,255,255,0.08)'
+              : 'rgba(0,0,0,0.05)',
+            // Only apply blur in dark mode
+            ...(mode === 'dark'
+              ? { backdropFilter: 'blur(8px)' }
+              : {}),
+            borderRadius: '50%',
+            width: 40,
+            height: 40,
+            transition: 'all 0.3s ease',
+            '&:hover': {
+              backgroundColor: mode === 'dark'
+                ? 'rgba(255,255,255,0.15)'
+                : 'rgba(0,0,0,0.1)',
+              transform: 'scale(1.05)',
+            },
+          }}
           aria-controls={open ? 'color-mode-menu' : undefined}
           aria-haspopup="true"
           aria-expanded={open ? 'true' : undefined}

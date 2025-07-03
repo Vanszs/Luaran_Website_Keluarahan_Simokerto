@@ -15,7 +15,8 @@ import {
   useTheme,
   alpha,
   Collapse,
-  Badge
+  Badge,
+  Stack
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { useRouter, usePathname } from 'next/navigation';
@@ -42,38 +43,47 @@ import { useAuth } from '../../contexts/AuthContext';
 // Constants
 const drawerWidth = 280;
 
-// Styled components
-const StyledDrawer = styled(Drawer)(({ theme }) => ({
+// Modern Sidebar with glassmorphism - updated with higher z-index
+const ModernDrawer = styled(Drawer)(({ theme }) => ({
   width: drawerWidth,
   flexShrink: 0,
   '& .MuiDrawer-paper': {
     width: drawerWidth,
     boxSizing: 'border-box',
-    backgroundColor: theme.palette.mode === 'dark' ? '#111827' : '#f8fafc',
-    backgroundImage: theme.palette.mode === 'dark' 
-      ? 'linear-gradient(rgba(17, 24, 39, 0.95), rgba(17, 24, 39, 1))' 
-      : 'linear-gradient(rgba(248, 250, 252, 0.95), rgba(248, 250, 252, 1))',
+    background: theme.palette.mode === 'dark'
+      ? 'linear-gradient(135deg, rgba(15, 23, 42, 0.95) 0%, rgba(30, 41, 59, 0.95) 100%)'
+      : 'linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 250, 252, 0.95) 100%)',
+    backdropFilter: 'blur(20px)',
+    borderRight: `1px solid ${theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.08)'}`,
     boxShadow: theme.palette.mode === 'dark'
-      ? '1px 0 20px rgba(0, 0, 0, 0.3)'
-      : '1px 0 20px rgba(0, 0, 0, 0.08)',
-    borderRight: `1px solid ${theme.palette.divider}`,
-    transition: 'width 0.3s ease-in-out',
+      ? '4px 0 20px rgba(0, 0, 0, 0.3)'
+      : '4px 0 20px rgba(0, 0, 0, 0.08)',
+    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
     overflowX: 'hidden',
+    position: 'fixed',
+    top: 0,
+    left: 0,
+    height: '100vh',
+    zIndex: theme.zIndex.drawer + 2, // Increased z-index to ensure it's above navbar
   },
 }));
 
-const DrawerHeader = styled('div')(({ theme }) => ({
+// Modern header with animation - Add padding for logo area
+const ModernDrawerHeader = styled('div')(({ theme }) => ({
   display: 'flex',
   alignItems: 'center',
-  padding: theme.spacing(0, 2),
-  minHeight: 64,
+  padding: theme.spacing(2, 2.5),
+  minHeight: '64px',
+  paddingTop: theme.spacing(2.5), // Added extra top padding for logo area
   justifyContent: 'space-between',
+  background: theme.palette.mode === 'dark'
+    ? 'rgba(30, 41, 59, 0.95)' // More opaque for better contrast
+    : 'rgba(255, 255, 255, 0.95)', // More opaque for better contrast
+  backdropFilter: 'blur(10px)',
+  borderBottom: `1px solid ${theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.08)'}`,
   position: 'sticky',
   top: 0,
   zIndex: 10,
-  backgroundColor: theme.palette.mode === 'dark' ? '#111827' : '#f8fafc',
-  backdropFilter: 'blur(8px)',
-  borderBottom: `1px solid ${theme.palette.divider}`,
 }));
 
 const NavSection = styled(Box)(({ theme }) => ({
@@ -261,6 +271,11 @@ const Sidebar: React.FC<SidebarProps> = ({ open, onClose, variant = 'permanent' 
       onClose();
     }
   };
+
+  const handleComingSoonHover = (title: string) => {
+    // You can add a tooltip or snackbar here if needed
+    console.log(`${title} - Coming Soon`);
+  };
   
   // Define navigation items based on user role
   const isSuperAdmin = user?.role === 'superadmin';
@@ -272,35 +287,19 @@ const Sidebar: React.FC<SidebarProps> = ({ open, onClose, variant = 'permanent' 
       icon: <DashboardIcon />,
       path: isSuperAdmin ? '/admin' : '/dashboard',
       exact: true,
+      badge: undefined,
     },
     {
       title: 'Laporan',
       icon: <ReportIcon />,
       path: `${basePath}/reports`,
+      badge: undefined,
     },
     {
       title: 'Warga',
       icon: <PeopleIcon />,
       path: `${basePath}/citizens`,
-    },
-    {
-      title: 'Sistem Alert',
-      icon: <AlertIcon />,
-      path: `${basePath}/alert-system`,
-      badge: 3, // Example notification count
-    },
-  ];
-
-  const analyticsNavItems = [
-    {
-      title: 'Statistik',
-      icon: <AssessmentIcon />,
-      path: `${basePath}/statistics`,
-    },
-    {
-      title: 'Perangkat',
-      icon: <DevicesIcon />,
-      path: `${basePath}/devices`,
+      badge: undefined,
     },
   ];
 
@@ -318,57 +317,103 @@ const Sidebar: React.FC<SidebarProps> = ({ open, onClose, variant = 'permanent' 
     },
   ] : [];
 
-  const helpNavItems = [
-    {
-      title: 'Bantuan',
-      icon: <HelpIcon />,
-      path: `${basePath}/help`,
-    },
-    {
-      title: 'Dukungan',
-      icon: <SupportIcon />,
-      path: `${basePath}/support`,
-    },
-  ];
-
   return (
-    <StyledDrawer
+    <ModernDrawer
       variant={variant}
       open={open}
       onClose={onClose}
       anchor="left"
       sx={{
+        display: { xs: variant === 'temporary' ? 'block' : 'none', md: 'block' },
         '& .MuiDrawer-paper': {
-          width: drawerWidth,
+          transform: open ? 'translateX(0)' : `translateX(-${drawerWidth}px)`,
+          [theme.breakpoints.down('md')]: {
+            transform: variant === 'temporary' && open ? 'translateX(0)' : `translateX(-${drawerWidth}px)`,
+          },
         },
       }}
     >
-      <DrawerHeader>
-        <Box sx={{ display: 'flex', alignItems: 'center' }}>
-          <Box
-            sx={{
-              width: 40,
-              height: 40,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              borderRadius: 1.5,
-              background: 'linear-gradient(135deg, #3b82f6, #1e40af)',
-              mr: 2,
+      <ModernDrawerHeader>
+        <Stack direction="column" spacing={0.5}>
+          <Box sx={{ display: 'flex', alignItems: 'center' }}>
+            <Box
+              sx={{
+                width: 44,
+                height: 44,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                borderRadius: 2.5,
+                background: 'linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%)',
+                boxShadow: '0 8px 16px rgba(59, 130, 246, 0.4)',
+                mr: 2,
+                transition: 'all 0.3s ease',
+                '&:hover': {
+                  transform: 'scale(1.05)',
+                  boxShadow: '0 12px 24px rgba(59, 130, 246, 0.5)',
+                },
+              }}
+            >
+              <Image src="/logo.png" alt="PINTAR Logo" width={28} height={28} />
+            </Box>
+            <Box>
+              <Typography 
+                variant="h6" 
+                sx={{ 
+                  fontWeight: 800,
+                  background: 'linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%)',
+                  backgroundClip: 'text',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  lineHeight: 1.2,
+                }}
+              >
+                PINTAR
+              </Typography>
+              <Typography 
+                variant="caption" 
+                sx={{ 
+                  color: 'text.secondary',
+                  fontWeight: 500,
+                  fontSize: '0.7rem',
+                  letterSpacing: '0.5px',
+                }}
+              >
+                Admin Panel
+              </Typography>
+            </Box>
+          </Box>
+          
+          <Box sx={{ pl: 0.5, pt: 0.5 }}>
+            <Typography 
+              variant="caption" 
+              sx={{ 
+                display: 'block',
+                fontSize: '0.65rem',
+                color: theme.palette.mode === 'dark' ? 'grey.400' : 'grey.600',
+              }}
+            >
+              Kota Surabaya
+            </Typography>
+          </Box>
+        </Stack>
+        
+        {variant === 'temporary' && (
+          <IconButton 
+            onClick={onClose} 
+            edge="end" 
+            sx={{ 
+              color: 'text.secondary',
+              borderRadius: 2,
+              '&:hover': {
+                bgcolor: 'rgba(255, 255, 255, 0.1)',
+              },
             }}
           >
-            <Image src="/logo.png" alt="PINTAR Logo" width={30} height={30} />
-          </Box>
-          <Typography variant="h6" sx={{ fontWeight: 700 }}>
-            PINTAR
-          </Typography>
-        </Box>
-        {variant === 'temporary' && (
-          <IconButton onClick={onClose} edge="end" sx={{ color: 'text.secondary' }}>
             <ChevronLeftIcon />
           </IconButton>
         )}
-      </DrawerHeader>
+      </ModernDrawerHeader>
 
       <Box sx={{ overflow: 'auto', height: '100%', display: 'flex', flexDirection: 'column' }}>
         {/* Main Navigation */}
@@ -389,20 +434,81 @@ const Sidebar: React.FC<SidebarProps> = ({ open, onClose, variant = 'permanent' 
           </List>
         </NavSection>
 
-        {/* Analytics Navigation */}
+        {/* Coming Soon Items */}
         <NavSection>
-          <NavLabel>Analitik</NavLabel>
+          <NavLabel>Fitur Lainnya</NavLabel>
           <List disablePadding>
-            {analyticsNavItems.map((item) => (
-              <NavItem
-                key={item.path}
-                icon={item.icon}
-                title={item.title}
-                path={item.path}
-                active={isActive(item.path)}
-                onClick={() => handleNavigation(item.path)}
-              />
-            ))}
+            <Tooltip title="Coming Soon" placement="right" arrow>
+              <ListItem disablePadding sx={{ mb: 0.5 }}>
+                <ListItemButton
+                  onMouseEnter={() => handleComingSoonHover('Statistik')}
+                  sx={{
+                    borderRadius: 2,
+                    py: 1.25,
+                    px: 1.5,
+                    opacity: 0.5,
+                    cursor: 'not-allowed',
+                    '&:hover': {
+                      bgcolor: 'transparent',
+                      opacity: 0.7,
+                    },
+                  }}
+                >
+                  <ListItemIcon
+                    sx={{
+                      minWidth: 36,
+                      color: 'text.disabled',
+                    }}
+                  >
+                    <AssessmentIcon />
+                  </ListItemIcon>
+                  <ListItemText 
+                    primary="Statistik" 
+                    primaryTypographyProps={{ 
+                      fontSize: '0.9rem',
+                      fontWeight: 500,
+                      color: 'text.disabled',
+                    }}
+                  />
+                </ListItemButton>
+              </ListItem>
+            </Tooltip>
+
+            <Tooltip title="Coming Soon" placement="right" arrow>
+              <ListItem disablePadding sx={{ mb: 0.5 }}>
+                <ListItemButton
+                  onMouseEnter={() => handleComingSoonHover('Perangkat')}
+                  sx={{
+                    borderRadius: 2,
+                    py: 1.25,
+                    px: 1.5,
+                    opacity: 0.5,
+                    cursor: 'not-allowed',
+                    '&:hover': {
+                      bgcolor: 'transparent',
+                      opacity: 0.7,
+                    },
+                  }}
+                >
+                  <ListItemIcon
+                    sx={{
+                      minWidth: 36,
+                      color: 'text.disabled',
+                    }}
+                  >
+                    <DevicesIcon />
+                  </ListItemIcon>
+                  <ListItemText 
+                    primary="Perangkat" 
+                    primaryTypographyProps={{ 
+                      fontSize: '0.9rem',
+                      fontWeight: 500,
+                      color: 'text.disabled',
+                    }}
+                  />
+                </ListItemButton>
+              </ListItem>
+            </Tooltip>
           </List>
         </NavSection>
 
@@ -424,23 +530,6 @@ const Sidebar: React.FC<SidebarProps> = ({ open, onClose, variant = 'permanent' 
             </List>
           </NavSection>
         )}
-
-        {/* Help & Support */}
-        <NavSection>
-          <NavLabel>Bantuan</NavLabel>
-          <List disablePadding>
-            {helpNavItems.map((item) => (
-              <NavItem
-                key={item.path}
-                icon={item.icon}
-                title={item.title}
-                path={item.path}
-                active={isActive(item.path)}
-                onClick={() => handleNavigation(item.path)}
-              />
-            ))}
-          </List>
-        </NavSection>
 
         <Box sx={{ flexGrow: 1 }} />
         
@@ -472,7 +561,7 @@ const Sidebar: React.FC<SidebarProps> = ({ open, onClose, variant = 'permanent' 
             <Box sx={{ ml: 1.5, overflow: 'hidden' }}>
               <Typography 
                 variant="subtitle2" 
-                sx={{ 
+                sx={{
                   fontWeight: 600,
                   whiteSpace: 'nowrap',
                   overflow: 'hidden',
@@ -497,7 +586,7 @@ const Sidebar: React.FC<SidebarProps> = ({ open, onClose, variant = 'permanent' 
             </Box>
             <Tooltip title="Logout">
               <IconButton 
-                size="small" 
+                size="small"
                 sx={{ ml: 'auto' }} 
                 onClick={() => logout()}
               >
@@ -507,7 +596,7 @@ const Sidebar: React.FC<SidebarProps> = ({ open, onClose, variant = 'permanent' 
           </Box>
         </Box>
       </Box>
-    </StyledDrawer>
+    </ModernDrawer>
   );
 };
 

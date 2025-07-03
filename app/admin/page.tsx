@@ -6,13 +6,15 @@ import {
   Grid,
   Paper,
   Typography,
-  Avatar,
-  useTheme,
-  alpha,
   Button,
-  LinearProgress,
+  useTheme,
   IconButton,
   Tooltip,
+  LinearProgress,
+  Chip,
+  Stack,
+  alpha,
+  Card,
 } from '@mui/material';
 import {
   NotificationsActive as AlertIcon,
@@ -20,14 +22,26 @@ import {
   Dashboard as DashboardIcon,
   Warning as WarningIcon,
   Refresh as RefreshIcon,
-  TrendingUp as TrendingUpIcon,
-  TrendingDown as TrendingDownIcon,
-  ChevronRight as ChevronRightIcon,
+  ArrowUpward as ArrowUpwardIcon,
+  ArrowDownward as ArrowDownwardIcon,
 } from '@mui/icons-material';
 import { useAuth } from '../../contexts/AuthContext';
 import DashboardStats from '../../components/admin/DashboardStats';
 import { useRouter } from 'next/navigation';
 import { useApiData } from '../../hooks/useMockApi';
+import Layout from '../../components/layout/Layout';
+
+// Define the interface for stats data
+interface StatsData {
+  todayReports: number;
+  todayChange: number;
+  totalReports: number;
+  totalReportsChange: number;
+  totalUsers: number;
+  userChange: number;
+  activeAdmins: number;
+  activeDevices?: number;
+}
 
 export default function AdminDashboard() {
   const theme = useTheme();
@@ -35,9 +49,18 @@ export default function AdminDashboard() {
   const router = useRouter();
   const [refreshing, setRefreshing] = useState(false);
   
-  const { data: stats, loading, refresh } = useApiData({
+  const { data: stats, loading, refresh } = useApiData<StatsData>({
     endpoint: '/api/admin/stats',
     useMock: false,
+    initialData: {
+      todayReports: 0,
+      todayChange: 0,
+      totalReports: 0,
+      totalReportsChange: 0,
+      totalUsers: 0,
+      userChange: 0,
+      activeAdmins: 0,
+    }
   });
   
   const fetchData = async () => {
@@ -50,236 +73,220 @@ export default function AdminDashboard() {
     {
       title: 'Laporan Hari Ini',
       value: stats?.todayReports || 0,
-      icon: <WarningIcon sx={{ fontSize: 24 }} />,
-      color: '#3f51b5',
-      trend: stats?.todayChange || 0,
-      path: '/admin/reports'
+      icon: <WarningIcon fontSize="small" />,
+      color: theme.palette.primary.main,
+      path: '/admin/reports',
+      change: stats?.todayChange || 0,
     },
     {
       title: 'Total Laporan',
       value: stats?.totalReports || 0,
-      icon: <AlertIcon sx={{ fontSize: 24 }} />,
-      color: '#f44336',
-      trend: stats?.totalReportsChange || 0,
-      path: '/admin/reports'
+      icon: <AlertIcon fontSize="small" />,
+      color: theme.palette.error.main,
+      path: '/admin/reports',
+      change: stats?.totalReportsChange || 0,
     },
     {
       title: 'Warga Terdaftar',
       value: stats?.totalUsers || 0,
-      icon: <PeopleIcon sx={{ fontSize: 24 }} />,
-      color: '#4caf50',
-      trend: stats?.userChange || 0,
-      path: '/admin/citizens'
+      icon: <PeopleIcon fontSize="small" />,
+      color: theme.palette.success.main,
+      path: '/admin/citizens',
+      change: stats?.userChange || 0,
     },
     {
-      title: 'Perangkat Aktif',
-      value: stats?.activeDevices || 0,
-      icon: <DashboardIcon sx={{ fontSize: 24 }} />,
-      color: '#ff9800',
-      trend: 0,
-      path: '/admin/devices'
+      title: 'Admin Aktif',
+      value: stats?.activeAdmins || 0,
+      icon: <DashboardIcon fontSize="small" />,
+      color: theme.palette.warning.main,
+      path: '/admin/manage-admins',
+      change: 0,
     }
   ];
 
   return (
-    <Box sx={{ p: 2 }}>
-      {/* Modern welcome section */}
-      <Paper
-        elevation={0}
-        sx={{
-          p: 3,
-          mb: 3,
-          borderRadius: 2,
-          background: theme.palette.mode === 'dark'
-            ? 'linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%)'
-            : 'linear-gradient(135deg, rgba(59, 130, 246, 0.05) 0%, rgba(139, 92, 246, 0.05) 100%)',
-          border: `1px solid ${alpha(theme.palette.primary.main, 0.1)}`,
-          position: 'relative',
-          overflow: 'hidden',
-          '&::before': {
-            content: '""',
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            width: '100%',
-            height: '2px',
-            background: 'linear-gradient(90deg, #3b82f6, #8b5cf6)',
-          }
-        }}
-      >
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 2 }}>
-          <Box>
-            <Typography variant="h4" fontWeight={700} sx={{ mb: 1, fontSize: { xs: '1.5rem', md: '2rem' } }}>
-              {loading ? 'Memuat...' : `Selamat Datang, ${user?.name?.split(' ')[0] || 'Admin'}`}
-            </Typography>
-            <Typography variant="body1" color="text.secondary" sx={{ fontSize: '1rem' }}>
-              Panel kontrol PINTAR - Pelaporan Instant Tangkal Ancaman Rawan
-            </Typography>
-          </Box>
-          
-          <Box sx={{ display: 'flex', gap: 2 }}>
-            <Button
-              variant="contained"
-              startIcon={<WarningIcon />}
-              onClick={() => router.push('/admin/reports')}
-              sx={{
-                px: 3,
-                py: 1.5,
-                borderRadius: 2,
-                fontSize: '0.95rem',
-                fontWeight: 600,
-                background: 'linear-gradient(135deg, #3b82f6 0%, #1e40af 100%)',
-                '&:hover': {
-                  background: 'linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%)',
-                  transform: 'translateY(-1px)',
-                  boxShadow: '0 8px 25px rgba(59, 130, 246, 0.4)',
-                },
-                transition: 'all 0.3s ease',
-              }}
-            >
-              Lihat Laporan
-            </Button>
-            
-            <Tooltip title="Refresh data">
-              <IconButton 
-                onClick={fetchData} 
-                disabled={refreshing || loading}
-                sx={{
-                  bgcolor: alpha(theme.palette.primary.main, 0.1),
-                  width: 48,
-                  height: 48,
-                  '&:hover': {
-                    bgcolor: alpha(theme.palette.primary.main, 0.2),
-                    transform: 'scale(1.05)',
-                  },
-                  transition: 'all 0.2s ease',
-                }}
-              >
-                <RefreshIcon />
-              </IconButton>
-            </Tooltip>
-          </Box>
-        </Box>
-      </Paper>
-
-      {/* Modern stats cards */}
-      <Grid container spacing={3} mb={3}>
-        {quickStatsCards.map((card, index) => (
-          <Grid item xs={12} sm={6} md={3} key={index}>
-            <Paper
-              elevation={0}
-              sx={{
-                p: 3,
-                height: 140,
-                borderRadius: 2,
-                cursor: 'pointer',
-                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                border: `1px solid ${theme.palette.divider}`,
-                background: theme.palette.mode === 'dark'
-                  ? 'linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.02) 100%)'
-                  : 'linear-gradient(135deg, rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 0.4) 100%)',
-                '&:hover': {
-                  transform: 'translateY(-4px) scale(1.02)',
-                  borderColor: card.color,
-                  boxShadow: `0 12px 40px ${alpha(card.color, 0.15)}`,
-                },
-                position: 'relative',
-                overflow: 'hidden',
-                '&::before': {
-                  content: '""',
-                  position: 'absolute',
-                  top: 0,
-                  left: 0,
-                  right: 0,
-                  height: '3px',
-                  backgroundColor: card.color,
-                  borderRadius: '2px 2px 0 0',
-                },
-              }}
-              onClick={() => router.push(card.path)}
-            >
-              <Box sx={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', mb: 2 }}>
-                <Avatar
-                  sx={{
-                    bgcolor: alpha(card.color, 0.1),
-                    color: card.color,
-                    width: 48,
-                    height: 48,
-                    boxShadow: `0 4px 14px ${alpha(card.color, 0.25)}`,
-                  }}
-                >
-                  {card.icon}
-                </Avatar>
-                {card.trend !== 0 && !loading && (
-                  <Box 
-                    sx={{ 
-                      display: 'flex',
-                      alignItems: 'center',
-                      color: card.trend > 0 ? 'success.main' : 'error.main',
-                      bgcolor: card.trend > 0 
-                        ? alpha(theme.palette.success.main, 0.1) 
-                        : alpha(theme.palette.error.main, 0.1),
-                      px: 1.5,
-                      py: 0.5,
-                      borderRadius: 2,
-                      fontSize: '0.8rem',
-                      fontWeight: 600,
-                    }}
-                  >
-                    {card.trend > 0 ? 
-                      <TrendingUpIcon sx={{ fontSize: 16, mr: 0.5 }} /> : 
-                      <TrendingDownIcon sx={{ fontSize: 16, mr: 0.5 }} />
-                    }
-                    {Math.abs(card.trend)}%
-                  </Box>
-                )}
-              </Box>
-              
-              {loading ? (
-                <LinearProgress sx={{ mb: 2, height: 3, borderRadius: 1.5 }} />
-              ) : (
-                <Typography variant="h3" fontWeight={700} sx={{ mb: 1, fontSize: '2rem', color: theme.palette.text.primary }}>
-                  {refreshing ? '-' : card.value}
-                </Typography>
-              )}
-              
-              <Typography variant="body1" color="text.secondary" sx={{ fontSize: '0.95rem', fontWeight: 500 }}>
-                {card.title}
-              </Typography>
-
-              <ChevronRightIcon 
-                sx={{ 
-                  position: 'absolute',
-                  bottom: 12,
-                  right: 12,
-                  fontSize: 20,
-                  color: alpha(card.color, 0.7),
-                  transition: 'transform 0.2s ease',
-                }} 
-              />
-            </Paper>
-          </Grid>
-        ))}
-      </Grid>
-
-      {/* Modern dashboard content */}
-      <DashboardStats useMockData={false} />
-      
-      {refreshing && (
-        <LinearProgress
+    <Layout title="">
+      <Box>
+        {/* Welcome Card - Removed search bar */}
+        <Card
+          elevation={0}
           sx={{
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            right: 0,
-            zIndex: 9999,
-            height: 3,
-            '& .MuiLinearProgress-bar': {
-              background: 'linear-gradient(90deg, #3b82f6, #8b5cf6)',
+            mb: 3,
+            borderRadius: 2,
+            position: 'relative',
+            overflow: 'hidden',
+            border: `1px solid ${theme.palette.divider}`,
+            background: theme.palette.mode === 'dark'
+              ? `linear-gradient(to right, ${alpha(theme.palette.background.paper, 0.9)}, ${alpha(theme.palette.background.paper, 0.95)})`
+              : `linear-gradient(to right, ${alpha(theme.palette.background.paper, 0.9)}, ${alpha(theme.palette.background.paper, 0.95)})`,
+            '&::before': {
+              content: '""',
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              width: '100%',
+              height: '100%',
+              backgroundImage: theme.palette.mode === 'dark'
+                ? 'radial-gradient(circle at 15% 50%, rgba(59, 130, 246, 0.08), transparent 25%)'
+                : 'radial-gradient(circle at 15% 50%, rgba(59, 130, 246, 0.05), transparent 25%)',
+              pointerEvents: 'none',
             }
           }}
-        />
-      )}
-    </Box>
+        >
+          <Box sx={{ p: 3, position: 'relative' }}>
+            <Grid container spacing={3} alignItems="center">
+              <Grid item xs={12} md={8}>
+                <Typography
+                  variant="h5"
+                  sx={{
+                    fontWeight: 700,
+                    color: theme.palette.text.primary,
+                    fontSize: { xs: '1.25rem', md: '1.5rem' },
+                    mb: 0.5,
+                  }}
+                >
+                  {loading ? 'Memuat...' : `Selamat Datang, ${user?.name?.split(' ')[0] || 'Admin'}`}
+                </Typography>
+                
+                <Typography 
+                  variant="body1" 
+                  color="text.secondary"
+                >
+                  PINTAR Control Panel - Sistem Pelaporan Instant Tangkal Ancaman Rawan
+                </Typography>
+              </Grid>
+              
+              <Grid item xs={12} md={4}>
+                <Stack 
+                  direction="row" 
+                  spacing={2} 
+                  justifyContent={{ xs: 'flex-start', md: 'flex-end' }}
+                  alignItems="center"
+                >
+                  <Button
+                    variant="contained"
+                    startIcon={<WarningIcon />}
+                    onClick={() => router.push('/admin/reports')}
+                    sx={{
+                      borderRadius: 2,
+                      boxShadow: `0 4px 14px ${alpha(theme.palette.primary.main, 0.3)}`,
+                      transition: 'all 0.3s ease',
+                      background: 'linear-gradient(90deg, #3b82f6, #2563eb)',
+                      '&:hover': {
+                        transform: 'translateY(-2px)',
+                        boxShadow: `0 6px 18px ${alpha(theme.palette.primary.main, 0.4)}`,
+                      }
+                    }}
+                  >
+                    Lihat Laporan
+                  </Button>
+                  
+                  <Tooltip title="Refresh Data" arrow>
+                    <IconButton 
+                      onClick={fetchData} 
+                      disabled={refreshing || loading}
+                      size="small"
+                      sx={{ 
+                        width: 38,
+                        height: 38,
+                        bgcolor: alpha(theme.palette.primary.main, 0.08),
+                        '&:hover': {
+                          bgcolor: alpha(theme.palette.primary.main, 0.16),
+                        }
+                      }}
+                    >
+                      <RefreshIcon fontSize="small" />
+                    </IconButton>
+                  </Tooltip>
+                </Stack>
+              </Grid>
+            </Grid>
+          </Box>
+        </Card>
+
+        {/* Stats Cards Grid */}
+        <Grid container spacing={2} sx={{ mb: 3 }}>
+          {quickStatsCards.map((card, index) => (
+            <Grid item xs={6} sm={6} md={3} key={index}>
+              <Paper
+                elevation={0}
+                sx={{
+                  p: 2.5,
+                  height: '100%',
+                  cursor: 'pointer',
+                  borderRadius: 2,
+                  border: `1px solid ${theme.palette.divider}`,
+                  transition: 'all 0.2s',
+                  '&:hover': {
+                    transform: 'translateY(-4px)',
+                    boxShadow: 2,
+                  },
+                }}
+                onClick={() => router.push(card.path)}
+              >
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1.5 }}>
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      width: 36,
+                      height: 36,
+                      borderRadius: 1.5,
+                      bgcolor: alpha(card.color, 0.12),
+                      color: card.color,
+                    }}
+                  >
+                    {card.icon}
+                  </Box>
+                  
+                  {card.change !== 0 && (
+                    <Chip
+                      icon={card.change > 0 ? <ArrowUpwardIcon sx={{ fontSize: '0.75rem !important' }} /> : <ArrowDownwardIcon sx={{ fontSize: '0.75rem !important' }} />}
+                      label={`${card.change > 0 ? '+' : ''}${card.change}%`}
+                      size="small"
+                      color={card.change > 0 ? 'success' : 'error'}
+                      sx={{ 
+                        height: 20, 
+                        fontSize: '0.7rem',
+                        fontWeight: 600,
+                        '& .MuiChip-icon': { 
+                          fontSize: '0.75rem',
+                        }
+                      }}
+                    />
+                  )}
+                </Box>
+                
+                <Typography variant="h5" fontWeight={700} sx={{ mb: 0.5, fontSize: '1.5rem' }}>
+                  {refreshing ? '...' : card.value.toLocaleString()}
+                </Typography>
+                
+                <Typography variant="body2" color="text.secondary" fontWeight={500}>
+                  {card.title}
+                </Typography>
+              </Paper>
+            </Grid>
+          ))}
+        </Grid>
+
+        {/* Recent Reports */}
+        <DashboardStats useMockData={false} />
+
+        {/* Loading Progress */}
+        {(refreshing || loading) && (
+          <LinearProgress
+            sx={{
+              position: 'fixed',
+              top: 64,
+              left: 0,
+              right: 0,
+              zIndex: 9999,
+              height: '2px',
+            }}
+          />
+        )}
+      </Box>
+    </Layout>
   );
 }

@@ -33,6 +33,7 @@ interface Report {
   id: number;
   user_id: number;
   address: string;
+  description: string;
   created_at: string;
   user: {
     name: string;
@@ -243,6 +244,14 @@ export default function ReportsList() {
                 </Typography>
                 <Typography variant="body1" fontWeight={500}>
                   {detailDialog.report.address}
+                </Typography>
+              </Grid>
+              <Grid item xs={12}>
+                <Typography variant="subtitle2" color="text.secondary">
+                  Deskripsi
+                </Typography>
+                <Typography variant="body1" fontWeight={500}>
+                  {detailDialog.report.description}
                 </Typography>
               </Grid>
             </Grid>

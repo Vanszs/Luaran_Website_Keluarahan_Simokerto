@@ -6,13 +6,13 @@ import {
   Typography,
   Grid,
   Paper,
-  Avatar,
-  Button,
-  useTheme,
-  alpha,
   IconButton,
   Tooltip,
-  LinearProgress
+  LinearProgress,
+  alpha,
+  useTheme,
+  Stack,
+  Button
 } from '@mui/material';
 import {
   Dashboard as DashboardIcon,
@@ -50,29 +50,29 @@ export default function AdminDashboard() {
     {
       title: 'Laporan Hari Ini',
       value: stats?.todayReports || 0,
-      icon: <WarningIcon />,
-      color: '#3f51b5',
+      icon: <WarningIcon fontSize="small" />,
+      color: theme.palette.primary.main,
       path: '/dashboard/reports'
     },
     {
       title: 'Total Laporan',
       value: stats?.totalReports || 0,
-      icon: <AlertIcon />,
-      color: '#f44336',
+      icon: <AlertIcon fontSize="small" />,
+      color: theme.palette.error.main,
       path: '/dashboard/reports'
     },
     {
       title: 'Warga Terdaftar',
       value: stats?.totalUsers || 0,
-      icon: <PeopleIcon />,
-      color: '#4caf50',
+      icon: <PeopleIcon fontSize="small" />,
+      color: theme.palette.success.main,
       path: '/dashboard/citizens'
     },
     {
       title: 'Perangkat Aktif',
       value: stats?.activeDevices || 0,
-      icon: <DashboardIcon />,
-      color: '#ff9800',
+      icon: <DashboardIcon fontSize="small" />,
+      color: theme.palette.warning.main,
       path: '/dashboard/devices'
     }
   ];
@@ -80,18 +80,17 @@ export default function AdminDashboard() {
   return (
     <Layout title="Dashboard Admin">
       <Box>
-        {/* Welcome section with refresh button */}
+        {/* Simple header with refresh button */}
         <Paper
           elevation={0}
           sx={{
             p: 2,
-            mb: 2,
-            borderRadius: 1.5,
+            mb: 3,
+            borderRadius: 2,
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'center',
-            flexWrap: 'wrap',
-            gap: 1
+            border: `1px solid ${theme.palette.divider}`
           }}
         >
           <Box>
@@ -106,7 +105,7 @@ export default function AdminDashboard() {
             </Typography>
           </Box>
           
-          <Box sx={{ display: 'flex', gap: 1 }}>
+          <Stack direction="row" spacing={1}>
             <Button
               variant="contained"
               size="small"
@@ -116,71 +115,72 @@ export default function AdminDashboard() {
               Lihat Laporan
             </Button>
             
-            <Tooltip title="Refresh data">
+            <Tooltip title="Refresh Data">
               <IconButton 
                 onClick={fetchData} 
                 disabled={refreshing || loading}
                 size="small"
+                sx={{ 
+                  bgcolor: alpha(theme.palette.primary.main, 0.1),
+                  '&:hover': {
+                    bgcolor: alpha(theme.palette.primary.main, 0.2),
+                  }
+                }}
               >
-                <RefreshIcon />
+                <RefreshIcon fontSize="small" />
               </IconButton>
             </Tooltip>
-          </Box>
+          </Stack>
         </Paper>
 
         {/* Quick stats cards */}
-        <Grid container spacing={2} mb={2}>
+        <Grid container spacing={2} mb={3}>
           {quickStatsCards.map((card, index) => (
-            <Grid item xs={12} sm={6} md={3} key={index}>
+            <Grid item xs={6} sm={6} md={3} key={index}>
               <Paper
                 elevation={0}
                 sx={{
                   p: 2,
                   height: '100%',
-                  borderRadius: 1.5,
+                  borderRadius: 2,
                   cursor: 'pointer',
-                  transition: 'transform 0.2s',
+                  border: `1px solid ${theme.palette.divider}`,
+                  transition: 'transform 0.2s, box-shadow 0.2s',
                   '&:hover': {
-                    transform: 'translateY(-2px)',
-                  },
-                  position: 'relative',
-                  overflow: 'hidden',
-                  '&::before': {
-                    content: '""',
-                    position: 'absolute',
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    height: '3px',
-                    backgroundColor: card.color,
+                    transform: 'translateY(-4px)',
+                    boxShadow: theme.shadows[4],
                   },
                 }}
                 onClick={() => router.push(card.path)}
               >
-                <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-                  <Avatar
+                <Stack spacing={1}>
+                  <Box
                     sx={{
-                      bgcolor: alpha(card.color, theme.palette.mode === 'dark' ? 0.2 : 0.1),
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      width: 32,
+                      height: 32,
+                      borderRadius: 1.5,
+                      bgcolor: alpha(card.color, 0.12),
                       color: card.color,
-                      width: 36,
-                      height: 36
                     }}
                   >
                     {card.icon}
-                  </Avatar>
-                </Box>
-                
-                {loading ? (
-                  <LinearProgress sx={{ mb: 1 }} />
-                ) : (
-                  <Typography variant="h5" fontWeight={600} sx={{ mb: 0.5 }}>
-                    {refreshing ? '-' : card.value}
+                  </Box>
+                  
+                  {loading ? (
+                    <LinearProgress sx={{ my: 1 }} />
+                  ) : (
+                    <Typography variant="h6" fontWeight={600}>
+                      {refreshing ? '-' : card.value}
+                    </Typography>
+                  )}
+                  
+                  <Typography variant="body2" color="text.secondary">
+                    {card.title}
                   </Typography>
-                )}
-                
-                <Typography variant="body2" color="text.secondary">
-                  {card.title}
-                </Typography>
+                </Stack>
               </Paper>
             </Grid>
           ))}

@@ -175,10 +175,11 @@ function RegisterContent() {
         password: formData.password,
         name: formData.name
       });
+      router.push('/login?registered=true');
     } catch (err) {
       setErrors(prev => ({ 
         ...prev, 
-        submit: err instanceof Error ? err.message : 'Registration failed. Please try again.' 
+        submit: err instanceof Error ? err.message : 'Registration failed. Please try again.'
       }));
     } finally {
       setLoading(false);
