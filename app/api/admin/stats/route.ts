@@ -110,24 +110,11 @@ export async function GET(request: NextRequest) {
         userChange = 100;
       }
       
-      // Get report status counts
-      const [pendingResult] = await connection.execute(
-        'SELECT COUNT(*) as count FROM reports WHERE status = ?',
-        ['pending']
-      );
-      const pending = (pendingResult as any[])[0].count;
-      
-      const [processingResult] = await connection.execute(
-        'SELECT COUNT(*) as count FROM reports WHERE status = ?',
-        ['processing']
-      );
-      const processing = (processingResult as any[])[0].count;
-      
-      const [completedResult] = await connection.execute(
-        'SELECT COUNT(*) as count FROM reports WHERE status = ?',
-        ['completed']
-      );
-      const completed = (completedResult as any[])[0].count;
+      // The current schema does not include a status column on reports.
+      // Provide default status counts for compatibility with existing UI.
+      const pending = totalReports;
+      const processing = 0;
+      const completed = 0;
       
       // Get monthly reports count
       const thisMonth = new Date();

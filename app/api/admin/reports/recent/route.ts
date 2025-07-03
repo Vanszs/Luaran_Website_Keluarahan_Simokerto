@@ -7,13 +7,12 @@ export async function GET(request: NextRequest) {
     
     try {
       const [reports] = await connection.execute(`
-        SELECT 
-          r.id, 
-          r.user_id, 
-          r.address, 
+        SELECT
+          r.id,
+          r.user_id,
+          r.address,
           r.description,
-          r.status,
-          r.created_at, 
+          r.created_at,
           u.name as user_name
         FROM reports r
         LEFT JOIN users u ON r.user_id = u.id
@@ -27,7 +26,9 @@ export async function GET(request: NextRequest) {
         user_id: report.user_id,
         address: report.address,
         description: report.description,
-        status: report.status || 'pending', // Default status if null
+        // The current database does not include a status column
+        // Default all reports to 'pending' for compatibility
+        status: 'pending',
         created_at: report.created_at,
         user: {
           name: report.user_name || 'Unknown User'

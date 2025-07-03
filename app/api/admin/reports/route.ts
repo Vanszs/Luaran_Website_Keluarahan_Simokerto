@@ -7,7 +7,7 @@ export async function GET(request: NextRequest) {
     
     try {
       const [reports] = await connection.execute(`
-        SELECT r.id, r.user_id, r.address, r.created_at, u.name as user_name
+        SELECT r.id, r.user_id, r.address, r.description, r.created_at, u.name as user_name
         FROM reports r
         JOIN users u ON r.user_id = u.id
         ORDER BY r.created_at DESC
@@ -18,6 +18,7 @@ export async function GET(request: NextRequest) {
         id: report.id,
         user_id: report.user_id,
         address: report.address,
+        description: report.description,
         created_at: report.created_at,
         user: {
           name: report.user_name

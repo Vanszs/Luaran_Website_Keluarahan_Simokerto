@@ -372,7 +372,9 @@ export default function DashboardStats({ stats: propStats, useMockData = false }
               </TableHead>
               <TableBody>
                 {recentReports && recentReports.length > 0 ? (
-                  recentReports.slice(0, 5).map((report: any) => (
+                  recentReports.slice(0, 5).map((report: any) => {
+                    const status = report.status || 'pending';
+                    return (
                     <TableRow key={report.id} hover sx={{ '&:hover': { bgcolor: alpha(theme.palette.primary.main, 0.04) } }}>
                       <TableCell sx={{ py: 2, fontSize: '0.9rem' }}>#{report.id}</TableCell>
                       <TableCell sx={{ py: 2, fontSize: '0.9rem' }}>{report.user?.name}</TableCell>
@@ -394,19 +396,20 @@ export default function DashboardStats({ stats: propStats, useMockData = false }
                       </TableCell>
                       <TableCell sx={{ py: 2 }}>
                         <Chip
-                          label={getStatusLabel(report.status)}
+                          label={getStatusLabel(status)}
                           size="small"
                           sx={{
                             height: 28,
                             fontSize: '0.8rem',
                             fontWeight: 600,
-                            backgroundColor: alpha(getStatusColor(report.status), 0.1),
-                            color: getStatusColor(report.status),
+                            backgroundColor: alpha(getStatusColor(status), 0.1),
+                            color: getStatusColor(status),
                           }}
                         />
                       </TableCell>
                     </TableRow>
-                  ))
+                  );
+                  })
                 ) : (
                   <TableRow>
                     <TableCell colSpan={5} align="center" sx={{ py: 4 }}>

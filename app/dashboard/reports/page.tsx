@@ -62,7 +62,13 @@ export default function ReportsPage() {
       const response = await fetch('/api/admin/reports');
       if (response.ok) {
         const data = await response.json();
-        setReports(data);
+        // Ensure backward compatibility when the API
+        // does not provide a status field
+        const normalized = data.map((r: any) => ({
+          ...r,
+          status: r.status || 'pending'
+        }));
+        setReports(normalized);
       } else {
         console.error('Failed to fetch reports');
       }
