@@ -1,318 +1,207 @@
 'use client';
 
-import * as React from 'react';
-import CssBaseline from '@mui/material/CssBaseline';
-import Box from '@mui/material/Box';
-import Typography from '@mui/material/Typography';
-import { keyframes, alpha } from '@mui/material/styles';
-import { useTheme } from '@mui/material/styles';
-import AppTheme from '../../shared-theme/AppTheme';
-import AppNavbar from '../../components/AppNavbar';
-import SideMenu from '../../components/SideMenu';
-import DashboardHome from '../../components/DashboardHome';
-import DocumentSelection from '../../components/DocumentSelection';
-import DocumentForm from '../../components/DocumentForm';
-import RiwayatPage from '../../components/RiwayatPage';
-import SettingsPage from '../../components/SettingsPage';
-import Image from 'next/image';
-import { Fade, Grow, Slide, CircularProgress, Zoom, Container, Paper } from '@mui/material';
+import React from 'react';
+import { 
+  Box, 
+  Typography,
+  Grid,
+  Paper,
+  IconButton,
+  Tooltip,
+  LinearProgress,
+  alpha,
+  useTheme,
+  Stack,
+  Button
+} from '@mui/material';
+import {
+  Dashboard as DashboardIcon,
+  NotificationsActive as AlertIcon,
+  People as PeopleIcon,
+  Warning as WarningIcon,
+  Refresh as RefreshIcon,
+} from '@mui/icons-material';
+import { useAuth } from '../../contexts/AuthContext';
+import { useRouter } from 'next/navigation';
+import { useApiData } from '../../hooks/useMockApi';
+import DashboardStats from '../../components/admin/DashboardStats';
+import Layout from '../../components/layout/Layout';
 
-// Enhanced modern animations
-const float = keyframes`
-  0%, 100% { transform: translateY(0px); }
-  50% { transform: translateY(-10px); }
-`;
-
-const fadeIn = keyframes`
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
-`;
-
-const slideInFromLeft = keyframes`
-  from { 
-    opacity: 0; 
-    transform: translateX(-50px) scale(0.95); 
-  }
-  to { 
-    opacity: 1; 
-    transform: translateX(0) scale(1); 
-  }
-`;
-
-const slideInFromRight = keyframes`
-  from { 
-    opacity: 0; 
-    transform: translateX(50px) scale(0.95); 
-  }
-  to { 
-    opacity: 1; 
-    transform: translateX(0) scale(1); 
-  }
-`;
-
-const scaleIn = keyframes`
-  from { 
-    opacity: 0; 
-    transform: scale(0.8) rotate(-5deg); 
-  }
-  to { 
-    opacity: 1; 
-    transform: scale(1) rotate(0deg); 
-  }
-`;
-
-const modernGlow = keyframes`
-  0%, 100% { 
-    box-shadow: 0 8px 32px rgba(59, 130, 246, 0.15),
-                0 4px 16px rgba(147, 51, 234, 0.1);
-  }
-  50% { 
-    box-shadow: 0 12px 48px rgba(59, 130, 246, 0.25),
-                0 6px 24px rgba(147, 51, 234, 0.15);
-  }
-`;
-
-export default function Dashboard() {
-  const [currentView, setCurrentView] = React.useState('dashboard');
-  const [selectedDocument, setSelectedDocument] = React.useState<string | null>(null);
-  const [isLoading, setIsLoading] = React.useState(true);
-  const [contentVisible, setContentVisible] = React.useState(false);
-  const [mounted, setMounted] = React.useState(false);
+export default function AdminDashboard() {
   const theme = useTheme();
-  const isDark = theme.palette.mode === 'dark';
-
-  // Add theme mode debugging
-  React.useEffect(() => {
-    console.log('Dashboard theme mode:', theme.palette.mode);
-  }, [theme.palette.mode]);
-
-  // Handle client-side mounting
-  React.useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  const handleViewChange = (view: string) => {
-    console.log('View changed to:', view);
-    setContentVisible(false);
-    setTimeout(() => {
-      setCurrentView(view);
-      if (view !== 'documents') {
-        setSelectedDocument(null);
-      }
-      setContentVisible(true);
-    }, 200);
+  const { user } = useAuth();
+  const router = useRouter();
+  const [refreshing, setRefreshing] = React.useState(false);
+  
+  // Get dashboard stats from the database
+  const { data: stats, loading, refresh } = useApiData({
+    endpoint: '/api/admin/stats',
+    useMock: false, // Use real data
+  });
+  
+  const fetchData = async () => {
+    setRefreshing(true);
+    refresh();
+    setTimeout(() => setRefreshing(false), 800);
   };
 
-  const handleDocumentSelect = (documentTitle: string) => {
-    console.log('Document selected:', documentTitle);
-    setSelectedDocument(documentTitle);
-    setCurrentView('form');
-  };
-
-  const handleBackFromDocuments = () => {
-    setCurrentView('dashboard');
-  };
-
-  const handleBackFromForm = () => {
-    setSelectedDocument(null);
-    setCurrentView('documents');
-  };
-
-  React.useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-      setTimeout(() => setContentVisible(true), 300);
-    }, 2500);
-    return () => clearTimeout(timer);
-  }, []);
-
-  // Don't render until mounted to prevent hydration mismatch
-  if (!mounted) {
-    return null;
-  }
-
-  if (isLoading) {
-    return (
-      <AppTheme>
-        <CssBaseline />
-        <Box
-          sx={{
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            background: theme => theme.palette.mode === 'dark'
-              ? 'linear-gradient(135deg, #0d1117 0%, #161b22 100%)'
-              : 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            flexDirection: 'column',
-            zIndex: 9999,
-          }}
-        >
-          <Box
-            sx={{
-              animation: `${float} 2s ease-in-out infinite`,
-              mb: 4,
-            }}
-          >
-            <Box
-              sx={{
-                width: 80,
-                height: 80,
-                borderRadius: '16px',
-                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                boxShadow: '0 8px 32px rgba(102, 126, 234, 0.3)',
-                p: 2,
-              }}
-            >
-              <Image
-                src="/logo.png"
-                alt="Logo Kelurahan Simokerto"
-                width={48}
-                height={48}
-                style={{ borderRadius: '8px' }}
-              />
-            </Box>
-          </Box>
-          
-          <Typography
-            variant="h4"
-            sx={{
-              fontWeight: 700,
-              color: 'text.primary',
-              textAlign: 'center',
-              mb: 1,
-              animation: `${fadeIn} 0.8s ease-out 0.5s both`,
-            }}
-          >
-            Dashboard Kelurahan
-          </Typography>
-          
-          <Typography 
-            variant="body1" 
-            sx={{ 
-              color: 'text.secondary',
-              textAlign: 'center',
-              animation: `${fadeIn} 0.8s ease-out 0.7s both`,
-            }}
-          >
-            Memuat sistem informasi...
-          </Typography>
-          
-          <Box
-            sx={{
-              width: '200px',
-              height: '3px',
-              backgroundColor: 'divider',
-              borderRadius: '2px',
-              mt: 3,
-              overflow: 'hidden',
-              animation: `${fadeIn} 0.8s ease-out 0.9s both`,
-            }}
-          >
-            <Box
-              sx={{
-                width: '60px',
-                height: '100%',
-                background: 'linear-gradient(90deg, #667eea, #764ba2)',
-                borderRadius: '2px',
-                animation: 'loading 1.5s ease-in-out infinite',
-                '@keyframes loading': {
-                  '0%': { transform: 'translateX(-100px)' },
-                  '100%': { transform: 'translateX(240px)' },
-                },
-              }}
-            />
-          </Box>
-        </Box>
-      </AppTheme>
-    );
-  }
-
-  const renderContent = () => {
-    switch (currentView) {
-      case 'dashboard':
-        return <DashboardHome onViewChange={handleViewChange} />;
-      case 'documents':
-        return (
-          <DocumentSelection 
-            onDocumentSelect={handleDocumentSelect}
-            onBack={handleBackFromDocuments}
-          />
-        );
-      case 'form':
-        return (
-          <DocumentForm 
-            selectedDocument={selectedDocument} 
-            onBack={handleBackFromForm}
-          />
-        );
-      case 'riwayat':
-        return <RiwayatPage />;
-      case 'settings':
-        return <SettingsPage />;
-      default:
-        return <DashboardHome onViewChange={handleViewChange} />;
+  // Quick stats cards data
+  const quickStatsCards = [
+    {
+      title: 'Laporan Hari Ini',
+      value: stats?.todayReports || 0,
+      icon: <WarningIcon fontSize="small" />,
+      color: theme.palette.primary.main,
+      path: '/dashboard/reports'
+    },
+    {
+      title: 'Total Laporan',
+      value: stats?.totalReports || 0,
+      icon: <AlertIcon fontSize="small" />,
+      color: theme.palette.error.main,
+      path: '/dashboard/reports'
+    },
+    {
+      title: 'Warga Terdaftar',
+      value: stats?.totalUsers || 0,
+      icon: <PeopleIcon fontSize="small" />,
+      color: theme.palette.success.main,
+      path: '/dashboard/citizens'
+    },
+    {
+      title: 'Perangkat Aktif',
+      value: stats?.activeDevices || 0,
+      icon: <DashboardIcon fontSize="small" />,
+      color: theme.palette.warning.main,
+      path: '/dashboard/devices'
     }
-  };
+  ];
 
   return (
-    <AppTheme>
-      <CssBaseline enableColorScheme />
-      <Box 
-        sx={{ 
-          display: 'flex', 
-          minHeight: '100vh',
-          bgcolor: 'background.default',
-          transition: 'background-color 300ms cubic-bezier(0.4, 0, 0.2, 1) !important'
-        }}
-      >
-        <SideMenu 
-          currentView={currentView}
-          onViewChange={handleViewChange}
-        />
-        <AppNavbar />
-        
-        <Box
-          component="main"
+    <Layout title="Dashboard Admin">
+      <Box>
+        {/* Simple header with refresh button */}
+        <Paper
+          elevation={0}
           sx={{
-            flexGrow: 1,
-            position: 'relative',
-            pt: { xs: '90px', md: '90px' },
-            pb: 4,
-            minHeight: '100vh',
-            bgcolor: 'background.default',
-            transition: 'background-color 300ms cubic-bezier(0.4, 0, 0.2, 1) !important'
+            p: 2,
+            mb: 3,
+            borderRadius: 2,
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            border: `1px solid ${theme.palette.divider}`
           }}
         >
-          <Container
-            maxWidth="xl"
-            sx={{
-              position: 'relative',
-              zIndex: 1,
-              px: { xs: 2, sm: 3, md: 4, lg: 6 },
-              bgcolor: 'transparent',
-            }}
-          >
-            <Box
-              sx={{
-                maxWidth: '1600px',
-                mx: 'auto',
-                width: '100%',
-                bgcolor: 'transparent',
-              }}
+          <Box>
+            <Typography variant="h5" fontWeight={600}>
+              {loading ? 
+                'Memuat data...' : 
+                `Selamat Datang, ${user?.name?.split(' ')[0] || 'Admin'}`
+              }
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              Dashboard Admin PINTAR - Pelaporan Instant Tangkal Ancaman Rawan
+            </Typography>
+          </Box>
+          
+          <Stack direction="row" spacing={1}>
+            <Button
+              variant="contained"
+              size="small"
+              startIcon={<WarningIcon />}
+              onClick={() => router.push('/dashboard/reports')}
             >
-              {renderContent()}
-            </Box>
-          </Container>
-        </Box>
+              Lihat Laporan
+            </Button>
+            
+            <Tooltip title="Refresh Data">
+              <IconButton 
+                onClick={fetchData} 
+                disabled={refreshing || loading}
+                size="small"
+                sx={{ 
+                  bgcolor: alpha(theme.palette.primary.main, 0.1),
+                  '&:hover': {
+                    bgcolor: alpha(theme.palette.primary.main, 0.2),
+                  }
+                }}
+              >
+                <RefreshIcon fontSize="small" />
+              </IconButton>
+            </Tooltip>
+          </Stack>
+        </Paper>
+
+        {/* Quick stats cards */}
+        <Grid container spacing={2} mb={3}>
+          {quickStatsCards.map((card, index) => (
+            <Grid item xs={6} sm={6} md={3} key={index}>
+              <Paper
+                elevation={0}
+                sx={{
+                  p: 2,
+                  height: '100%',
+                  borderRadius: 2,
+                  cursor: 'pointer',
+                  border: `1px solid ${theme.palette.divider}`,
+                  transition: 'transform 0.2s, box-shadow 0.2s',
+                  '&:hover': {
+                    transform: 'translateY(-4px)',
+                    boxShadow: theme.shadows[4],
+                  },
+                }}
+                onClick={() => router.push(card.path)}
+              >
+                <Stack spacing={1}>
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      width: 32,
+                      height: 32,
+                      borderRadius: 1.5,
+                      bgcolor: alpha(card.color, 0.12),
+                      color: card.color,
+                    }}
+                  >
+                    {card.icon}
+                  </Box>
+                  
+                  {loading ? (
+                    <LinearProgress sx={{ my: 1 }} />
+                  ) : (
+                    <Typography variant="h6" fontWeight={600}>
+                      {refreshing ? '-' : card.value}
+                    </Typography>
+                  )}
+                  
+                  <Typography variant="body2" color="text.secondary">
+                    {card.title}
+                  </Typography>
+                </Stack>
+              </Paper>
+            </Grid>
+          ))}
+        </Grid>
+
+        {/* Main dashboard content */}
+        <DashboardStats useMockData={false} />
+        
+        {/* Refresh indicator */}
+        {refreshing && (
+          <LinearProgress
+            sx={{
+              position: 'fixed',
+              top: 0,
+              left: 0,
+              right: 0,
+              zIndex: 9999,
+            }}
+          />
+        )}
       </Box>
-    </AppTheme>
+    </Layout>
   );
 }

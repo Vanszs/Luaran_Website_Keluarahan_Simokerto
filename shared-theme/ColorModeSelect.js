@@ -1,62 +1,45 @@
 'use client';
 
-import * as React from 'react';
-import IconButton from '@mui/material/IconButton';
-import Tooltip from '@mui/material/Tooltip';
-import LightModeIcon from '@mui/icons-material/LightMode';
-import DarkModeIcon from '@mui/icons-material/DarkMode';
-import { styled } from '@mui/material/styles';
+import React, { useContext } from 'react';
+import { IconButton, Tooltip, useTheme } from '@mui/material';
+import { DarkMode, LightMode } from '@mui/icons-material';
 import { ColorModeContext } from './AppTheme';
 
-const StyledIconButton = styled(IconButton)(({ theme }) => ({
-  width: 48,
-  height: 48,
-  borderRadius: '12px',
-  backgroundColor: theme.palette.mode === 'dark' ? 
-    'rgba(96, 165, 250, 0.1)' : 
-    'rgba(29, 78, 216, 0.08)',
-  border: `1px solid ${theme.palette.mode === 'dark' ? 
-    'rgba(96, 165, 250, 0.2)' : 
-    'rgba(29, 78, 216, 0.15)'}`,
-  // UNIFIED TRANSITION
-  transition: 'all 200ms ease-in-out !important',
-  '&:hover': {
-    backgroundColor: theme.palette.mode === 'dark' ? 
-      'rgba(96, 165, 250, 0.15)' : 
-      'rgba(29, 78, 216, 0.12)',
-    transform: 'translateY(-2px)',
-    boxShadow: theme.palette.mode === 'dark' ?
-      '0 8px 24px rgba(96, 165, 250, 0.25)' :
-      '0 4px 12px rgba(29, 78, 216, 0.15)',
-  },
-}));
-
-export default function ColorModeSelect(props) {
-  const colorModeContext = React.useContext(ColorModeContext);
-  
-  // PREVENT CRASH IF CONTEXT IS NULL
-  if (!colorModeContext || !colorModeContext.mode) {
-    return null;
-  }
-
-  const { mode, toggleColorMode } = colorModeContext;
+const ColorModeSelect = (props) => {
+  const theme = useTheme();
+  const colorMode = useContext(ColorModeContext);
 
   return (
-    <Tooltip 
-      title={mode === 'light' ? 'Mode Gelap' : 'Mode Terang'}
-      placement="bottom"
-    >
-      <StyledIconButton
-        onClick={toggleColorMode}
-        aria-label="toggle color mode"
+    <Tooltip title={theme.palette.mode === 'dark' ? 'Light mode' : 'Dark mode'}>
+      <IconButton 
+        onClick={colorMode.toggleColorMode} 
+        color="inherit"
         {...props}
+        sx={{
+          backgroundColor: theme.palette.mode === 'dark' 
+            ? 'rgba(255, 255, 255, 0.08)' 
+            : 'rgba(0, 0, 0, 0.05)',
+          // Only apply blur in dark mode for modern effect, not in light mode
+          ...(theme.palette.mode === 'dark'
+            ? { backdropFilter: 'blur(8px)' }
+            : {}),
+          borderRadius: '50%',
+          width: 40,
+          height: 40,
+          transition: 'all 0.3s ease',
+          '&:hover': {
+            backgroundColor: theme.palette.mode === 'dark' 
+              ? 'rgba(255, 255, 255, 0.15)' 
+              : 'rgba(0, 0, 0, 0.1)',
+            transform: 'scale(1.05)',
+          },
+          ...props.sx
+        }}
       >
-        {mode === 'light' ? (
-          <DarkModeIcon sx={{ fontSize: 24, color: 'primary.main' }} />
-        ) : (
-          <LightModeIcon sx={{ fontSize: 24, color: 'warning.main' }} />
-        )}
-      </StyledIconButton>
+        {theme.palette.mode === 'dark' ? <LightMode /> : <DarkMode />}
+      </IconButton>
     </Tooltip>
   );
-}
+};
+
+export default ColorModeSelect;
