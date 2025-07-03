@@ -1,329 +1,285 @@
 'use client';
 
-import * as React from 'react';
-import CssBaseline from '@mui/material/CssBaseline';
-import Box from '@mui/material/Box';
-import Typography from '@mui/material/Typography';
-import { keyframes, alpha } from '@mui/material/styles';
-import { useTheme } from '@mui/material/styles';
-import AppTheme from '../../shared-theme/AppTheme';
-import AppNavbar from '../../components/AppNavbar';
-import AdminSideMenu from '../../components/AdminSideMenu';
-import AdminDashboardHome from '../../components/AdminDashboardHome';
-import AdminSubmissionsPage from '../../components/AdminSubmissionsPage';
-import TemplateManagementPage from '../../components/TemplateManagementPage';
-import DocumentSelection from '../../components/DocumentSelection';
-import DocumentForm from '../../components/DocumentForm';
-import RiwayatPage from '../../components/RiwayatPage';
-import SettingsPage from '../../components/SettingsPage';
-import UserManagementPage from '../../components/UserManagementPage';
-import Image from 'next/image';
-import { Fade, Grow, Slide, CircularProgress, Zoom, Container, Paper } from '@mui/material';
+import React, { useState } from 'react';
+import {
+  Box,
+  Grid,
+  Paper,
+  Typography,
+  Avatar,
+  useTheme,
+  alpha,
+  Button,
+  LinearProgress,
+  IconButton,
+  Tooltip,
+} from '@mui/material';
+import {
+  NotificationsActive as AlertIcon,
+  People as PeopleIcon,
+  Dashboard as DashboardIcon,
+  Warning as WarningIcon,
+  Refresh as RefreshIcon,
+  TrendingUp as TrendingUpIcon,
+  TrendingDown as TrendingDownIcon,
+  ChevronRight as ChevronRightIcon,
+} from '@mui/icons-material';
+import { useAuth } from '../../contexts/AuthContext';
+import DashboardStats from '../../components/admin/DashboardStats';
+import { useRouter } from 'next/navigation';
+import { useApiData } from '../../hooks/useMockApi';
 
-// Enhanced modern animations
-const float = keyframes`
-  0%, 100% { transform: translateY(0px); }
-  50% { transform: translateY(-10px); }
-`;
-
-const fadeIn = keyframes`
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
-`;
-
-const slideInFromLeft = keyframes`
-  from { 
-    opacity: 0; 
-    transform: translateX(-50px) scale(0.95); 
-  }
-  to { 
-    opacity: 1; 
-    transform: translateX(0) scale(1); 
-  }
-`;
-
-const slideInFromRight = keyframes`
-  from { 
-    opacity: 0; 
-    transform: translateX(50px) scale(0.95); 
-  }
-  to { 
-    opacity: 1; 
-    transform: translateX(0) scale(1); 
-  }
-`;
-
-const scaleIn = keyframes`
-  from { 
-    opacity: 0; 
-    transform: scale(0.8) rotate(-5deg); 
-  }
-  to { 
-    opacity: 1; 
-    transform: scale(1) rotate(0deg); 
-  }
-`;
-
-const modernGlow = keyframes`
-  0%, 100% { 
-    box-shadow: 0 8px 32px rgba(59, 130, 246, 0.15),
-                0 4px 16px rgba(147, 51, 234, 0.1);
-  }
-  50% { 
-    box-shadow: 0 12px 48px rgba(59, 130, 246, 0.25),
-                0 6px 24px rgba(147, 51, 234, 0.15);
-  }
-`;
-
-export default function Dashboard() {
-  const [currentView, setCurrentView] = React.useState('dashboard');
-  const [selectedDocument, setSelectedDocument] = React.useState<string | null>(null);
-  const [isLoading, setIsLoading] = React.useState(true);
-  const [contentVisible, setContentVisible] = React.useState(false);
-  const [mounted, setMounted] = React.useState(false);
+export default function AdminDashboard() {
   const theme = useTheme();
-  const isDark = theme.palette.mode === 'dark';
-
-  // Add theme mode debugging
-  React.useEffect(() => {
-    console.log('Dashboard theme mode:', theme.palette.mode);
-  }, [theme.palette.mode]);
-
-  // Handle client-side mounting
-  React.useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  const handleViewChange = (view: string) => {
-    console.log('View changed to:', view);
-    setContentVisible(false);
-    setTimeout(() => {
-      setCurrentView(view);
-      if (view !== 'documents') {
-        setSelectedDocument(null);
-      }
-      setContentVisible(true);
-    }, 200);
+  const { user } = useAuth();
+  const router = useRouter();
+  const [refreshing, setRefreshing] = useState(false);
+  
+  const { data: stats, loading, refresh } = useApiData({
+    endpoint: '/api/admin/stats',
+    useMock: false,
+  });
+  
+  const fetchData = async () => {
+    setRefreshing(true);
+    refresh();
+    setTimeout(() => setRefreshing(false), 1000);
   };
 
-  const handleDocumentSelect = (documentTitle: string) => {
-    console.log('Document selected:', documentTitle);
-    setSelectedDocument(documentTitle);
-    setCurrentView('form');
-  };
+  const quickStatsCards = [
+    {
+      title: 'Laporan Hari Ini',
+      value: stats?.todayReports || 0,
+      icon: <WarningIcon sx={{ fontSize: 24 }} />,
+      color: '#3f51b5',
+      trend: stats?.todayChange || 0,
+      path: '/admin/reports'
+    },
+    {
+      title: 'Total Laporan',
+      value: stats?.totalReports || 0,
+      icon: <AlertIcon sx={{ fontSize: 24 }} />,
+      color: '#f44336',
+      trend: stats?.totalReportsChange || 0,
+      path: '/admin/reports'
+    },
+    {
+      title: 'Warga Terdaftar',
+      value: stats?.totalUsers || 0,
+      icon: <PeopleIcon sx={{ fontSize: 24 }} />,
+      color: '#4caf50',
+      trend: stats?.userChange || 0,
+      path: '/admin/citizens'
+    },
+    {
+      title: 'Perangkat Aktif',
+      value: stats?.activeDevices || 0,
+      icon: <DashboardIcon sx={{ fontSize: 24 }} />,
+      color: '#ff9800',
+      trend: 0,
+      path: '/admin/devices'
+    }
+  ];
 
-  const handleBackFromDocuments = () => {
-    setCurrentView('dashboard');
-  };
+  return (
+    <Box sx={{ p: 2 }}>
+      {/* Modern welcome section */}
+      <Paper
+        elevation={0}
+        sx={{
+          p: 3,
+          mb: 3,
+          borderRadius: 2,
+          background: theme.palette.mode === 'dark'
+            ? 'linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%)'
+            : 'linear-gradient(135deg, rgba(59, 130, 246, 0.05) 0%, rgba(139, 92, 246, 0.05) 100%)',
+          border: `1px solid ${alpha(theme.palette.primary.main, 0.1)}`,
+          position: 'relative',
+          overflow: 'hidden',
+          '&::before': {
+            content: '""',
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '2px',
+            background: 'linear-gradient(90deg, #3b82f6, #8b5cf6)',
+          }
+        }}
+      >
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 2 }}>
+          <Box>
+            <Typography variant="h4" fontWeight={700} sx={{ mb: 1, fontSize: { xs: '1.5rem', md: '2rem' } }}>
+              {loading ? 'Memuat...' : `Selamat Datang, ${user?.name?.split(' ')[0] || 'Admin'}`}
+            </Typography>
+            <Typography variant="body1" color="text.secondary" sx={{ fontSize: '1rem' }}>
+              Panel kontrol PINTAR - Pelaporan Instant Tangkal Ancaman Rawan
+            </Typography>
+          </Box>
+          
+          <Box sx={{ display: 'flex', gap: 2 }}>
+            <Button
+              variant="contained"
+              startIcon={<WarningIcon />}
+              onClick={() => router.push('/admin/reports')}
+              sx={{
+                px: 3,
+                py: 1.5,
+                borderRadius: 2,
+                fontSize: '0.95rem',
+                fontWeight: 600,
+                background: 'linear-gradient(135deg, #3b82f6 0%, #1e40af 100%)',
+                '&:hover': {
+                  background: 'linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%)',
+                  transform: 'translateY(-1px)',
+                  boxShadow: '0 8px 25px rgba(59, 130, 246, 0.4)',
+                },
+                transition: 'all 0.3s ease',
+              }}
+            >
+              Lihat Laporan
+            </Button>
+            
+            <Tooltip title="Refresh data">
+              <IconButton 
+                onClick={fetchData} 
+                disabled={refreshing || loading}
+                sx={{
+                  bgcolor: alpha(theme.palette.primary.main, 0.1),
+                  width: 48,
+                  height: 48,
+                  '&:hover': {
+                    bgcolor: alpha(theme.palette.primary.main, 0.2),
+                    transform: 'scale(1.05)',
+                  },
+                  transition: 'all 0.2s ease',
+                }}
+              >
+                <RefreshIcon />
+              </IconButton>
+            </Tooltip>
+          </Box>
+        </Box>
+      </Paper>
 
-  const handleBackFromForm = () => {
-    setSelectedDocument(null);
-    setCurrentView('documents');
-  };
+      {/* Modern stats cards */}
+      <Grid container spacing={3} mb={3}>
+        {quickStatsCards.map((card, index) => (
+          <Grid item xs={12} sm={6} md={3} key={index}>
+            <Paper
+              elevation={0}
+              sx={{
+                p: 3,
+                height: 140,
+                borderRadius: 2,
+                cursor: 'pointer',
+                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                border: `1px solid ${theme.palette.divider}`,
+                background: theme.palette.mode === 'dark'
+                  ? 'linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.02) 100%)'
+                  : 'linear-gradient(135deg, rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 0.4) 100%)',
+                '&:hover': {
+                  transform: 'translateY(-4px) scale(1.02)',
+                  borderColor: card.color,
+                  boxShadow: `0 12px 40px ${alpha(card.color, 0.15)}`,
+                },
+                position: 'relative',
+                overflow: 'hidden',
+                '&::before': {
+                  content: '""',
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  height: '3px',
+                  backgroundColor: card.color,
+                  borderRadius: '2px 2px 0 0',
+                },
+              }}
+              onClick={() => router.push(card.path)}
+            >
+              <Box sx={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', mb: 2 }}>
+                <Avatar
+                  sx={{
+                    bgcolor: alpha(card.color, 0.1),
+                    color: card.color,
+                    width: 48,
+                    height: 48,
+                    boxShadow: `0 4px 14px ${alpha(card.color, 0.25)}`,
+                  }}
+                >
+                  {card.icon}
+                </Avatar>
+                {card.trend !== 0 && !loading && (
+                  <Box 
+                    sx={{ 
+                      display: 'flex',
+                      alignItems: 'center',
+                      color: card.trend > 0 ? 'success.main' : 'error.main',
+                      bgcolor: card.trend > 0 
+                        ? alpha(theme.palette.success.main, 0.1) 
+                        : alpha(theme.palette.error.main, 0.1),
+                      px: 1.5,
+                      py: 0.5,
+                      borderRadius: 2,
+                      fontSize: '0.8rem',
+                      fontWeight: 600,
+                    }}
+                  >
+                    {card.trend > 0 ? 
+                      <TrendingUpIcon sx={{ fontSize: 16, mr: 0.5 }} /> : 
+                      <TrendingDownIcon sx={{ fontSize: 16, mr: 0.5 }} />
+                    }
+                    {Math.abs(card.trend)}%
+                  </Box>
+                )}
+              </Box>
+              
+              {loading ? (
+                <LinearProgress sx={{ mb: 2, height: 3, borderRadius: 1.5 }} />
+              ) : (
+                <Typography variant="h3" fontWeight={700} sx={{ mb: 1, fontSize: '2rem', color: theme.palette.text.primary }}>
+                  {refreshing ? '-' : card.value}
+                </Typography>
+              )}
+              
+              <Typography variant="body1" color="text.secondary" sx={{ fontSize: '0.95rem', fontWeight: 500 }}>
+                {card.title}
+              </Typography>
 
-  React.useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-      setTimeout(() => setContentVisible(true), 300);
-    }, 2500);
-    return () => clearTimeout(timer);
-  }, []);
+              <ChevronRightIcon 
+                sx={{ 
+                  position: 'absolute',
+                  bottom: 12,
+                  right: 12,
+                  fontSize: 20,
+                  color: alpha(card.color, 0.7),
+                  transition: 'transform 0.2s ease',
+                }} 
+              />
+            </Paper>
+          </Grid>
+        ))}
+      </Grid>
 
-  // Don't render until mounted to prevent hydration mismatch
-  if (!mounted) {
-    return null;
-  }
-
-  if (isLoading) {
-    return (
-      <AppTheme>
-        <CssBaseline />
-        <Box
+      {/* Modern dashboard content */}
+      <DashboardStats useMockData={false} />
+      
+      {refreshing && (
+        <LinearProgress
           sx={{
             position: 'fixed',
             top: 0,
             left: 0,
             right: 0,
-            bottom: 0,
-            background: theme => theme.palette.mode === 'dark'
-              ? 'linear-gradient(135deg, #0d1117 0%, #161b22 100%)'
-              : 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            flexDirection: 'column',
             zIndex: 9999,
+            height: 3,
+            '& .MuiLinearProgress-bar': {
+              background: 'linear-gradient(90deg, #3b82f6, #8b5cf6)',
+            }
           }}
-        >
-          <Box
-            sx={{
-              animation: `${float} 2s ease-in-out infinite`,
-              mb: 4,
-            }}
-          >
-            <Box
-              sx={{
-                width: 80,
-                height: 80,
-                borderRadius: '16px',
-                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                boxShadow: '0 8px 32px rgba(102, 126, 234, 0.3)',
-                p: 2,
-              }}
-            >
-              <Image
-                src="/logo.png"
-                alt="Logo Kelurahan Simokerto"
-                width={48}
-                height={48}
-                style={{ borderRadius: '8px' }}
-              />
-            </Box>
-          </Box>
-          
-          <Typography
-            variant="h4"
-            sx={{
-              fontWeight: 700,
-              color: 'text.primary',
-              textAlign: 'center',
-              mb: 1,
-              animation: `${fadeIn} 0.8s ease-out 0.5s both`,
-            }}
-          >
-            Dashboard Kelurahan
-          </Typography>
-          
-          <Typography 
-            variant="body1" 
-            sx={{ 
-              color: 'text.secondary',
-              textAlign: 'center',
-              animation: `${fadeIn} 0.8s ease-out 0.7s both`,
-            }}
-          >
-            Memuat sistem informasi...
-          </Typography>
-          
-          <Box
-            sx={{
-              width: '200px',
-              height: '3px',
-              backgroundColor: 'divider',
-              borderRadius: '2px',
-              mt: 3,
-              overflow: 'hidden',
-              animation: `${fadeIn} 0.8s ease-out 0.9s both`,
-            }}
-          >
-            <Box
-              sx={{
-                width: '60px',
-                height: '100%',
-                background: 'linear-gradient(90deg, #667eea, #764ba2)',
-                borderRadius: '2px',
-                animation: 'loading 1.5s ease-in-out infinite',
-                '@keyframes loading': {
-                  '0%': { transform: 'translateX(-100px)' },
-                  '100%': { transform: 'translateX(240px)' },
-                },
-              }}
-            />
-          </Box>
-        </Box>
-      </AppTheme>
-    );
-  }
-
-  const renderContent = () => {
-    switch (currentView) {
-      case 'dashboard':
-        return <AdminDashboardHome onViewChange={handleViewChange} />;
-      case 'pengajuan':
-        return <AdminSubmissionsPage />;
-      case 'documents':
-        return (
-          <DocumentSelection
-            onDocumentSelect={handleDocumentSelect}
-            onBack={handleBackFromDocuments}
-          />
-        );
-      case 'form':
-        return (
-          <DocumentForm 
-            selectedDocument={selectedDocument} 
-            onBack={handleBackFromForm}
-          />
-        );
-      case 'riwayat':
-        return <RiwayatPage />;
-      case 'settings':
-        return <SettingsPage />;
-      case 'users':
-        return <UserManagementPage />;
-      case 'templates':
-        return <TemplateManagementPage />;
-      case 'logout':
-        return <AdminDashboardHome onViewChange={handleViewChange} />;
-      default:
-        return <AdminDashboardHome onViewChange={handleViewChange} />;
-    }
-  };
-
-  return (
-    <AppTheme>
-      <CssBaseline enableColorScheme />
-      <Box 
-        sx={{ 
-          display: 'flex', 
-          minHeight: '100vh',
-          bgcolor: 'background.default',
-          transition: 'background-color 300ms cubic-bezier(0.4, 0, 0.2, 1) !important'
-        }}
-      >
-        <AdminSideMenu
-          currentView={currentView}
-          onViewChange={handleViewChange}
         />
-        <AppNavbar />
-        
-        <Box
-          component="main"
-          sx={{
-            flexGrow: 1,
-            position: 'relative',
-            pt: { xs: '90px', md: '90px' },
-            pb: 4,
-            minHeight: '100vh',
-            bgcolor: 'background.default',
-            transition: 'background-color 300ms cubic-bezier(0.4, 0, 0.2, 1) !important'
-          }}
-        >
-          <Container
-            maxWidth="xl"
-            sx={{
-              position: 'relative',
-              zIndex: 1,
-              px: { xs: 2, sm: 3, md: 4, lg: 6 },
-              bgcolor: 'transparent',
-            }}
-          >
-            <Box
-              sx={{
-                maxWidth: '1600px',
-                mx: 'auto',
-                width: '100%',
-                bgcolor: 'transparent',
-              }}
-            >
-              {renderContent()}
-            </Box>
-          </Container>
-        </Box>
-      </Box>
-    </AppTheme>
+      )}
+    </Box>
   );
 }

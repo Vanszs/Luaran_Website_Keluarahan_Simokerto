@@ -1,0 +1,66 @@
+'use client';
+
+import React, { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { useAuth } from '../contexts/AuthContext';
+import { Box, CircularProgress, Typography } from '@mui/material';
+
+interface ProtectedRouteProps {
+  children: React.ReactNode;
+  allowedRoles?: ('admin' | 'superadmin')[];
+  redirectTo?: string;
+}
+
+const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ 
+  children, 
+  allowedRoles = ['admin', 'superadmin'],
+  redirectTo = '/'
+}) => {
+  const { user, loading } = useAuth();
+  const router = useRouter();
+  
+  useEffect(() => {
+    if (!loading && !user) {
+      router.push('/');
+      return;
+    }
+    
+    if (!loading && user && !allowedRoles.includes(user.role)) {
+      if (user.role === 'superadmin' && window.location.pathname.includes('/dashboard')) {
+        router.push('/admin');
+        return;
+      }
+      
+      if (user.role === 'admin' && window.location.pathname.includes('/admin/manage-admins')) {
+        router.push('/dashboard');
+        return;
+      }
+    }
+  }, [loading, user, allowedRoles, router]);
+  
+  if (loading) {
+    return (
+      <Box sx={{ 
+        display: 'flex', 
+        justifyContent: 'center', 
+        alignItems: 'center', 
+        height: '100vh',
+        flexDirection: 'column',
+        gap: 2
+      }}>
+        <CircularProgress size={40} />
+        <Typography variant="body1" color="text.secondary">
+          Memeriksa akses...
+        </Typography>
+      </Box>
+    );
+  }
+  
+  if (!user || !allowedRoles.includes(user.role)) {
+    return null;
+  }
+  
+  return <>{children}</>;
+};
+
+export default ProtectedRoute;
