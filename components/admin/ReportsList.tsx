@@ -12,6 +12,11 @@ import {
   TableHead,
   TableRow,
   TextField,
+  InputAdornment,
+  FormControl,
+  Select,
+  MenuItem,
+  InputLabel,
   Snackbar,
   Alert,
   alpha,
@@ -38,6 +43,7 @@ interface Report {
   user: {
     name: string;
   };
+  status?: string;
 }
 
 export default function ReportsList() {
@@ -45,6 +51,7 @@ export default function ReportsList() {
   const [reports, setReports] = useState<Report[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
+  const [statusFilter, setStatusFilter] = useState('all');
   const [detailDialog, setDetailDialog] = useState({
     open: false,
     report: null as Report | null
@@ -65,7 +72,7 @@ export default function ReportsList() {
       const response = await fetch('/api/admin/reports');
       if (response.ok) {
         const data = await response.json();
-        setReports(data);
+        setReports(data.reports ?? data);
       } else {
         throw new Error('Failed to fetch reports');
       }
@@ -88,10 +95,14 @@ export default function ReportsList() {
     });
   };
 
-  const filteredReports = reports.filter(report => 
-    report.address.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    report.user.name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredReports = reports.filter(report => {
+    const matchesSearch =
+      report.address.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      report.user.name.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesStatus =
+      statusFilter === 'all' || report.status === statusFilter;
+    return matchesSearch && matchesStatus;
+  });
 
   if (loading) {
     return (
@@ -109,27 +120,70 @@ export default function ReportsList() {
         </Typography>
       </Box>
 
-      <Paper elevation={0} sx={{ 
-        p: 2, 
-        mb: 3, 
-        display: 'flex',
-        borderRadius: 3,
-        boxShadow: theme.palette.mode === 'dark'
-          ? '0 4px 12px rgba(0,0,0,0.2)'
-          : '0 4px 12px rgba(0,0,0,0.1)',
-      }}>
-        <TextField
-          fullWidth
-          placeholder="Cari berdasarkan nama warga atau alamat..."
-          variant="outlined"
-          size="small"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          InputProps={{
-            startAdornment: <SearchIcon sx={{ mr: 1, color: 'text.secondary' }} />,
-          }}
-          sx={{ maxWidth: 500 }}
-        />
+      <Paper
+        elevation={0}
+        sx={{
+          p: 2,
+          mb: 3,
+          borderRadius: 2,
+          border: `1px solid ${theme.palette.divider}`,
+        }}
+      >
+        <Grid container spacing={2} alignItems="center">
+          <Grid item xs={12} md={6}>
+            <TextField
+              fullWidth
+              placeholder="Cari berdasarkan nama warga atau alamat..."
+              variant="outlined"
+              size="small"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <SearchIcon fontSize="small" color="action" />
+                  </InputAdornment>
+                ),
+              }}
+              sx={{
+                '& .MuiOutlinedInput-root': {
+                  borderRadius: 2,
+                  bgcolor: theme.palette.mode === 'dark'
+                    ? alpha(theme.palette.common.white, 0.05)
+                    : alpha(theme.palette.common.black, 0.03),
+                  transition: 'all 0.3s ease',
+                  '&:hover': {
+                    bgcolor: theme.palette.mode === 'dark'
+                      ? alpha(theme.palette.common.white, 0.08)
+                      : alpha(theme.palette.common.black, 0.05),
+                  },
+                  '&.Mui-focused': {
+                    boxShadow: `0 0 0 2px ${alpha(theme.palette.primary.main, 0.25)}`,
+                    bgcolor: theme.palette.mode === 'dark'
+                      ? alpha(theme.palette.common.white, 0.1)
+                      : alpha(theme.palette.common.black, 0.06),
+                  },
+                },
+              }}
+            />
+          </Grid>
+          <Grid item xs={12} md={3}>
+            <FormControl fullWidth size="small">
+              <InputLabel id="status-filter-label">Status</InputLabel>
+              <Select
+                labelId="status-filter-label"
+                value={statusFilter}
+                label="Status"
+                onChange={(e) => setStatusFilter(e.target.value)}
+              >
+                <MenuItem value="all">Semua Status</MenuItem>
+                <MenuItem value="Pending">Pending</MenuItem>
+                <MenuItem value="In Progress">In Progress</MenuItem>
+                <MenuItem value="Completed">Completed</MenuItem>
+              </Select>
+            </FormControl>
+          </Grid>
+        </Grid>
       </Paper>
 
       <TableContainer component={Paper} elevation={0} sx={{ 
@@ -150,6 +204,7 @@ export default function ReportsList() {
               <TableCell>Nama Warga</TableCell>
               <TableCell>Alamat</TableCell>
               <TableCell>Waktu Laporan</TableCell>
+              <TableCell>Status</TableCell>
               <TableCell align="right">Aksi</TableCell>
             </TableRow>
           </TableHead>
@@ -169,6 +224,7 @@ export default function ReportsList() {
                       minute: '2-digit'
                     })}
                   </TableCell>
+                  <TableCell>{report.status}</TableCell>
                   <TableCell align="right">
                     <Button
                       variant="outlined"
@@ -183,7 +239,7 @@ export default function ReportsList() {
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={5} align="center" sx={{ py: 3 }}>
+                <TableCell colSpan={6} align="center" sx={{ py: 3 }}>
                   <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', py: 2 }}>
                     <WarningIcon sx={{ fontSize: 40, color: 'text.secondary', mb: 1 }} />
                     <Typography variant="body1" color="text.secondary">

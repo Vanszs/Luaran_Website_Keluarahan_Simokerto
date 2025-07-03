@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import pool from '../../../../../../utils/db';
+import { query } from '../../../../../../utils/db';
 
 // PUT to approve admin
 export async function PUT(
@@ -15,32 +15,26 @@ export async function PUT(
       );
     }
     
-    const connection = await pool.getConnection();
-    
-    try {
-      // Check if admin exists and is pending
-      const [admins] = await connection.execute(
-        'SELECT id FROM admin WHERE id = ? AND role IS NULL',
-        [adminId]
-      );
+    // Check if admin exists and is pending
+    const admins = await query(
+      'SELECT id FROM admin WHERE id = ? AND role IS NULL',
+      [adminId]
+    );
       
-      if ((admins as any[]).length === 0) {
-        return NextResponse.json(
-          { message: 'Pending admin not found' },
-          { status: 404 }
-        );
-      }
+    if ((admins as any[]).length === 0) {
+      return NextResponse.json(
+        { message: 'Pending admin not found' },
+        { status: 404 }
+      );
+    }
       
       // Set role to 'admin'
-      await connection.execute(
-        'UPDATE admin SET role = ? WHERE id = ?',
-        ['admin', adminId]
-      );
+    await query(
+      'UPDATE admin SET role = ? WHERE id = ?',
+      ['admin', adminId]
+    );
       
       return NextResponse.json({ message: 'Admin approved successfully' });
-    } finally {
-      connection.release();
-    }
   } catch (error) {
     console.error('Error approving admin:', error);
     return NextResponse.json(

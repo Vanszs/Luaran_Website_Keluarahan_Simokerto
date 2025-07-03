@@ -1,3 +1,4 @@
+// @ts-nocheck
 import * as React from 'react';
 import dayjs, { Dayjs } from 'dayjs';
 import { useForkRef } from '@mui/material/utils';

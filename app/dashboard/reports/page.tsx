@@ -63,7 +63,7 @@ export default function ReportsPage() {
       const response = await fetch('/api/admin/reports');
       if (response.ok) {
         const data = await response.json();
-        setReports(data);
+        setReports(data.reports ?? data);
       } else {
         console.error('Failed to fetch reports');
       }
@@ -79,12 +79,12 @@ export default function ReportsPage() {
     setViewDialogOpen(true);
   };
   
-  const handleChangePage = (event: unknown, newPage: number) => {
+  const handleChangePage = (_event: unknown, newPage: number) => {
     setPage(newPage);
   };
 
-  const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setRowsPerPage(parseInt(event.target.value, 10));
+  const handleChangeRowsPerPage = (_event: React.ChangeEvent<HTMLInputElement>) => {
+    setRowsPerPage(parseInt(_event.target.value, 10));
     setPage(0);
   };
   
@@ -103,10 +103,10 @@ export default function ReportsPage() {
   
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'pending': return theme.palette.warning;
-      case 'processing': return theme.palette.info;
-      case 'completed': return theme.palette.success;
-      default: return theme.palette.grey;
+      case 'pending': return theme.palette.warning.main;
+      case 'processing': return theme.palette.info.main;
+      case 'completed': return theme.palette.success.main;
+      default: return theme.palette.grey[500];
     }
   };
   
@@ -241,9 +241,9 @@ export default function ReportsPage() {
                         <Chip 
                           label={getStatusLabel(report.status)} 
                           size="small"
-                          sx={{ 
-                            bgcolor: alpha(getStatusColor(report.status).main, 0.1),
-                            color: getStatusColor(report.status).main,
+                          sx={{
+                            bgcolor: alpha(getStatusColor(report.status), 0.1),
+                            color: getStatusColor(report.status),
                             fontWeight: 500
                           }}
                         />
@@ -333,11 +333,11 @@ export default function ReportsPage() {
                 <Typography variant="subtitle2" color="text.secondary">
                   Status
                 </Typography>
-                <Chip 
-                  label={getStatusLabel(selectedReport.status)} 
-                  sx={{ 
-                    bgcolor: alpha(getStatusColor(selectedReport.status).main, 0.1),
-                    color: getStatusColor(selectedReport.status).main,
+                <Chip
+                  label={getStatusLabel(selectedReport.status)}
+                  sx={{
+                    bgcolor: alpha(getStatusColor(selectedReport.status), 0.1),
+                    color: getStatusColor(selectedReport.status),
                     fontWeight: 500
                   }}
                 />

@@ -10,6 +10,7 @@ import MenuRoundedIcon from '@mui/icons-material/MenuRounded';
 import DashboardRoundedIcon from '@mui/icons-material/DashboardRounded';
 import SideMenuMobile from './SideMenuMobile';
 import MenuButton from './MenuButton';
+// @ts-ignore - JS module without types
 import ColorModeIconDropdown from '../../shared-theme/ColorModeIconDropdown';
 
 const Toolbar = styled(MuiToolbar)({
