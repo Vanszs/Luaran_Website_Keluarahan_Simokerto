@@ -59,7 +59,7 @@ const StyledText = styled('text', {
 })<StyledTextProps>(({ theme }) => ({
   textAnchor: 'middle',
   dominantBaseline: 'central',
-  fill: (theme.vars || theme).palette.text.secondary,
+  fill: ((theme as any).vars || theme).palette.text.secondary,
   variants: [
     {
       props: {
@@ -146,7 +146,7 @@ export default function ChartUserByCountry() {
                 innerRadius: 75,
                 outerRadius: 100,
                 paddingAngle: 0,
-                highlightScope: { fade: 'global', highlight: 'item' },
+                highlightScope: { fade: 'global', highlight: 'item' } as any,
               },
             ]}
             height={260}

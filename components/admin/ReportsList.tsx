@@ -23,6 +23,12 @@ import {
   DialogTitle,
   Button,
   Grid,
+  InputAdornment,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  Chip,
 } from '@mui/material';
 import {
   Search as SearchIcon,
@@ -38,6 +44,7 @@ interface Report {
   user: {
     name: string;
   };
+  status?: string;
 }
 
 export default function ReportsList() {
@@ -45,6 +52,7 @@ export default function ReportsList() {
   const [reports, setReports] = useState<Report[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
+  const [statusFilter, setStatusFilter] = useState('all');
   const [detailDialog, setDetailDialog] = useState({
     open: false,
     report: null as Report | null
@@ -88,10 +96,16 @@ export default function ReportsList() {
     });
   };
 
-  const filteredReports = reports.filter(report => 
-    report.address.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    report.user.name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredReports = reports.filter(report => {
+    const matchesText =
+      report.address.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      report.user.name.toLowerCase().includes(searchTerm.toLowerCase());
+
+    const matchesStatus =
+      statusFilter === 'all' || report.status === statusFilter;
+
+    return matchesText && matchesStatus;
+  });
 
   if (loading) {
     return (
@@ -109,10 +123,12 @@ export default function ReportsList() {
         </Typography>
       </Box>
 
-      <Paper elevation={0} sx={{ 
-        p: 2, 
-        mb: 3, 
+      <Paper elevation={0} sx={{
+        p: 2,
+        mb: 3,
         display: 'flex',
+        flexWrap: 'wrap',
+        gap: 2,
         borderRadius: 3,
         boxShadow: theme.palette.mode === 'dark'
           ? '0 4px 12px rgba(0,0,0,0.2)'
@@ -126,10 +142,48 @@ export default function ReportsList() {
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           InputProps={{
-            startAdornment: <SearchIcon sx={{ mr: 1, color: 'text.secondary' }} />,
+            startAdornment: (
+              <InputAdornment position="start">
+                <SearchIcon fontSize="small" color="action" />
+              </InputAdornment>
+            ),
           }}
-          sx={{ maxWidth: 500 }}
+          sx={{
+            maxWidth: 500,
+            '& .MuiOutlinedInput-root': {
+              borderRadius: 2,
+              bgcolor: theme.palette.mode === 'dark'
+                ? alpha(theme.palette.common.white, 0.05)
+                : alpha(theme.palette.common.black, 0.03),
+              transition: 'all 0.3s ease',
+              '&:hover': {
+                bgcolor: theme.palette.mode === 'dark'
+                  ? alpha(theme.palette.common.white, 0.08)
+                  : alpha(theme.palette.common.black, 0.05),
+              },
+              '&.Mui-focused': {
+                boxShadow: `0 0 0 2px ${alpha(theme.palette.primary.main, 0.25)}`,
+                bgcolor: theme.palette.mode === 'dark'
+                  ? alpha(theme.palette.common.white, 0.1)
+                  : alpha(theme.palette.common.black, 0.06),
+              }
+            }
+          }}
         />
+
+        <FormControl size="small" sx={{ minWidth: 140 }}>
+          <InputLabel>Status</InputLabel>
+          <Select
+            label="Status"
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value as string)}
+          >
+            <MenuItem value="all">Semua Status</MenuItem>
+            <MenuItem value="pending">Pending</MenuItem>
+            <MenuItem value="processing">In Progress</MenuItem>
+            <MenuItem value="completed">Completed</MenuItem>
+          </Select>
+        </FormControl>
       </Paper>
 
       <TableContainer component={Paper} elevation={0} sx={{ 
@@ -150,6 +204,7 @@ export default function ReportsList() {
               <TableCell>Nama Warga</TableCell>
               <TableCell>Alamat</TableCell>
               <TableCell>Waktu Laporan</TableCell>
+              <TableCell>Status</TableCell>
               <TableCell align="right">Aksi</TableCell>
             </TableRow>
           </TableHead>
@@ -169,6 +224,27 @@ export default function ReportsList() {
                       minute: '2-digit'
                     })}
                   </TableCell>
+                  <TableCell>
+                    <Chip
+                      label={report.status || 'Pending'}
+                      size="small"
+                      sx={{
+                        fontWeight: 500,
+                        backgroundColor:
+                          report.status === 'completed'
+                            ? alpha(theme.palette.success.main, 0.1)
+                            : report.status === 'processing'
+                              ? alpha(theme.palette.warning.main, 0.1)
+                              : alpha(theme.palette.info.main, 0.1),
+                        color:
+                          report.status === 'completed'
+                            ? theme.palette.success.main
+                            : report.status === 'processing'
+                              ? theme.palette.warning.main
+                              : theme.palette.info.main,
+                      }}
+                    />
+                  </TableCell>
                   <TableCell align="right">
                     <Button
                       variant="outlined"
@@ -183,7 +259,7 @@ export default function ReportsList() {
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={5} align="center" sx={{ py: 3 }}>
+                <TableCell colSpan={6} align="center" sx={{ py: 3 }}>
                   <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', py: 2 }}>
                     <WarningIcon sx={{ fontSize: 40, color: 'text.secondary', mb: 1 }} />
                     <Typography variant="body1" color="text.secondary">

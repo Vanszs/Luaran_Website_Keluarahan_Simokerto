@@ -34,7 +34,12 @@ export default function AdminDashboard() {
   const [refreshing, setRefreshing] = React.useState(false);
   
   // Get dashboard stats from the database
-  const { data: stats, loading, refresh } = useApiData({
+  const { data: stats, loading, refresh } = useApiData<{
+    todayReports: number;
+    totalReports: number;
+    totalUsers: number;
+    activeDevices: number;
+  }>({
     endpoint: '/api/admin/stats',
     useMock: false, // Use real data
   });

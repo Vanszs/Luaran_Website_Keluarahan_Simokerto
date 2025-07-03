@@ -77,8 +77,8 @@ const ModernAppBar = styled(AppBar, {
 })<{ open?: boolean }>(({ theme, open }) => ({
   background: theme.palette.mode === 'dark'
     ? 'rgba(15, 23, 42, 0.75)'
-    : 'rgba(255, 255, 255, 0.95)',
-  backdropFilter: 'blur(6px)',
+    : 'rgba(255, 255, 255, 0.98)',
+  backdropFilter: 'blur(4px)',
   borderBottom: `1px solid ${theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.08)'}`,
   boxShadow: theme.palette.mode === 'dark'
     ? '0 4px 20px rgba(0, 0, 0, 0.2)'
@@ -371,13 +371,13 @@ const Layout: React.FC<LayoutProps> = ({ children, title = 'PINTAR Admin' }) => 
             <ColorModeSelect sx={{
               borderRadius: 2,
               backgroundColor: theme.palette.mode === 'dark'
-                ? 'rgba(255,255,255,0.08)'
-                : 'rgba(0,0,0,0.04)',
+                ? 'rgba(255,255,255,0.12)'
+                : 'rgba(0,0,0,0.06)',
               '&:hover': {
                 transform: 'scale(1.05)',
                 backgroundColor: theme.palette.mode === 'dark'
-                  ? 'rgba(255,255,255,0.16)'
-                  : 'rgba(0,0,0,0.08)',
+                  ? 'rgba(255,255,255,0.2)'
+                  : 'rgba(0,0,0,0.1)',
               },
             }} />
             
@@ -389,13 +389,13 @@ const Layout: React.FC<LayoutProps> = ({ children, title = 'PINTAR Admin' }) => 
                   borderRadius: 2,
                   transition: 'all 0.3s ease',
                   backgroundColor: theme.palette.mode === 'dark'
-                    ? 'rgba(255,255,255,0.08)'
-                    : 'rgba(0,0,0,0.04)',
+                    ? 'rgba(255,255,255,0.12)'
+                    : 'rgba(0,0,0,0.06)',
                   '&:hover': {
                     transform: 'scale(1.05)',
                     backgroundColor: theme.palette.mode === 'dark'
-                      ? 'rgba(255,255,255,0.16)'
-                      : 'rgba(0,0,0,0.08)',
+                      ? 'rgba(255,255,255,0.2)'
+                      : 'rgba(0,0,0,0.1)',
                   },
                 }}
               >
