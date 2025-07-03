@@ -65,7 +65,7 @@ export default function ReportsList() {
       const response = await fetch('/api/admin/reports');
       if (response.ok) {
         const data = await response.json();
-        setReports(data);
+        setReports(data.reports ?? data);
       } else {
         throw new Error('Failed to fetch reports');
       }
