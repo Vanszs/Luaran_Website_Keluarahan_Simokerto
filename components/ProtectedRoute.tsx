@@ -21,7 +21,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   
   useEffect(() => {
     if (!loading && !user) {
-      router.push('/');
+      router.push(redirectTo);
       return;
     }
     

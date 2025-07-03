@@ -130,17 +130,18 @@ export const useMockApi = () => {
   };
 };
 
-interface FetchOptions {
+interface FetchOptions<T = any> {
   endpoint: string;
   method?: 'GET' | 'POST' | 'PUT' | 'DELETE';
   body?: any;
   mockData?: any;
   mockDelay?: number;
   useMock?: boolean;
+  initialData?: T;
 }
 
-export function useApiData<T>(options: FetchOptions) {
-  const [data, setData] = useState<T | null>(null);
+export function useApiData<T>(options: FetchOptions<T>) {
+  const [data, setData] = useState<T | null>(options.initialData ?? null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<Error | null>(null);
   const [refreshTrigger, setRefreshTrigger] = useState<number>(0);

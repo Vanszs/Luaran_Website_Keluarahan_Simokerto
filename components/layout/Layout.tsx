@@ -368,23 +368,34 @@ const Layout: React.FC<LayoutProps> = ({ children, title = 'PINTAR Admin' }) => 
           </Box>
           
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <ColorModeSelect sx={{ 
+            <ColorModeSelect sx={{
               borderRadius: 2,
+              backgroundColor: theme.palette.mode === 'dark'
+                ? 'rgba(255,255,255,0.08)'
+                : 'rgba(0,0,0,0.04)',
               '&:hover': {
                 transform: 'scale(1.05)',
+                backgroundColor: theme.palette.mode === 'dark'
+                  ? 'rgba(255,255,255,0.16)'
+                  : 'rgba(0,0,0,0.08)',
               },
             }} />
             
             <Tooltip title="Notifications" arrow>
-              <IconButton 
-                color="inherit" 
+              <IconButton
+                color="inherit"
                 onClick={handleNotificationMenuOpen}
-                sx={{ 
+                sx={{
                   borderRadius: 2,
                   transition: 'all 0.3s ease',
+                  backgroundColor: theme.palette.mode === 'dark'
+                    ? 'rgba(255,255,255,0.08)'
+                    : 'rgba(0,0,0,0.04)',
                   '&:hover': {
                     transform: 'scale(1.05)',
-                    bgcolor: 'rgba(255, 255, 255, 0.1)',
+                    backgroundColor: theme.palette.mode === 'dark'
+                      ? 'rgba(255,255,255,0.16)'
+                      : 'rgba(0,0,0,0.08)',
                   },
                 }}
               >
