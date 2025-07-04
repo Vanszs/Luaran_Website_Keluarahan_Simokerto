@@ -11,28 +11,21 @@ import {
   DialogTitle,
   Typography,
   Paper,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
   IconButton,
   Snackbar,
   Alert,
   alpha,
   useTheme,
   CircularProgress,
-  Chip,
   Grid,
   InputAdornment,
 } from '@mui/material';
+import { DataGrid, GridColDef, GridRenderCellParams } from '@mui/x-data-grid';
 import {
   Add as AddIcon,
   Search as SearchIcon,
   Edit as EditIcon,
   Delete as DeleteIcon,
-  PersonAdd as PersonAddIcon,
 } from '@mui/icons-material';
 
 interface User {
@@ -69,6 +62,7 @@ export default function UserManagement() {
     message: '',
     severity: 'success' as 'success' | 'error' | 'info'
   });
+  const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 10 });
 
   useEffect(() => {
     fetchUsers();
@@ -208,11 +202,53 @@ export default function UserManagement() {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  const filteredUsers = users.filter(user => 
+  const filteredUsers = users.filter(user =>
     user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     user.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
     user.address.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  const columns: GridColDef[] = [
+    { field: 'id', headerName: 'ID', width: 70 },
+    { field: 'username', headerName: 'Username', flex: 1, minWidth: 120 },
+    { field: 'name', headerName: 'Nama', flex: 1, minWidth: 120 },
+    { field: 'address', headerName: 'Alamat', flex: 1.5, minWidth: 150 },
+    {
+      field: 'created_at',
+      headerName: 'Terdaftar',
+      width: 150,
+    },
+    {
+      field: 'actions',
+      headerName: 'Aksi',
+      width: 110,
+      sortable: false,
+      filterable: false,
+      renderCell: (params: GridRenderCellParams<any>) => (
+        <Box>
+          <IconButton size="small" onClick={() => handleEditUser(params.row.raw)} color="primary">
+            <EditIcon fontSize="small" />
+          </IconButton>
+          <IconButton size="small" onClick={() => handleDeleteUser(params.row.raw)} color="error" sx={{ ml: 1 }}>
+            <DeleteIcon fontSize="small" />
+          </IconButton>
+        </Box>
+      ),
+    },
+  ];
+
+  const rows = filteredUsers.map((user) => ({
+    id: user.id,
+    username: user.username,
+    name: user.name,
+    address: user.address,
+    created_at: new Date(user.created_at).toLocaleDateString('id-ID', {
+      day: 'numeric',
+      month: 'short',
+      year: 'numeric',
+    }),
+    raw: user,
+  }));
 
   if (loading) {
     return (
@@ -286,85 +322,19 @@ export default function UserManagement() {
         />
       </Paper>
 
-      <TableContainer component={Paper} elevation={0} sx={{ 
-        borderRadius: 3,
-        overflow: 'hidden',
-        boxShadow: theme.palette.mode === 'dark'
-          ? '0 4px 12px rgba(0,0,0,0.2)'
-          : '0 4px 12px rgba(0,0,0,0.1)',
-      }}>
-        <Table>
-          <TableHead sx={{ 
-            backgroundColor: theme.palette.mode === 'dark'
-              ? alpha(theme.palette.primary.main, 0.1)
-              : alpha(theme.palette.primary.main, 0.05)
-          }}>
-            <TableRow>
-              <TableCell>ID</TableCell>
-              <TableCell>Username</TableCell>
-              <TableCell>Nama</TableCell>
-              <TableCell>Alamat</TableCell>
-              <TableCell>Terdaftar</TableCell>
-              <TableCell align="right">Aksi</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {filteredUsers.length > 0 ? (
-              filteredUsers.map((user) => (
-                <TableRow key={user.id} hover>
-                  <TableCell>{user.id}</TableCell>
-                  <TableCell>{user.username}</TableCell>
-                  <TableCell>{user.name}</TableCell>
-                  <TableCell>{user.address}</TableCell>
-                  <TableCell>
-                    {new Date(user.created_at).toLocaleDateString('id-ID', {
-                      day: 'numeric',
-                      month: 'short',
-                      year: 'numeric'
-                    })}
-                  </TableCell>
-                  <TableCell align="right">
-                    <IconButton 
-                      size="small" 
-                      onClick={() => handleEditUser(user)}
-                      color="primary"
-                    >
-                      <EditIcon fontSize="small" />
-                    </IconButton>
-                    <IconButton 
-                      size="small" 
-                      onClick={() => handleDeleteUser(user)}
-                      color="error"
-                      sx={{ ml: 1 }}
-                    >
-                      <DeleteIcon fontSize="small" />
-                    </IconButton>
-                  </TableCell>
-                </TableRow>
-              ))
-            ) : (
-              <TableRow>
-                <TableCell colSpan={6} align="center" sx={{ py: 3 }}>
-                  <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', py: 2 }}>
-                    <PersonAddIcon sx={{ fontSize: 40, color: 'text.secondary', mb: 1 }} />
-                    <Typography variant="body1" color="text.secondary">
-                      Tidak ada data warga
-                    </Typography>
-                    <Button 
-                      variant="contained" 
-                      startIcon={<AddIcon />}
-                      onClick={handleAddUser}
-                      sx={{ mt: 2, borderRadius: 2 }}
-                    >
-                      Tambah Warga
-                    </Button>
-                  </Box>
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
-      </TableContainer>
+      <DataGrid
+        autoHeight
+        rows={rows}
+        columns={columns}
+        pageSizeOptions={[5, 10, 25]}
+        paginationModel={paginationModel}
+        onPaginationModelChange={setPaginationModel}
+        disableRowSelectionOnClick
+        getRowHeight={() => 'auto'}
+        sx={{ borderRadius: 3, boxShadow: theme.palette.mode === 'dark' ? '0 4px 12px rgba(0,0,0,0.2)' : '0 4px 12px rgba(0,0,0,0.1)' }}
+        localeText={{ noRowsLabel: 'Tidak ada data warga' }}
+        loading={loading}
+      />
 
       {/* User Form Dialog */}
       <Dialog 

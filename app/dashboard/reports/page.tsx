@@ -1,19 +1,12 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { 
+import {
   Box,
   Typography,
   Paper,
   useTheme,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
   TextField,
-  TablePagination,
   Chip,
   IconButton,
   Dialog,
@@ -25,6 +18,7 @@ import {
   alpha,
   InputAdornment
 } from '@mui/material';
+import { DataGrid, GridColDef, GridRenderCellParams } from '@mui/x-data-grid';
 import {
   Search as SearchIcon,
   Visibility as ViewIcon
@@ -48,8 +42,7 @@ export default function ReportsPage() {
   const [reports, setReports] = useState<Report[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
-  const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 10 });
   const [selectedReport, setSelectedReport] = useState<Report | null>(null);
   const [viewDialogOpen, setViewDialogOpen] = useState(false);
   
@@ -79,14 +72,6 @@ export default function ReportsPage() {
     setViewDialogOpen(true);
   };
   
-  const handleChangePage = (_event: unknown, newPage: number) => {
-    setPage(newPage);
-  };
-
-  const handleChangeRowsPerPage = (_event: React.ChangeEvent<HTMLInputElement>) => {
-    setRowsPerPage(parseInt(_event.target.value, 10));
-    setPage(0);
-  };
   
   // Filter reports based on search term
   const filteredReports = reports.filter(report => 
@@ -96,10 +81,6 @@ export default function ReportsPage() {
   );
   
   // Get reports for current page
-  const paginatedReports = filteredReports.slice(
-    page * rowsPerPage, 
-    page * rowsPerPage + rowsPerPage
-  );
   
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -118,6 +99,54 @@ export default function ReportsPage() {
       default: return status;
     }
   };
+
+  const columns: GridColDef[] = [
+    { field: 'id', headerName: 'ID', width: 80 },
+    { field: 'name', headerName: 'Pelapor', flex: 1, minWidth: 120 },
+    { field: 'address', headerName: 'Alamat', flex: 1.5, minWidth: 160 },
+    { field: 'created_at', headerName: 'Tanggal', width: 150 },
+    {
+      field: 'status',
+      headerName: 'Status',
+      width: 110,
+      renderCell: (params: GridRenderCellParams) => (
+        <Chip
+          label={getStatusLabel(params.value || '')}
+          size="small"
+          sx={{
+            bgcolor: alpha(getStatusColor(params.value || ''), 0.1),
+            color: getStatusColor(params.value || ''),
+            fontWeight: 500,
+          }}
+        />
+      ),
+    },
+    {
+      field: 'actions',
+      headerName: 'Aksi',
+      width: 80,
+      sortable: false,
+      filterable: false,
+      renderCell: (params: GridRenderCellParams<any>) => (
+        <IconButton size="small" onClick={() => handleViewReport(params.row.raw)} color="primary">
+          <ViewIcon fontSize="small" />
+        </IconButton>
+      ),
+    },
+  ];
+
+  const rows = filteredReports.map((report) => ({
+    id: report.id,
+    name: report.user?.name,
+    address: report.address,
+    created_at: new Date(report.created_at).toLocaleDateString('id-ID', {
+      day: 'numeric',
+      month: 'short',
+      year: 'numeric',
+    }),
+    status: report.status,
+    raw: report,
+  }));
   
   return (
     <Layout title="Laporan">
@@ -184,96 +213,16 @@ export default function ReportsPage() {
             />
           </Box>
           
-          <TableContainer>
-            <Table size="small">
-              <TableHead>
-                <TableRow sx={{ bgcolor: theme.palette.mode === 'dark' 
-                  ? alpha(theme.palette.background.paper, 0.5) 
-                  : alpha(theme.palette.background.paper, 0.5) 
-                }}>
-                  <TableCell sx={{ fontWeight: 600, py: 2 }}>ID</TableCell>
-                  <TableCell sx={{ fontWeight: 600, py: 2 }}>Pelapor</TableCell>
-                  <TableCell sx={{ fontWeight: 600, py: 2 }}>Alamat</TableCell>
-                  <TableCell sx={{ fontWeight: 600, py: 2 }}>Tanggal</TableCell>
-                  <TableCell sx={{ fontWeight: 600, py: 2 }}>Status</TableCell>
-                  <TableCell sx={{ fontWeight: 600, py: 2 }} align="right">Aksi</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {loading ? (
-                  <TableRow>
-                    <TableCell colSpan={6} align="center" sx={{ py: 3 }}>
-                      Memuat data...
-                    </TableCell>
-                  </TableRow>
-                ) : paginatedReports.length === 0 ? (
-                  <TableRow>
-                    <TableCell colSpan={6} align="center" sx={{ py: 3 }}>
-                      {searchTerm ? 'Tidak ada hasil yang sesuai dengan pencarian' : 'Tidak ada data laporan'}
-                    </TableCell>
-                  </TableRow>
-                ) : (
-                  paginatedReports.map(report => (
-                    <TableRow key={report.id} hover>
-                      <TableCell sx={{ fontSize: '0.875rem', py: 2 }}>#{report.id}</TableCell>
-                      <TableCell sx={{ fontSize: '0.875rem', py: 2 }}>{report.user?.name}</TableCell>
-                      <TableCell sx={{ fontSize: '0.875rem', py: 2 }}>
-                        <Typography 
-                          variant="body2" 
-                          sx={{ 
-                            maxWidth: 200, 
-                            overflow: 'hidden', 
-                            textOverflow: 'ellipsis', 
-                            whiteSpace: 'nowrap' 
-                          }}
-                        >
-                          {report.address}
-                        </Typography>
-                      </TableCell>
-                      <TableCell sx={{ fontSize: '0.875rem', py: 2 }}>
-                        {new Date(report.created_at).toLocaleDateString('id-ID', { 
-                          day: 'numeric', 
-                          month: 'short', 
-                          year: 'numeric' 
-                        })}
-                      </TableCell>
-                      <TableCell sx={{ py: 2 }}>
-                        <Chip 
-                          label={getStatusLabel(report.status)} 
-                          size="small"
-                          sx={{
-                            bgcolor: alpha(getStatusColor(report.status), 0.1),
-                            color: getStatusColor(report.status),
-                            fontWeight: 500
-                          }}
-                        />
-                      </TableCell>
-                      <TableCell sx={{ py: 2 }} align="right">
-                        <IconButton 
-                          size="small" 
-                          onClick={() => handleViewReport(report)}
-                          color="primary"
-                        >
-                          <ViewIcon fontSize="small" />
-                        </IconButton>
-                      </TableCell>
-                    </TableRow>
-                  ))
-                )}
-              </TableBody>
-            </Table>
-          </TableContainer>
-          
-          <TablePagination
-            rowsPerPageOptions={[5, 10, 25]}
-            component="div"
-            count={filteredReports.length}
-            rowsPerPage={rowsPerPage}
-            page={page}
-            onPageChange={handleChangePage}
-            onRowsPerPageChange={handleChangeRowsPerPage}
-            labelRowsPerPage="Baris per halaman:"
-            labelDisplayedRows={({ from, to, count }) => `${from}-${to} dari ${count}`}
+          <DataGrid
+            autoHeight
+            rows={rows}
+            columns={columns}
+            disableRowSelectionOnClick
+            paginationModel={paginationModel}
+            onPaginationModelChange={setPaginationModel}
+            pageSizeOptions={[5, 10, 25]}
+            loading={loading}
+            sx={{ border: 'none' }}
           />
         </Paper>
       </Box>

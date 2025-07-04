@@ -11,12 +11,6 @@ import {
   DialogTitle,
   Typography,
   Paper,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
   IconButton,
   Snackbar,
   Alert,
@@ -32,6 +26,7 @@ import {
   InputLabel,
   InputAdornment,
 } from '@mui/material';
+import { DataGrid, GridColDef, GridRenderCellParams } from '@mui/x-data-grid';
 import {
   Add as AddIcon,
   Search as SearchIcon,
@@ -80,6 +75,8 @@ export default function AdminManagement() {
     message: '',
     severity: 'success' as 'success' | 'error' | 'info'
   });
+  const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 10 });
+  const [pendingPaginationModel, setPendingPaginationModel] = useState({ page: 0, pageSize: 10 });
 
   useEffect(() => {
     fetchAdmins();
@@ -316,10 +313,122 @@ export default function AdminManagement() {
     setFormData(prev => ({ ...prev, role: e.target.value }));
   };
 
-  const filteredAdmins = admins.filter(admin => 
+  const filteredAdmins = admins.filter(admin =>
     (admin.name?.toLowerCase() || '').includes(searchTerm.toLowerCase()) ||
     admin.username.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  const pendingColumns: GridColDef[] = [
+    { field: 'id', headerName: 'ID', width: 70 },
+    { field: 'username', headerName: 'Username', flex: 1, minWidth: 120 },
+    { field: 'name', headerName: 'Nama', flex: 1, minWidth: 120 },
+    { field: 'created_at', headerName: 'Mendaftar', width: 160 },
+    {
+      field: 'actions',
+      headerName: 'Aksi',
+      width: 160,
+      sortable: false,
+      filterable: false,
+      renderCell: (params: GridRenderCellParams<any>) => (
+        <Box>
+          <Button
+            variant="contained"
+            size="small"
+            color="success"
+            onClick={() => handleApproveAdmin(params.row.raw)}
+            sx={{ mr: 1, borderRadius: 2 }}
+          >
+            Setujui
+          </Button>
+          <Button
+            variant="outlined"
+            size="small"
+            color="error"
+            onClick={() => handleRejectAdmin(params.row.raw)}
+            sx={{ borderRadius: 2 }}
+          >
+            Tolak
+          </Button>
+        </Box>
+      ),
+    },
+  ];
+
+  const columns: GridColDef[] = [
+    { field: 'id', headerName: 'ID', width: 70 },
+    { field: 'username', headerName: 'Username', flex: 1, minWidth: 120 },
+    { field: 'name', headerName: 'Nama', flex: 1, minWidth: 120 },
+    {
+      field: 'role',
+      headerName: 'Role',
+      width: 120,
+      renderCell: (params: GridRenderCellParams) => (
+        <Chip
+          label={params.value === 'superadmin' ? 'Super Admin' : 'Admin'}
+          color={params.value === 'superadmin' ? 'primary' : 'default'}
+          size="small"
+        />
+      ),
+    },
+    { field: 'created_at', headerName: 'Terdaftar', width: 160 },
+    {
+      field: 'actions',
+      headerName: 'Aksi',
+      width: 110,
+      sortable: false,
+      filterable: false,
+      renderCell: (params: GridRenderCellParams<any>) => (
+        <Box>
+          <IconButton
+            size="small"
+            onClick={() => handleEditAdmin(params.row.raw)}
+            color="primary"
+            disabled={params.row.raw.id === Number(user?.id) && params.row.raw.role === 'superadmin'}
+            title={params.row.raw.id === Number(user?.id) && params.row.raw.role === 'superadmin' ? 'Anda tidak dapat mengedit akun superadmin Anda sendiri' : ''}
+          >
+            <EditIcon fontSize="small" />
+          </IconButton>
+          <IconButton
+            size="small"
+            onClick={() => handleDeleteAdmin(params.row.raw)}
+            color="error"
+            disabled={params.row.raw.id === Number(user?.id)}
+            title={params.row.raw.id === Number(user?.id) ? 'Anda tidak dapat menghapus akun Anda sendiri' : ''}
+            sx={{ ml: 1 }}
+          >
+            <DeleteIcon fontSize="small" />
+          </IconButton>
+        </Box>
+      ),
+    },
+  ];
+
+  const pendingRows = pendingAdmins.map((admin) => ({
+    id: admin.id,
+    username: admin.username,
+    name: admin.name,
+    created_at: new Date(admin.created_at).toLocaleDateString('id-ID', {
+      day: 'numeric',
+      month: 'short',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    }),
+    raw: admin,
+  }));
+
+  const rows = filteredAdmins.map((admin) => ({
+    id: admin.id,
+    username: admin.username,
+    name: admin.name,
+    role: admin.role,
+    created_at: new Date(admin.created_at).toLocaleDateString('id-ID', {
+      day: 'numeric',
+      month: 'short',
+      year: 'numeric',
+    }),
+    raw: admin,
+  }));
 
   if (loading) {
     return (
@@ -399,68 +508,23 @@ export default function AdminManagement() {
           <Typography variant="h6" sx={{ mt: 4, mb: 2, fontWeight: 600 }}>
             Admin Menunggu Persetujuan
           </Typography>
-          <TableContainer component={Paper} elevation={0} sx={{ 
-            borderRadius: 3,
-            overflow: 'hidden',
-            mb: 4,
-            boxShadow: theme.palette.mode === 'dark'
-              ? '0 4px 12px rgba(0,0,0,0.2)'
-              : '0 4px 12px rgba(0,0,0,0.1)',
-          }}>
-            <Table>
-              <TableHead sx={{ 
-                backgroundColor: theme.palette.mode === 'dark'
-                  ? alpha(theme.palette.warning.main, 0.1)
-                  : alpha(theme.palette.warning.main, 0.05)
-              }}>
-                <TableRow>
-                  <TableCell>ID</TableCell>
-                  <TableCell>Username</TableCell>
-                  <TableCell>Nama</TableCell>
-                  <TableCell>Mendaftar Pada</TableCell>
-                  <TableCell align="right">Aksi</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {pendingAdmins.map((admin) => (
-                  <TableRow key={admin.id} hover>
-                    <TableCell>{admin.id}</TableCell>
-                    <TableCell>{admin.username}</TableCell>
-                    <TableCell>{admin.name}</TableCell>
-                    <TableCell>
-                      {new Date(admin.created_at).toLocaleDateString('id-ID', {
-                        day: 'numeric',
-                        month: 'short',
-                        year: 'numeric',
-                        hour: '2-digit',
-                        minute: '2-digit',
-                      })}
-                    </TableCell>
-                    <TableCell align="right">
-                      <Button
-                        variant="contained"
-                        size="small"
-                        color="success"
-                        onClick={() => handleApproveAdmin(admin)}
-                        sx={{ mr: 1, borderRadius: 2 }}
-                      >
-                        Setujui
-                      </Button>
-                      <Button
-                        variant="outlined"
-                        size="small"
-                        color="error"
-                        onClick={() => handleRejectAdmin(admin)}
-                        sx={{ borderRadius: 2 }}
-                      >
-                        Tolak
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
+          <DataGrid
+            autoHeight
+            rows={pendingRows}
+            columns={pendingColumns}
+            disableRowSelectionOnClick
+            pageSizeOptions={[5, 10, 25]}
+            paginationModel={pendingPaginationModel}
+            onPaginationModelChange={setPendingPaginationModel}
+            getRowHeight={() => 'auto'}
+            sx={{
+              mb: 4,
+              borderRadius: 3,
+              boxShadow: theme.palette.mode === 'dark'
+                ? '0 4px 12px rgba(0,0,0,0.2)'
+                : '0 4px 12px rgba(0,0,0,0.1)',
+            }}
+          />
         </>
       )}
 
@@ -468,96 +532,23 @@ export default function AdminManagement() {
       <Typography variant="h6" sx={{ mt: 4, mb: 2, fontWeight: 600 }}>
         Admin Terdaftar
       </Typography>
-      <TableContainer component={Paper} elevation={0} sx={{ 
-        borderRadius: 3,
-        overflow: 'hidden',
-        boxShadow: theme.palette.mode === 'dark'
-          ? '0 4px 12px rgba(0,0,0,0.2)'
-          : '0 4px 12px rgba(0,0,0,0.1)',
-      }}>
-        <Table>
-          <TableHead sx={{ 
-            backgroundColor: theme.palette.mode === 'dark'
-              ? alpha(theme.palette.primary.main, 0.1)
-              : alpha(theme.palette.primary.main, 0.05)
-          }}>
-            <TableRow>
-              <TableCell>ID</TableCell>
-              <TableCell>Username</TableCell>
-              <TableCell>Nama</TableCell>
-              <TableCell>Role</TableCell>
-              <TableCell>Terdaftar</TableCell>
-              <TableCell align="right">Aksi</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {filteredAdmins.length > 0 ? (
-              filteredAdmins.map((admin) => (
-                <TableRow key={admin.id} hover>
-                  <TableCell>{admin.id}</TableCell>
-                  <TableCell>{admin.username}</TableCell>
-                  <TableCell>{admin.name}</TableCell>
-                  <TableCell>
-                    <Chip
-                      label={admin.role === 'superadmin' ? 'Super Admin' : 'Admin'}
-                      color={admin.role === 'superadmin' ? 'primary' : 'default'}
-                      size="small"
-                    />
-                  </TableCell>
-                  <TableCell>
-                    {new Date(admin.created_at).toLocaleDateString('id-ID', {
-                      day: 'numeric',
-                      month: 'short',
-                      year: 'numeric'
-                    })}
-                  </TableCell>
-                  <TableCell align="right">
-                    <IconButton 
-                      size="small" 
-                      onClick={() => handleEditAdmin(admin)}
-                      color="primary"
-                      disabled={admin.id === Number(user?.id) && admin.role === 'superadmin'}
-                      title={admin.id === Number(user?.id) && admin.role === 'superadmin' ? 
-                        "Anda tidak dapat mengedit akun superadmin Anda sendiri" : ""}
-                    >
-                      <EditIcon fontSize="small" />
-                    </IconButton>
-                    <IconButton 
-                      size="small" 
-                      onClick={() => handleDeleteAdmin(admin)}
-                      color="error"
-                      disabled={admin.id === Number(user?.id)}
-                      title={admin.id === Number(user?.id) ? "Anda tidak dapat menghapus akun Anda sendiri" : ""}
-                      sx={{ ml: 1 }}
-                    >
-                      <DeleteIcon fontSize="small" />
-                    </IconButton>
-                  </TableCell>
-                </TableRow>
-              ))
-            ) : (
-              <TableRow>
-                <TableCell colSpan={6} align="center" sx={{ py: 3 }}>
-                  <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', py: 2 }}>
-                    <AdminIcon sx={{ fontSize: 40, color: 'text.secondary', mb: 1 }} />
-                    <Typography variant="body1" color="text.secondary">
-                      Tidak ada data admin
-                    </Typography>
-                    <Button 
-                      variant="contained" 
-                      startIcon={<AddIcon />}
-                      onClick={handleAddAdmin}
-                      sx={{ mt: 2, borderRadius: 2 }}
-                    >
-                      Tambah Admin
-                    </Button>
-                  </Box>
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
-      </TableContainer>
+      <DataGrid
+        autoHeight
+        rows={rows}
+        columns={columns}
+        pageSizeOptions={[5, 10, 25]}
+        paginationModel={paginationModel}
+        onPaginationModelChange={setPaginationModel}
+        disableRowSelectionOnClick
+        getRowHeight={() => 'auto'}
+        sx={{
+          borderRadius: 3,
+          boxShadow: theme.palette.mode === 'dark'
+            ? '0 4px 12px rgba(0,0,0,0.2)'
+            : '0 4px 12px rgba(0,0,0,0.1)'
+        }}
+        localeText={{ noRowsLabel: 'Tidak ada data admin' }}
+      />
 
       {/* Admin Form Dialog */}
       <Dialog 
