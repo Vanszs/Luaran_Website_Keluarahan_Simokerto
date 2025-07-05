@@ -15,8 +15,28 @@ export function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL('/', request.url));
   }
   
-  // For role-based access control, we would need to decode the session
-  // or check a cached value - for now, we'll just allow access if logged in
+  // Decode the session cookie to get user role
+  let userRole: string | null = null;
+  try {
+    const decoded = Buffer.from(sessionCookie.value, 'base64').toString('utf8');
+    const sessionData = JSON.parse(decoded);
+    userRole = sessionData.role;
+  } catch (error) {
+    console.error('Error decoding session cookie:', error);
+    // If decoding fails, treat as unauthenticated
+    return NextResponse.redirect(new URL('/', request.url));
+  }
+
+  // Role-based redirection
+  if (pathname.startsWith('/admin')) {
+    if (userRole === 'admin') {
+      // Regular admin trying to access superadmin area, redirect to their dashboard
+      return NextResponse.redirect(new URL('/dashboard', request.url));
+    } else if (userRole === 'superadmin') {
+      // Superadmin can access /admin
+      return NextResponse.next();
+    }
+  }
   
   return NextResponse.next();
 }

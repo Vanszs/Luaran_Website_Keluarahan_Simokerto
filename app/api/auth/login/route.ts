@@ -44,7 +44,7 @@ export async function POST(req: NextRequest) {
     }
     
     // Generate a simple session ID
-    const sessionId = Date.now().toString() + Math.random().toString(36).substring(2);
+    const sessionId = Buffer.from(JSON.stringify({ id: userData.id, role: userData.role, username: userData.username, name: userData.name })).toString('base64');
     
     // Set secure HTTP-only cookie
     cookies().set({

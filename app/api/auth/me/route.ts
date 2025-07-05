@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
-import { query, checkDatabaseConnection } from '../../../../utils/db';
 
 export const dynamic = 'force-dynamic';
 
@@ -11,27 +10,41 @@ export async function GET(req: NextRequest) {
     
     if (!sessionCookie?.value) {
       return NextResponse.json(
-        { authenticated: false },
+        { authenticated: false, message: 'No active session' },
         { status: 401 }
       );
     }
     
-    // Check if database is available
-    const isDatabaseAvailable = await checkDatabaseConnection();
-    console.log(`Database available for auth check: ${isDatabaseAvailable}`);
+    let sessionData;
+    try {
+      const decoded = Buffer.from(sessionCookie.value, 'base64').toString('utf8');
+      sessionData = JSON.parse(decoded);
+    } catch (error) {
+      console.error('Error decoding session cookie in /api/auth/me:', error);
+      // If decoding fails, clear the cookie and return unauthenticated
+      cookies().set({
+        name: 'admin_session',
+        value: '',
+        expires: new Date(0),
+        path: '/',
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'strict',
+      });
+      return NextResponse.json({ authenticated: false, message: 'Invalid session data' }, { status: 401 });
+    }
+
+    // In a real application, you would want to verify the sessionData.id against a database
+    // to ensure the user still exists and the session is valid and not revoked.
+    // For this example, we'll assume the decoded data is sufficient for basic user info.
+    // You might want to fetch full user details (like name) from DB if not stored in session.
     
-    // In a real app with a sessions table, you'd do something like:
-    // const sessionData = await query('SELECT user_id FROM sessions WHERE id = ?', [sessionId]);
-    // const userId = sessionData[0]?.user_id;
-    // const userData = await query('SELECT id, username, name, role FROM admin WHERE id = ?', [userId]);
-    
-    // For now we'll return a mock user based on the existing credentials
-    // In a real app, you would fetch this from the database based on the session
+    // For now, we'll construct the user object from the sessionData
     const user = {
-      id: '1',
-      username: 'admin_kelurahan1',
-      name: 'Admin Simokerto',
-      role: 'superadmin'
+      id: sessionData.id,
+      username: sessionData.username || 'unknown', // Assuming username is in sessionData
+      name: sessionData.name || 'Unknown User', // Assuming name is in sessionData
+      role: sessionData.role,
     };
     
     return NextResponse.json({
@@ -43,6 +56,7 @@ export async function GET(req: NextRequest) {
     console.error('Auth check error:', error);
     return NextResponse.json(
       { 
+        authenticated: false,
         error: 'Authentication check failed',
         details: error instanceof Error ? error.message : String(error)
       },

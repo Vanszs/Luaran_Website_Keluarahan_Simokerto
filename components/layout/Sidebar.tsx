@@ -334,67 +334,56 @@ const Sidebar: React.FC<SidebarProps> = ({ open, onClose, variant = 'permanent' 
       }}
     >
       <ModernDrawerHeader>
-        <Stack direction="column" spacing={0.5}>
-          <Box sx={{ display: 'flex', alignItems: 'center' }}>
+        <Stack direction="column" spacing={0.5} sx={{ width: '100%' }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', width: '100%' }}>
             <Box
               sx={{
-                width: 44,
-                height: 44,
+                width: 40,
+                height: 40,
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                borderRadius: 2.5,
+                borderRadius: 2,
                 background: 'linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%)',
-                boxShadow: '0 8px 16px rgba(59, 130, 246, 0.4)',
-                mr: 2,
+                boxShadow: '0 6px 12px rgba(59, 130, 246, 0.3)',
+                mr: 1.5,
                 transition: 'all 0.3s ease',
                 '&:hover': {
                   transform: 'scale(1.05)',
-                  boxShadow: '0 12px 24px rgba(59, 130, 246, 0.5)',
+                  boxShadow: '0 8px 16px rgba(59, 130, 246, 0.4)',
                 },
               }}
             >
-              <Image src="/logo.png" alt="PINTAR Logo" width={28} height={28} />
+              <Image src="/logo.png" alt="PINTAR Logo" width={24} height={24} />
             </Box>
-            <Box>
-              <Typography 
-                variant="h6" 
-                sx={{ 
-                  fontWeight: 800,
+            <Box sx={{ flexGrow: 1 }}>
+              <Typography
+                variant="h6"
+                sx={{
+                  fontWeight: 700,
                   background: 'linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%)',
                   backgroundClip: 'text',
                   WebkitBackgroundClip: 'text',
                   WebkitTextFillColor: 'transparent',
                   lineHeight: 1.2,
+                  fontSize: '1.1rem',
                 }}
               >
                 PINTAR
               </Typography>
-              <Typography 
-                variant="caption" 
-                sx={{ 
+              <Typography
+                variant="caption"
+                sx={{
                   color: 'text.secondary',
                   fontWeight: 500,
-                  fontSize: '0.7rem',
+                  fontSize: '0.65rem',
                   letterSpacing: '0.5px',
+                  display: 'block',
                 }}
               >
                 Admin Panel
               </Typography>
             </Box>
-          </Box>
-          
-          <Box sx={{ pl: 0.5, pt: 0.5 }}>
-            <Typography 
-              variant="caption" 
-              sx={{ 
-                display: 'block',
-                fontSize: '0.65rem',
-                color: theme.palette.mode === 'dark' ? 'grey.400' : 'grey.600',
-              }}
-            >
-              Kota Surabaya
-            </Typography>
           </Box>
         </Stack>
         
