@@ -17,7 +17,7 @@ export async function PUT(
     
     // Check if admin exists and is pending
     const admins = await query(
-      'SELECT id FROM admin WHERE id = ? AND role IS NULL',
+      'SELECT id FROM admin WHERE id = ? AND pending = TRUE',
       [adminId]
     );
       
@@ -28,13 +28,13 @@ export async function PUT(
       );
     }
       
-      // Set role to 'admin'
+    // Set role to 'admin' and pending to FALSE
     await query(
-      'UPDATE admin SET role = ? WHERE id = ?',
+      'UPDATE admin SET role = ?, pending = FALSE WHERE id = ?',
       ['admin', adminId]
     );
       
-      return NextResponse.json({ message: 'Admin approved successfully' });
+    return NextResponse.json({ message: 'Admin approved successfully' });
   } catch (error) {
     console.error('Error approving admin:', error);
     return NextResponse.json(

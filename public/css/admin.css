@@ -1,0 +1,38 @@
+/* ...existing code... */
+
+/* Style for the brand link in the sidebar */
+.main-sidebar .brand-link {
+    display: flex; /* Use flexbox for alignment */
+    align-items: center; /* Vertically align items */
+    padding: 0.8125rem 0.5rem; /* Adjust padding as needed */
+    font-size: 1.25rem; /* Adjust font size if text is present */
+    line-height: 1.5;
+    white-space: nowrap;
+    transition: width .3s ease-in-out;
+}
+
+/* Style for the logo image */
+.main-sidebar .brand-link .brand-image {
+    float: left;
+    line-height: .8;
+    margin-left: 0.5rem; /* Adjust margin as needed */
+    margin-right: 0.5rem; /* Adjust margin as needed */
+    margin-top: 0;
+    max-height: 33px; /* Set a max height for the logo */
+    width: auto; /* Allow width to adjust proportionally */
+    /* Add border-radius if using img-circle */
+    border-radius: 50%;
+}
+
+/* Adjust text style if present */
+.main-sidebar .brand-link .brand-text {
+    font-weight: 300;
+    color: #c2c7d0; /* Adjust text color */
+}
+
+/* You might need to adjust styles based on your specific AdminLTE or theme version */
+/* For example, if the logo is also shown in the top navbar when collapsed */
+/* .main-header .navbar-brand { ... } */
+/* .main-header .navbar-brand img { ... } */
+
+/* ...existing code... */

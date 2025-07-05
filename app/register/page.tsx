@@ -175,7 +175,7 @@ function RegisterContent() {
         password: formData.password,
         name: formData.name
       });
-      router.push('/login?registered=true');
+      router.push('/?registered=true');
     } catch (err) {
       setErrors(prev => ({ 
         ...prev, 

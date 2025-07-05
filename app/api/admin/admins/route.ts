@@ -5,7 +5,7 @@ import { query } from '../../../../utils/db';
 export async function GET(request: NextRequest) {
   try {
     const admins = await query(
-      'SELECT id, username, name, role, created_at FROM admin WHERE role IS NOT NULL ORDER BY id DESC'
+      'SELECT id, username, name, role, created_at FROM admin WHERE pending = FALSE ORDER BY id DESC'
     );
 
     return NextResponse.json(admins);

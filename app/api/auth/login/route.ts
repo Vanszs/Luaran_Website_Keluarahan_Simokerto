@@ -20,9 +20,9 @@ export async function POST(req: NextRequest) {
     const isDatabaseAvailable = await checkDatabaseConnection();
     console.log(`Database available: ${isDatabaseAvailable}`);
     
-    // Query the database (with fallback to mock data)
+    // Query the database, including the pending status
     const results = await query(
-      'SELECT id, username, name, role FROM admin WHERE username = ? AND password = ?',
+      'SELECT id, username, name, role, pending FROM admin WHERE username = ? AND password = ?',
       [username, password]
     );
     
@@ -34,6 +34,14 @@ export async function POST(req: NextRequest) {
     }
     
     const userData = (results as any[])[0];
+    
+    // Check if the account is pending approval
+    if (userData.pending) {
+      return NextResponse.json(
+        { success: false, message: 'Your account is pending approval by an administrator.' },
+        { status: 401 }
+      );
+    }
     
     // Generate a simple session ID
     const sessionId = Date.now().toString() + Math.random().toString(36).substring(2);

@@ -18,6 +18,7 @@ import {
   Settings,
   Logout,
   DriveFolderUpload,
+  ExitToApp, // Added ExitToApp icon
 } from '@mui/icons-material';
 import Image from 'next/image';
 
@@ -90,33 +91,64 @@ export default function AdminSideMenu({ currentView, onViewChange }: AdminSideMe
             backdropFilter: 'blur(10px)',
             transition: 'all 300ms ease-in-out !important',
             position: 'relative',
+            display: 'flex', // Use flexbox for alignment
+            flexDirection: 'column', // Stack logo and text vertically
+            alignItems: 'center', // Center items horizontally
+            justifyContent: 'center', // Center items vertically
           }}
         >
           <Box
             sx={{
-              width: 56,
-              height: 56,
-              borderRadius: 4,
+              width: 48, // Slightly smaller logo container
+              height: 48, // Slightly smaller logo container
+              borderRadius: 3, // Slightly less rounded corners
               background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               mx: 'auto',
-              mb: 2,
+              mb: 1.5, // Reduced bottom margin
               boxShadow: theme => theme.palette.mode === 'dark'
-                ? '0 8px 24px rgba(102,126,234,0.4), 0 4px 12px rgba(102,126,234,0.3), inset 0 1px 0 rgba(255,255,255,0.2)'
-                : '0 8px 24px rgba(102,126,234,0.2), 0 4px 12px rgba(102,126,234,0.1), inset 0 1px 0 rgba(255,255,255,0.8)',
+                ? '0 6px 18px rgba(102,126,234,0.3), 0 3px 9px rgba(102,126,234,0.2), inset 0 1px 0 rgba(255,255,255,0.15)'
+                : '0 6px 18px rgba(102,126,234,0.15), 0 3px 9px rgba(102,126,234,0.08), inset 0 1px 0 rgba(255,255,255,0.7)',
               border: theme => `1px solid ${theme.palette.divider}`,
+              transition: 'all 300ms ease-in-out', // Add transition
+              '&:hover': {
+                transform: 'scale(1.05)', // Add hover effect
+                boxShadow: theme => theme.palette.mode === 'dark'
+                  ? '0 8px 24px rgba(102,126,234,0.4), 0 4px 12px rgba(102,126,234,0.3), inset 0 1px 0 rgba(255,255,255,0.2)'
+                  : '0 8px 24px rgba(102,126,234,0.2), 0 4px 12px rgba(102,126,234,0.1), inset 0 1px 0 rgba(255,255,255,0.8)',
+              }
             }}
           >
-            <Image src="/logo.png" alt="Logo" width={32} height={32} style={{ borderRadius: '8px' }} />
+            <Image src="/logo.png" alt="Logo" width={30} height={30} style={{ borderRadius: '6px' }} /> {/* Slightly smaller image */}
           </Box>
           <Typography
             variant="h6"
-            sx={{ fontWeight: 800, fontSize: '1.1rem', color: 'text.primary' }}
+            sx={{
+              fontWeight: 700, // Slightly less bold
+              fontSize: '1rem', // Slightly smaller font size
+              color: 'text.primary',
+              letterSpacing: '0.05em', // Add slight letter spacing
+              textTransform: 'uppercase', // Uppercase text
+            }}
           >
             Portal Admin
           </Typography>
+           {/* You can add a subtitle here if needed */}
+           {/*
+           <Typography
+            variant="body2"
+            sx={{
+              fontWeight: 400,
+              fontSize: '0.8rem',
+              color: 'text.secondary',
+              mt: 0.5,
+            }}
+           >
+             Kota Surabaya
+           </Typography>
+           */}
         </Box>
 
         <Box sx={{ flex: 1, p: 2 }}>
@@ -238,7 +270,7 @@ export default function AdminSideMenu({ currentView, onViewChange }: AdminSideMe
               primary="Keluar"
               primaryTypographyProps={{ fontSize: '0.9rem', fontWeight: 600, color: 'text.primary' }}
             />
-            <Logout sx={{ fontSize: 20, color: 'error.main' }} />
+            <ExitToApp sx={{ fontSize: 20, color: 'error.main' }} /> {/* Changed icon to ExitToApp */}
           </ListItemButton>
         </Box>
       </Box>

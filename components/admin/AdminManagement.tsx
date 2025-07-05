@@ -48,7 +48,8 @@ interface Admin {
   username: string;
   name: string | null;
   created_at: string;
-  role: 'superadmin' | 'admin';
+  role: 'superadmin' | 'admin' | null; // Allow null for pending admins
+  pending: boolean; // Add pending status
 }
 
 export default function AdminManagement() {
@@ -131,7 +132,7 @@ export default function AdminManagement() {
       username: admin.username,
       name: admin.name || '',
       password: '', // Don't prefill password when editing
-      role: admin.role,
+      role: admin.role!, // Assert non-null as edit is only for approved admins
     });
     setAdminDialog({
       open: true,

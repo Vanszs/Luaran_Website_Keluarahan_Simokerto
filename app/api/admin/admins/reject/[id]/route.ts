@@ -17,7 +17,7 @@ export async function DELETE(
     
     // Check if admin exists and is pending
     const admins = await query(
-      'SELECT id FROM admin WHERE id = ? AND role IS NULL',
+      'SELECT id FROM admin WHERE id = ? AND pending = TRUE',
       [adminId]
     );
       
@@ -28,13 +28,13 @@ export async function DELETE(
       );
     }
       
-      // Delete the admin
+    // Delete the admin
     await query(
       'DELETE FROM admin WHERE id = ?',
       [adminId]
     );
       
-      return NextResponse.json({ message: 'Admin rejected successfully' });
+    return NextResponse.json({ message: 'Admin rejected successfully' });
   } catch (error) {
     console.error('Error rejecting admin:', error);
     return NextResponse.json(
