@@ -1,6 +1,7 @@
 /* Prevent horizontal overflow and ensure smooth experience */
 html, body {
   overflow-x: hidden;
+  overflow-y: scroll; /* Always show scrollbar track to prevent layout shift */
   max-width: 100vw;
   scroll-behavior: smooth;
 }
@@ -110,8 +111,15 @@ button, a, input, textarea, select {
 }
 
 @keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.7; }
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+  }
 }
 
 @keyframes shimmer {
@@ -186,4 +194,68 @@ button, a, input, textarea, select {
 
 .modern-button:hover::before {
   left: 100%;
+}
+
+/* Notification menu and dropdown styling */
+.notification-menu {
+  position: relative;
+  display: inline-block;
+}
+
+.notification-dropdown {
+  /* This styling is now handled by MUI's Menu PaperProps sx prop */
+}
+
+.notification-item {
+  /* This styling is now handled by MUI's MenuItem sx prop */
+}
+
+.notification-item:last-child {
+  border-bottom: none;
+}
+
+.notification-item.unread {
+  background-color: var(--unread-notification-bg, #e3f2fd); /* Light blue for unread */
+  font-weight: 600; /* Make unread notifications stand out */
+}
+
+.notification-item:hover {
+  background-color: var(--hover-color, #f0f0f0);
+  transform: translateX(5px); /* Slight slide effect on hover */
+}
+
+.notification-item p {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--text-primary);
+}
+
+.notification-item small {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+}
+
+.no-notifications {
+  /* This styling is now handled by MUI's MenuItem sx prop */
+}
+
+/* Dark mode adjustments */
+body.dark {
+  --background-color: #1a202c; /* Slightly darker background for better contrast */
+  --text-primary: #e2e8f0;
+  --text-secondary: #ffffff; /* Pure white in dark mode */
+  --border-color: #2d3748;
+  --unread-notification-bg: #2c5282; /* Deeper blue for unread in dark mode */
+  --unread-notification-bg-hover: #3182ce; /* Brighter blue hover for unread in dark mode */
+  --hover-color: #2d3748; /* Darker hover for dark mode */
+}
+
+body { /* Light mode */
+  --background-color: #ffffff;
+  --text-primary: #2d3748;
+  --text-secondary: #000000; /* Pure black in light mode */
+  --border-color: #e2e8f0;
+  --unread-notification-bg: #ebf8ff; /* Very light blue for unread in light mode */
+  --unread-notification-bg-hover: #bee3f8; /* Slightly darker blue hover for unread in light mode */
+  --hover-color: #f7fafc; /* Very light gray for hover in light mode */
 }

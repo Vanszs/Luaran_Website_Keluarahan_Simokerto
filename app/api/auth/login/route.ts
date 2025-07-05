@@ -53,7 +53,7 @@ export async function POST(req: NextRequest) {
       httpOnly: true,
       path: '/',
       secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
+      sameSite: 'lax',
       // 7 day expiration
       maxAge: 7 * 24 * 60 * 60
     });

@@ -18,7 +18,7 @@ export async function POST(request: NextRequest) {
         path: '/',
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
-        sameSite: 'strict',
+        sameSite: 'lax', // Changed from "strict" to "lax"
       });
     }
     

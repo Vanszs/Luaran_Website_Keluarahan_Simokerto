@@ -34,6 +34,12 @@ export async function POST(req: NextRequest) {
       [username, password, name, 'admin']
     );
     
+    // Insert notification for superadmin about new pending admin
+    await query(
+      'INSERT INTO notifications (message, user_role, is_read, created_at) VALUES (?, ?, FALSE, NOW())',
+      [`New admin registration: ${name} (${username}) is pending approval.`, 'superadmin']
+    );
+    
     return NextResponse.json(
       { message: 'Registration successful. Waiting for approval.' },
       { status: 201 }

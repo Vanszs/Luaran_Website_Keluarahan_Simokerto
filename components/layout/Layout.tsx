@@ -22,17 +22,18 @@ import {
 import { styled, keyframes, alpha } from '@mui/material/styles';
 import {
   Menu as MenuIcon,
-  Notifications as NotificationsIcon,
   Person as PersonIcon,
   Settings as SettingsIcon,
   Logout as LogoutIcon,
   Home as HomeIcon,
+  Notifications as NotificationsIcon,
 } from '@mui/icons-material';
 import { useRouter, usePathname } from 'next/navigation';
 import { useAuth } from '../../contexts/AuthContext';
 import Sidebar from './Sidebar';
 import ColorModeSelect from '../../shared-theme/ColorModeSelect';
 import NextLink from 'next/link';
+import { NotificationMenu } from '../NotificationMenu'; // Import NotificationMenu
 
 // Modern animations
 const fadeInUp = keyframes`
@@ -156,7 +157,7 @@ const Layout: React.FC<LayoutProps> = ({ children, title = 'PINTAR Admin' }) => 
   const isSmallScreen = useMediaQuery(theme.breakpoints.down('md'));
   const [drawerOpen, setDrawerOpen] = useState(!isSmallScreen);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const [notificationAnchorEl, setNotificationAnchorEl] = useState<null | HTMLElement>(null);
+  const [notificationAnchorEl, setNotificationAnchorEl] = useState<null | HTMLElement>(null); // Re-add notificationAnchorEl
   const { user, logout } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
@@ -173,11 +174,11 @@ const Layout: React.FC<LayoutProps> = ({ children, title = 'PINTAR Admin' }) => 
     setAnchorEl(null);
   };
 
-  const handleNotificationMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
+  const handleNotificationMenuOpen = (event: React.MouseEvent<HTMLElement>) => { // Re-add handler
     setNotificationAnchorEl(event.currentTarget);
   };
 
-  const handleNotificationMenuClose = () => {
+  const handleNotificationMenuClose = () => { // Re-add handler
     setNotificationAnchorEl(null);
   };
 
@@ -266,7 +267,7 @@ const Layout: React.FC<LayoutProps> = ({ children, title = 'PINTAR Admin' }) => 
             aria-label="toggle drawer"
             edge="start"
             onClick={() => setDrawerOpen(!drawerOpen)}
-            sx={{ 
+            sx={{
               mr: 2,
               borderRadius: 2,
               transition: 'all 0.3s ease',
@@ -336,7 +337,7 @@ const Layout: React.FC<LayoutProps> = ({ children, title = 'PINTAR Admin' }) => 
               <Typography 
                 variant="h6" 
                 noWrap 
-                sx={{ 
+                sx={{
                   fontWeight: 700,
                   background: theme.palette.mode === 'dark'
                     ? 'linear-gradient(135deg, #ffffff 0%, #cbd5e1 100%)'
@@ -371,39 +372,18 @@ const Layout: React.FC<LayoutProps> = ({ children, title = 'PINTAR Admin' }) => 
             <ColorModeSelect sx={{
               borderRadius: 2,
               backgroundColor: theme.palette.mode === 'dark'
-                ? 'rgba(255,255,255,0.08)'
-                : 'transparent',
+                ? '#333333' // Solid dark background
+                : '#f0f0f0', // Solid light background
               '&:hover': {
                 transform: 'scale(1.05)',
                 backgroundColor: theme.palette.mode === 'dark'
-                  ? 'rgba(255,255,255,0.16)'
-                  : 'rgba(0,0,0,0.08)',
+                  ? '#555555' // Darker hover for dark mode
+                  : '#e0e0e0', // Darker hover for light mode
               },
             }} />
             
-            <Tooltip title="Notifications" arrow>
-              <IconButton
-                color="inherit"
-                onClick={handleNotificationMenuOpen}
-                sx={{
-                  borderRadius: 2,
-                  transition: 'all 0.3s ease',
-              backgroundColor: theme.palette.mode === 'dark'
-                    ? 'rgba(255,255,255,0.08)'
-                    : 'transparent',
-              '&:hover': {
-                transform: 'scale(1.05)',
-                backgroundColor: theme.palette.mode === 'dark'
-                      ? 'rgba(255,255,255,0.16)'
-                      : 'rgba(0,0,0,0.08)',
-              },
-            }}
-              >
-                <Badge badgeContent={3} color="error">
-                  <NotificationsIcon />
-                </Badge>
-              </IconButton>
-            </Tooltip>
+            {/* Notification Menu - Now a self-contained component */}
+            <NotificationMenu />
             
             <Tooltip title="Account" arrow>
               <IconButton
@@ -455,6 +435,57 @@ const Layout: React.FC<LayoutProps> = ({ children, title = 'PINTAR Admin' }) => 
           </Fade>
         </ContentWrapper>
       </MainContent>
+
+      <Menu
+        anchorEl={anchorEl}
+        open={Boolean(anchorEl)}
+        onClose={handleProfileMenuClose}
+        PaperProps={{
+          elevation: 0,
+          sx: {
+            overflow: 'visible',
+            filter: 'drop-shadow(0px 2px 8px rgba(0,0,0,0.32))',
+            mt: 1.5,
+            '& .MuiAvatar-root': {
+              width: 32,
+              height: 32,
+              ml: -0.5,
+              mr: 1,
+            },
+            '&:before': {
+              content: '""',
+              display: 'block',
+              position: 'absolute',
+              top: 0,
+              right: 14,
+              width: 10,
+              height: 10,
+              bgcolor: 'background.paper',
+              transform: 'translateY(-50%) rotate(45deg)',
+              zIndex: 0,
+            },
+          },
+        }}
+        transformOrigin={{ horizontal: 'right', vertical: 'top' }}
+        anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
+      >
+        <MenuItem onClick={handleProfileMenuClose}>
+          <Avatar /> My account
+        </MenuItem>
+        <Divider />
+        <MenuItem onClick={handleProfileMenuClose}>
+          <ListItemIcon>
+            <SettingsIcon fontSize="small" />
+          </ListItemIcon>
+          Settings
+        </MenuItem>
+        <MenuItem onClick={handleLogout}>
+          <ListItemIcon>
+            <LogoutIcon fontSize="small" />
+          </ListItemIcon>
+          Logout
+        </MenuItem>
+      </Menu>
     </LayoutContainer>
   );
 };
