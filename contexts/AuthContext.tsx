@@ -2,6 +2,7 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import LoadingScreen from '../components/LoadingScreen';
 
 // Define proper interfaces for type safety
 interface User {
@@ -141,6 +142,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   return (
     <AuthContext.Provider value={value}>
+      {loading && <LoadingScreen message="Memeriksa akses..." />}
       {children}
     </AuthContext.Provider>
   );

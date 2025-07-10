@@ -261,22 +261,32 @@ const getDesignTokens = (mode) => ({
 
 export default function AppTheme({ children }) {
   const [mode, setMode] = useState('light');
+  const [isHydrated, setIsHydrated] = useState(false);
+  
+  // Check if component is hydrated (client-side)
+  useEffect(() => {
+    setIsHydrated(true);
+  }, []);
   
   // Try to load saved theme preference on first render
   useEffect(() => {
-    const savedMode = localStorage.getItem('colorMode');
-    if (savedMode) {
-      setMode(savedMode);
-    } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-      // Use system preference as fallback
-      setMode('dark');
+    if (isHydrated) {
+      const savedMode = localStorage.getItem('colorMode');
+      if (savedMode && (savedMode === 'light' || savedMode === 'dark')) {
+        setMode(savedMode);
+      } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        // Use system preference as fallback
+        setMode('dark');
+      }
     }
-  }, []);
+  }, [isHydrated]);
   
   // Update localStorage when mode changes
   useEffect(() => {
-    localStorage.setItem('colorMode', mode);
-  }, [mode]);
+    if (isHydrated) {
+      localStorage.setItem('colorMode', mode);
+    }
+  }, [mode, isHydrated]);
   
   const colorMode = useMemo(
     () => ({

@@ -3,7 +3,7 @@
 import React, { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '../contexts/AuthContext';
-import { Box, CircularProgress, Typography } from '@mui/material';
+import LoadingScreen from './LoadingScreen';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -39,21 +39,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   }, [loading, user, allowedRoles, router]);
   
   if (loading) {
-    return (
-      <Box sx={{ 
-        display: 'flex', 
-        justifyContent: 'center', 
-        alignItems: 'center', 
-        height: '100vh',
-        flexDirection: 'column',
-        gap: 2
-      }}>
-        <CircularProgress size={40} />
-        <Typography variant="body1" color="text.secondary">
-          Memeriksa akses...
-        </Typography>
-      </Box>
-    );
+    return <LoadingScreen message="Memverifikasi akses..." />;
   }
   
   if (!user || !allowedRoles.includes(user.role)) {

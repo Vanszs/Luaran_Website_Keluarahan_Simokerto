@@ -14,6 +14,7 @@ import {
   Card,
   CardActions,
   Paper,
+  Skeleton,
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import {
@@ -28,6 +29,7 @@ import {
   Groups,
 } from '@mui/icons-material';
 import { useMockApi } from '../hooks/useMockApi';
+import { useIndividualStats } from '../hooks/useIndividualStats';
 
 interface DashboardHomeProps {
   onViewChange: (view: string) => void;
@@ -141,6 +143,9 @@ export default function DashboardHome({ onViewChange }: DashboardHomeProps) {
   const theme = useTheme();
   const [currentTime, setCurrentTime] = React.useState(new Date());
   const { submissions, users } = useMockApi();
+  
+  // Use individual stats hook with separate loading for each stat
+  const { todayReports, totalReports, totalUsers, activeAdmins } = useIndividualStats();
 
   React.useEffect(() => {
     const timer = setInterval(() => {
@@ -189,10 +194,38 @@ export default function DashboardHome({ onViewChange }: DashboardHomeProps) {
   ];
 
   const stats = [
-    { title: 'Total User Warga', value: String(users.length), icon: <Groups />, color: theme.palette.info.main },
-    { title: 'Pengajuan Baru', value: String(submissions.filter(s => s.status === 'pending').length), icon: <Description />, color: theme.palette.primary.main },
-    { title: 'Diproses', value: String(submissions.filter(s => s.status === 'processing').length), icon: <Pending />, color: theme.palette.warning.main },
-    { title: 'Selesai', value: String(submissions.filter(s => s.status === 'approved').length), icon: <CheckCircle />, color: theme.palette.success.main },
+    { 
+      title: 'Laporan Hari Ini', 
+      value: todayReports.isLoading ? undefined : String(todayReports.value), 
+      icon: <Description />, 
+      color: theme.palette.primary.main,
+      loading: todayReports.isLoading,
+      error: todayReports.error
+    },
+    { 
+      title: 'Total Laporan', 
+      value: totalReports.isLoading ? undefined : String(totalReports.value), 
+      icon: <CheckCircle />, 
+      color: theme.palette.success.main,
+      loading: totalReports.isLoading,
+      error: totalReports.error
+    },
+    { 
+      title: 'Total User Warga', 
+      value: totalUsers.isLoading ? undefined : String(totalUsers.value), 
+      icon: <Groups />, 
+      color: theme.palette.info.main,
+      loading: totalUsers.isLoading,
+      error: totalUsers.error
+    },
+    { 
+      title: 'Admin Aktif', 
+      value: activeAdmins.isLoading ? undefined : String(activeAdmins.value), 
+      icon: <Settings />, 
+      color: theme.palette.warning.main,
+      loading: activeAdmins.isLoading,
+      error: activeAdmins.error
+    },
   ];
 
   return (
@@ -341,25 +374,45 @@ export default function DashboardHome({ onViewChange }: DashboardHomeProps) {
                           width: 48,
                           height: 48,
                           borderRadius: 1,
-                          background: alpha(stat.color, 0.1),
+                          background: stat.loading ? alpha(theme.palette.grey[500], 0.1) : alpha(stat.color, 0.1),
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'center',
-                          color: stat.color,
+                          color: stat.loading ? theme.palette.grey[500] : stat.color,
                         }}
                       >
-                        {React.cloneElement(stat.icon, { sx: { fontSize: 24 } })}
+                        {stat.loading ? (
+                          <Skeleton variant="circular" width={24} height={24} />
+                        ) : (
+                          React.cloneElement(stat.icon, { sx: { fontSize: 24 } })
+                        )}
                       </Box>
                       <Box sx={{ flex: 1 }}>
                         <Typography variant="h4" sx={{ 
                           fontWeight: 700, 
-                          color: stat.color, 
+                          color: stat.loading ? 'text.secondary' : stat.color, 
                           mb: 0.5 
                         }}>
-                          {stat.value}
+                          {stat.loading ? (
+                            <Skeleton variant="text" width={60} height={40} />
+                          ) : stat.error ? (
+                            <Typography variant="body2" color="error">
+                              Error
+                            </Typography>
+                          ) : (
+                            stat.value
+                          )}
                         </Typography>
                         <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 500 }}>
-                          {stat.title}
+                          {stat.loading ? (
+                            <Skeleton variant="text" width={100} height={20} />
+                          ) : stat.error ? (
+                            <Typography variant="caption" color="error">
+                              {stat.error}
+                            </Typography>
+                          ) : (
+                            stat.title
+                          )}
                         </Typography>
                       </Box>
                     </Stack>

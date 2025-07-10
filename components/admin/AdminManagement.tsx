@@ -59,6 +59,15 @@ export default function AdminManagement() {
   const [pendingAdmins, setPendingAdmins] = useState<Admin[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
+  
+  // Loading states for different operations
+  const [loadingStates, setLoadingStates] = useState({
+    approve: {} as Record<number, boolean>,
+    reject: {} as Record<number, boolean>,
+    delete: {} as Record<number, boolean>,
+    submit: false,
+  });
+  
   const [adminDialog, setAdminDialog] = useState({
     open: false,
     admin: null as Admin | null,
@@ -205,6 +214,12 @@ export default function AdminManagement() {
   };
 
   const submitAdminForm = async () => {
+    // Set loading state
+    setLoadingStates(prev => ({
+      ...prev,
+      submit: true
+    }));
+    
     try {
       const url = adminDialog.mode === 'add' 
         ? '/api/admin/admins' 
@@ -242,10 +257,22 @@ export default function AdminManagement() {
         message: error instanceof Error ? error.message : 'Failed to save admin',
         severity: 'error'
       });
+    } finally {
+      // Clear loading state
+      setLoadingStates(prev => ({
+        ...prev,
+        submit: false
+      }));
     }
   };
 
   const confirmDeleteAdmin = async (adminId: number) => {
+    // Set loading state
+    setLoadingStates(prev => ({
+      ...prev,
+      delete: { ...prev.delete, [adminId]: true }
+    }));
+    
     try {
       const response = await fetch(`/api/admin/admins/${adminId}`, {
         method: 'DELETE'
@@ -271,11 +298,22 @@ export default function AdminManagement() {
         severity: 'error'
       });
     } finally {
+      // Clear loading state
+      setLoadingStates(prev => ({
+        ...prev,
+        delete: { ...prev.delete, [adminId]: false }
+      }));
       setConfirmDialog({ ...confirmDialog, open: false });
     }
   };
 
   const confirmApproveAdmin = async (adminId: number, selectedRole: 'admin' | 'petugas' | 'superadmin') => {
+    // Set loading state
+    setLoadingStates(prev => ({
+      ...prev,
+      approve: { ...prev.approve, [adminId]: true }
+    }));
+    
     try {
       const response = await fetch(`/api/admin/admins/approve/${adminId}`, {
         method: 'PUT',
@@ -318,11 +356,22 @@ export default function AdminManagement() {
         severity: 'error'
       });
     } finally {
+      // Clear loading state
+      setLoadingStates(prev => ({
+        ...prev,
+        approve: { ...prev.approve, [adminId]: false }
+      }));
       setConfirmDialog({ ...confirmDialog, open: false });
     }
   };
 
   const confirmRejectAdmin = async (adminId: number) => {
+    // Set loading state
+    setLoadingStates(prev => ({
+      ...prev,
+      reject: { ...prev.reject, [adminId]: true }
+    }));
+    
     try {
       const response = await fetch(`/api/admin/admins/reject/${adminId}`, {
         method: 'DELETE'
@@ -348,6 +397,11 @@ export default function AdminManagement() {
         severity: 'error'
       });
     } finally {
+      // Clear loading state
+      setLoadingStates(prev => ({
+        ...prev,
+        reject: { ...prev.reject, [adminId]: false }
+      }));
       setConfirmDialog({ ...confirmDialog, open: false });
     }
   };
@@ -493,18 +547,22 @@ export default function AdminManagement() {
                       size="small"
                       color="success"
                       onClick={() => handleApproveAdmin(admin)}
+                      disabled={loadingStates.approve[admin.id] || loadingStates.reject[admin.id]}
                       sx={{ mr: 1, borderRadius: 2 }}
+                      startIcon={loadingStates.approve[admin.id] ? <CircularProgress size={16} /> : null}
                     >
-                      Setujui
+                      {loadingStates.approve[admin.id] ? 'Processing...' : 'Setujui'}
                     </Button>
                     <Button
                       variant="outlined"
                       size="small"
                       color="error"
                       onClick={() => handleRejectAdmin(admin)}
+                      disabled={loadingStates.approve[admin.id] || loadingStates.reject[admin.id]}
                       sx={{ borderRadius: 2 }}
+                      startIcon={loadingStates.reject[admin.id] ? <CircularProgress size={16} /> : null}
                     >
-                      Tolak
+                      {loadingStates.reject[admin.id] ? 'Processing...' : 'Tolak'}
                     </Button>
                   </TableCell>
                 </TableRow>
@@ -699,8 +757,13 @@ export default function AdminManagement() {
           <Button onClick={() => setAdminDialog({ ...adminDialog, open: false })}>
             Batal
           </Button>
-          <Button onClick={submitAdminForm} variant="contained">
-            Simpan
+          <Button 
+            onClick={submitAdminForm} 
+            variant="contained"
+            disabled={loadingStates.submit}
+            startIcon={loadingStates.submit ? <CircularProgress size={16} /> : null}
+          >
+            {loadingStates.submit ? 'Menyimpan...' : 'Simpan'}
           </Button>
         </DialogActions>
       </Dialog>
