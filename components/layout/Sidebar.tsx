@@ -43,7 +43,7 @@ import { useAuth } from '../../contexts/AuthContext';
 // Constants
 const drawerWidth = 280;
 
-// Modern Sidebar with glassmorphism - updated with proper z-index
+// Modern Sidebar with glassmorphism - updated with proper z-index and no gaps
 const ModernDrawer = styled(Drawer)(({ theme }) => ({
   width: drawerWidth,
   flexShrink: 0,
@@ -54,10 +54,8 @@ const ModernDrawer = styled(Drawer)(({ theme }) => ({
       ? 'linear-gradient(135deg, rgba(15, 23, 42, 0.95) 0%, rgba(30, 41, 59, 0.95) 100%)'
       : 'linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 250, 252, 0.95) 100%)',
     backdropFilter: 'blur(20px)',
-    borderRight: `1px solid ${theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.08)'}`,
-    boxShadow: theme.palette.mode === 'dark'
-      ? '4px 0 20px rgba(0, 0, 0, 0.3)'
-      : '4px 0 20px rgba(0, 0, 0, 0.08)',
+    borderRight: 'none', // Remove border to eliminate visual gap
+    boxShadow: 'none', // Remove shadow to eliminate visual gap
     transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
     overflowX: 'hidden',
     position: 'fixed',
@@ -69,7 +67,7 @@ const ModernDrawer = styled(Drawer)(({ theme }) => ({
   },
 }));
 
-// Modern header with animation - Removed extra padding since we added paddingTop to the drawer
+// Modern header with animation - Removed extra padding and borders for seamless connection
 const ModernDrawerHeader = styled('div')(({ theme }) => ({
   display: 'flex',
   alignItems: 'center',
@@ -80,7 +78,7 @@ const ModernDrawerHeader = styled('div')(({ theme }) => ({
     ? 'rgba(30, 41, 59, 0.95)' // More opaque for better contrast
     : 'rgba(255, 255, 255, 0.95)', // More opaque for better contrast
   backdropFilter: 'blur(10px)',
-  borderBottom: `1px solid ${theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.08)'}`,
+  borderBottom: 'none', // Remove border for seamless connection
   position: 'sticky',
   top: 0,
   zIndex: 10,

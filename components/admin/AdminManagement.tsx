@@ -109,16 +109,27 @@ export default function AdminManagement() {
   const fetchAdmins = async () => {
     setLoading(true);
     try {
+      console.log('Fetching admins and pending admins...');
       const adminsResponse = await fetch('/api/admin/admins');
       const pendingResponse = await fetch('/api/admin/admins/pending');
+
+      console.log('Admin response status:', adminsResponse.status);
+      console.log('Pending response status:', pendingResponse.status);
 
       if (adminsResponse.ok && pendingResponse.ok) {
         const adminsData = await adminsResponse.json();
         const pendingData = await pendingResponse.json();
         
+        console.log('Admins data:', adminsData);
+        console.log('Pending data:', pendingData);
+        
         setAdmins(adminsData);
         setPendingAdmins(pendingData);
       } else {
+        console.error('Failed to fetch admins:', {
+          adminsStatus: adminsResponse.status,
+          pendingStatus: pendingResponse.status
+        });
         throw new Error('Failed to fetch admins');
       }
     } catch (error) {
@@ -427,79 +438,94 @@ export default function AdminManagement() {
         />
       </Paper>
 
+
+
       {/* Pending Admins Section */}
-      {pendingAdmins.length > 0 && (
-        <>
-          <Typography variant="h6" sx={{ mt: 4, mb: 2, fontWeight: 600 }}>
-            Admin Menunggu Persetujuan
-          </Typography>
-          <TableContainer component={Paper} elevation={0} sx={{ 
-            borderRadius: 3,
-            overflow: 'hidden',
-            mb: 4,
-            boxShadow: theme.palette.mode === 'dark'
-              ? '0 4px 12px rgba(0,0,0,0.2)'
-              : '0 4px 12px rgba(0,0,0,0.1)',
-            padding: 0.5, // Add padding to separate container border from table
-            background: theme.palette.mode === 'dark'
-              ? alpha(theme.palette.background.paper, 0.8)
-              : alpha(theme.palette.background.paper, 0.8),
-          }}>
-            <Table>
-              <TableHead sx={{ 
-                backgroundColor: theme.palette.mode === 'dark'
-                  ? alpha(theme.palette.warning.main, 0.1)
-                  : alpha(theme.palette.warning.main, 0.05)
-              }}>
-                <TableRow>
-                  <TableCell>ID</TableCell>
-                  <TableCell>Username</TableCell>
-                  <TableCell>Nama</TableCell>
-                  <TableCell>Mendaftar Pada</TableCell>
-                  <TableCell align="right">Aksi</TableCell>
+      <Typography variant="h6" sx={{ mt: 4, mb: 2, fontWeight: 600 }}>
+        Admin Menunggu Persetujuan
+      </Typography>
+      
+      {pendingAdmins.length > 0 ? (
+        <TableContainer component={Paper} elevation={0} sx={{ 
+          borderRadius: 3,
+          overflow: 'hidden',
+          mb: 4,
+          boxShadow: theme.palette.mode === 'dark'
+            ? '0 4px 12px rgba(0,0,0,0.2)'
+            : '0 4px 12px rgba(0,0,0,0.1)',
+          padding: 0.5, // Add padding to separate container border from table
+          background: theme.palette.mode === 'dark'
+            ? alpha(theme.palette.background.paper, 0.8)
+            : alpha(theme.palette.background.paper, 0.8),
+        }}>
+          <Table>
+            <TableHead sx={{ 
+              backgroundColor: theme.palette.mode === 'dark'
+                ? alpha(theme.palette.warning.main, 0.1)
+                : alpha(theme.palette.warning.main, 0.05)
+            }}>
+              <TableRow>
+                <TableCell>ID</TableCell>
+                <TableCell>Username</TableCell>
+                <TableCell>Nama</TableCell>
+                <TableCell>Mendaftar Pada</TableCell>
+                <TableCell align="right">Aksi</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {pendingAdmins.map((admin) => (
+                <TableRow key={admin.id} hover>
+                  <TableCell>{admin.id}</TableCell>
+                  <TableCell>{admin.username}</TableCell>
+                  <TableCell>{admin.name}</TableCell>
+                  <TableCell>
+                    {new Date(admin.created_at).toLocaleDateString('id-ID', {
+                      day: 'numeric',
+                      month: 'short',
+                      year: 'numeric',
+                      hour: '2-digit',
+                      minute: '2-digit',
+                    })}
+                  </TableCell>
+                  <TableCell align="right">
+                    <Button
+                      variant="contained"
+                      size="small"
+                      color="success"
+                      onClick={() => handleApproveAdmin(admin)}
+                      sx={{ mr: 1, borderRadius: 2 }}
+                    >
+                      Setujui
+                    </Button>
+                    <Button
+                      variant="outlined"
+                      size="small"
+                      color="error"
+                      onClick={() => handleRejectAdmin(admin)}
+                      sx={{ borderRadius: 2 }}
+                    >
+                      Tolak
+                    </Button>
+                  </TableCell>
                 </TableRow>
-              </TableHead>
-              <TableBody>
-                {pendingAdmins.map((admin) => (
-                  <TableRow key={admin.id} hover>
-                    <TableCell>{admin.id}</TableCell>
-                    <TableCell>{admin.username}</TableCell>
-                    <TableCell>{admin.name}</TableCell>
-                    <TableCell>
-                      {new Date(admin.created_at).toLocaleDateString('id-ID', {
-                        day: 'numeric',
-                        month: 'short',
-                        year: 'numeric',
-                        hour: '2-digit',
-                        minute: '2-digit',
-                      })}
-                    </TableCell>
-                    <TableCell align="right">
-                      <Button
-                        variant="contained"
-                        size="small"
-                        color="success"
-                        onClick={() => handleApproveAdmin(admin)}
-                        sx={{ mr: 1, borderRadius: 2 }}
-                      >
-                        Setujui
-                      </Button>
-                      <Button
-                        variant="outlined"
-                        size="small"
-                        color="error"
-                        onClick={() => handleRejectAdmin(admin)}
-                        sx={{ borderRadius: 2 }}
-                      >
-                        Tolak
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
-        </>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      ) : (
+        <Paper sx={{ 
+          p: 3, 
+          textAlign: 'center', 
+          borderRadius: 3,
+          mb: 4,
+          bgcolor: theme.palette.mode === 'dark' 
+            ? alpha(theme.palette.info.main, 0.1) 
+            : alpha(theme.palette.info.main, 0.05)
+        }}>
+          <Typography variant="body1" color="text.secondary">
+            {loading ? 'Loading pending admins...' : 'Tidak ada admin yang menunggu persetujuan'}
+          </Typography>
+        </Paper>
       )}
 
       {/* Approved Admins Section */}

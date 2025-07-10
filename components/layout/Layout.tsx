@@ -59,9 +59,9 @@ const slideInRight = keyframes`
 `;
 
 // Constants
-const drawerWidth = 280;
+const drawerWidth = 0;
 
-// Modern Layout Container - No margin issues
+// Modern Layout Container - No margin issues, seamless connection
 const LayoutContainer = styled(Box)(({ theme }) => ({
   display: 'flex',
   minHeight: '100vh',
@@ -70,6 +70,8 @@ const LayoutContainer = styled(Box)(({ theme }) => ({
     : 'radial-gradient(circle at 20% 80%, rgba(59, 130, 246, 0.05) 0%, transparent 50%), radial-gradient(circle at 80% 20%, rgba(139, 92, 246, 0.05) 0%, transparent 50%), linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)',
   position: 'relative',
   overflow: 'hidden',
+  margin: 0,
+  padding: 0,
 }));
 
 // Modern AppBar with glassmorphism - Reduced opacity for light theme
@@ -93,7 +95,7 @@ const ModernAppBar = styled(AppBar, {
   right: 0,
 }));
 
-// Main content area with smooth transitions
+// Main content area with smooth transitions - Remove all gaps
 const MainContent = styled(Box, {
   shouldForwardProp: (prop) => prop !== 'open',
 })<{ open?: boolean }>(({ theme, open }) => ({
@@ -102,20 +104,26 @@ const MainContent = styled(Box, {
   flexDirection: 'column',
   minHeight: '100vh',
   transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+  paddingTop: '74px', // Padding to ensure content is below AppBar
+  // Mobile: full width, no margin
   width: '100%',
-  paddingTop: '74px', // Increased padding to ensure content is below AppBar
-  marginLeft: 0, // Default margin for mobile
+  marginLeft: 0,
+  paddingLeft: 0,
+  paddingRight: 0,
+  // Desktop: adjust margin based on sidebar state, no width calculation
   [theme.breakpoints.up('md')]: {
-    width: '100%', // Full width always
-    marginLeft: open ? `${drawerWidth}px` : 0, // Only add margin when sidebar is open
-    paddingLeft: 0, // Remove default padding to eliminate gap
+    marginLeft: open ? `${drawerWidth}px` : 0,
+    paddingLeft: 0,
+    paddingRight: 0,
+    width: 'auto', // Let it fill remaining space naturally
   },
 }));
 
-// Content wrapper with consistent spacing
+// Content wrapper with consistent spacing - Remove all unnecessary padding
 const ContentWrapper = styled(Box)(({ theme }) => ({
   flexGrow: 1,
   padding: theme.spacing(3),
+  margin: 0, // Remove any default margin
   [theme.breakpoints.down('sm')]: {
     padding: theme.spacing(2),
   },
@@ -135,7 +143,7 @@ const ContentWrapper = styled(Box)(({ theme }) => ({
       ? 'rgba(15, 23, 42, 0.02)'
       : 'rgba(255, 255, 255, 0.02)',
     pointerEvents: 'none',
-    borderRadius: '24px 0 0 0',
+    // Removed border radius to eliminate any visual gaps
   },
 }));
 

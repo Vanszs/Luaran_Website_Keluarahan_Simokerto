@@ -15,7 +15,7 @@ interface AuthContextType {
   user: User | null;
   login: (username: string, password: string) => Promise<any>;
   logout: () => Promise<void>;
-  registerAdmin: (data: { username: string; password: string; name: string; address?: string; phone?: string }) => Promise<any>;
+  registerAdmin: (data: { username: string; password: string; name: string }) => Promise<any>;
   loading: boolean;
 }
 
@@ -108,7 +108,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const registerAdmin = async (data: { username: string; password: string; name: string; address?: string; phone?: string }) => {
+  const registerAdmin = async (data: { username: string; password: string; name: string }) => {
     setLoading(true);
     try {
       const response = await fetch('/api/auth/register', {

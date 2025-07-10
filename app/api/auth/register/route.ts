@@ -6,7 +6,7 @@ export const dynamic = 'force-dynamic';
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { username, password, name, address, phone } = body;
+    const { username, password, name } = body;
     
     if (!username || !password || !name) {
       return NextResponse.json(
@@ -30,8 +30,8 @@ export async function POST(req: NextRequest) {
     
     // Insert new admin with default role as 'admin' and pending status as TRUE
     await query(
-      'INSERT INTO admin (username, password, name, address, phone, role, pending) VALUES (?, ?, ?, ?, ?, ?, TRUE)',
-      [username, password, name, address || null, phone || null, 'admin']
+      'INSERT INTO admin (username, password, name, role, pending) VALUES (?, ?, ?, ?, TRUE)',
+      [username, password, name, 'admin']
     );
     
     // Insert notification for superadmin about new pending admin

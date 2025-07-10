@@ -118,8 +118,6 @@ function RegisterContent() {
     password: '',
     confirmPassword: '',
     name: '',
-    address: '',
-    phone: '',
   });
   const [showPassword, setShowPassword] = React.useState(false);
   const [errors, setErrors] = React.useState<Record<string, string>>({});
@@ -139,12 +137,6 @@ function RegisterContent() {
     if (!formData.name) {
       newErrors.name = 'Full name is required';
     }
-    
-    if (!formData.address) {
-      newErrors.address = 'Address is required';
-    }
-    
-    // Phone is optional, no validation needed
     
     if (!formData.password) {
       newErrors.password = 'Password is required';
@@ -182,8 +174,6 @@ function RegisterContent() {
         username: formData.username,
         password: formData.password,
         name: formData.name,
-        address: formData.address,
-        phone: formData.phone
       });
       router.push('/?registered=true');
     } catch (err) {
@@ -343,36 +333,6 @@ function RegisterContent() {
                       </InputAdornment>
                     ),
                   }}
-                />
-              </Grid>
-              
-              <Grid item xs={12}>
-                <TextField
-                  required
-                  fullWidth
-                  id="address"
-                  label="Address"
-                  name="address"
-                  multiline
-                  rows={2}
-                  value={formData.address}
-                  onChange={handleChange}
-                  error={!!errors.address}
-                  helperText={errors.address}
-                />
-              </Grid>
-              
-              <Grid item xs={12}>
-                <TextField
-                  fullWidth
-                  id="phone"
-                  label="Phone Number (Optional)"
-                  name="phone"
-                  value={formData.phone}
-                  onChange={handleChange}
-                  error={!!errors.phone}
-                  helperText={errors.phone}
-                  placeholder="Ex: 081234567890"
                 />
               </Grid>
               
