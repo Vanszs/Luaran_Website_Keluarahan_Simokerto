@@ -31,6 +31,7 @@ import {
   FormControl,
   InputLabel,
   InputAdornment,
+  Stack,
 } from '@mui/material';
 import {
   Add as AddIcon,
@@ -59,6 +60,7 @@ export default function AdminManagement() {
   const [pendingAdmins, setPendingAdmins] = useState<Admin[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
+  const [roleFilter, setRoleFilter] = useState('');
   
   // Loading states for different operations
   const [loadingStates, setLoadingStates] = useState({
@@ -415,10 +417,12 @@ export default function AdminManagement() {
     setFormData(prev => ({ ...prev, role: e.target.value }));
   };
 
-  const filteredAdmins = admins.filter(admin => 
-    (admin.name?.toLowerCase() || '').includes(searchTerm.toLowerCase()) ||
-    admin.username.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredAdmins = admins.filter(admin => {
+    const matchesSearch = (admin.name?.toLowerCase() || '').includes(searchTerm.toLowerCase()) ||
+                         admin.username.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesRole = roleFilter ? admin.role === roleFilter : true;
+    return matchesSearch && matchesRole;
+  });
 
   if (loading) {
     return (
@@ -454,45 +458,174 @@ export default function AdminManagement() {
           border: `1px solid ${theme.palette.divider}`,
         }}
       >
-        <TextField
-          fullWidth
-          placeholder="Cari admin berdasarkan nama atau username..."
-          variant="outlined"
-          size="small"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">
-                <SearchIcon fontSize="small" color="action" />
-              </InputAdornment>
-            ),
-          }}
-          sx={{
-            maxWidth: 500,
-            '& .MuiOutlinedInput-root': {
-              borderRadius: 2,
-              bgcolor: theme.palette.mode === 'dark'
-                ? alpha(theme.palette.common.white, 0.05)
-                : alpha(theme.palette.common.black, 0.03),
-              transition: 'all 0.3s ease',
-              '&:hover': {
+        <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
+          <TextField
+            label="Cari admin"
+            placeholder="Cari berdasarkan nama atau username..."
+            variant="outlined"
+            size="small"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <SearchIcon fontSize="small" color="action" />
+                </InputAdornment>
+              ),
+            }}
+            sx={{
+              flex: 1,
+              minWidth: 300,
+              '& .MuiOutlinedInput-root': {
+                borderRadius: 2,
                 bgcolor: theme.palette.mode === 'dark'
-                  ? alpha(theme.palette.common.white, 0.08)
-                  : alpha(theme.palette.common.black, 0.05),
-              },
-              '&.Mui-focused': {
-                boxShadow: `0 0 0 2px ${alpha(theme.palette.primary.main, 0.25)}`,
-                bgcolor: theme.palette.mode === 'dark'
-                  ? alpha(theme.palette.common.white, 0.1)
-                  : alpha(theme.palette.common.black, 0.06),
+                  ? alpha(theme.palette.common.white, 0.05)
+                  : alpha(theme.palette.common.black, 0.03),
+                transition: 'all 0.3s ease',
+                '&:hover': {
+                  bgcolor: theme.palette.mode === 'dark'
+                    ? alpha(theme.palette.common.white, 0.08)
+                    : alpha(theme.palette.common.black, 0.05),
+                },
+                '&.Mui-focused': {
+                  boxShadow: `0 0 0 2px ${alpha(theme.palette.primary.main, 0.25)}`,
+                  bgcolor: theme.palette.mode === 'dark'
+                    ? alpha(theme.palette.common.white, 0.1)
+                    : alpha(theme.palette.common.black, 0.06),
+                }
               }
-            }
-          }}
-        />
+            }}
+          />
+          <TextField
+            label="Role"
+            select
+            value={roleFilter}
+            onChange={(e) => setRoleFilter(e.target.value)}
+            size="small"
+            sx={{ 
+              width: { xs: '100%', sm: 160 },
+              '& .MuiOutlinedInput-root': {
+                borderRadius: 2,
+              }
+            }}
+          >
+            <MenuItem value="">Semua Role</MenuItem>
+            <MenuItem value="superadmin">Super Admin</MenuItem>
+            <MenuItem value="admin">Admin</MenuItem>
+            <MenuItem value="petugas">Petugas</MenuItem>
+          </TextField>
+        </Stack>
       </Paper>
 
+      {/* Admin List Section */}
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+        <Typography variant="h6" sx={{ fontWeight: 600 }}>
+          Daftar Admin
+        </Typography>
+        <Typography variant="body2" color="text.secondary">
+          Menampilkan {filteredAdmins.length} dari {admins.length} admin
+          {(searchTerm || roleFilter) && (
+            <Chip 
+              label={`Filter: ${searchTerm || roleFilter}`} 
+              size="small" 
+              onDelete={() => {
+                setSearchTerm('');
+                setRoleFilter('');
+              }}
+              sx={{ ml: 1 }}
+            />
+          )}
+        </Typography>
+      </Box>
 
+      {/* Admins Table */}
+      {filteredAdmins.length > 0 ? (
+        <TableContainer component={Paper} elevation={0} sx={{ 
+          borderRadius: 3,
+          overflow: 'hidden',
+          mb: 4,
+          boxShadow: theme.palette.mode === 'dark'
+            ? '0 4px 12px rgba(0,0,0,0.2)'
+            : '0 4px 12px rgba(0,0,0,0.1)',
+          padding: 0.5,
+          background: theme.palette.mode === 'dark'
+            ? alpha(theme.palette.background.paper, 0.8)
+            : alpha(theme.palette.background.paper, 0.8),
+        }}>
+          <Table>
+            <TableHead sx={{ 
+              backgroundColor: theme.palette.mode === 'dark'
+                ? alpha(theme.palette.primary.main, 0.1)
+                : alpha(theme.palette.primary.main, 0.05)
+            }}>
+              <TableRow>
+                <TableCell>ID</TableCell>
+                <TableCell>Username</TableCell>
+                <TableCell>Nama</TableCell>
+                <TableCell>Role</TableCell>
+                <TableCell>Bergabung</TableCell>
+                <TableCell align="right">Aksi</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {filteredAdmins.map((admin) => (
+                <TableRow key={admin.id}>
+                  <TableCell>{admin.id}</TableCell>
+                  <TableCell sx={{ fontWeight: 500 }}>{admin.username}</TableCell>
+                  <TableCell>{admin.name || '-'}</TableCell>
+                  <TableCell>
+                    <Chip 
+                      label={admin.role} 
+                      size="small" 
+                      color={admin.role === 'superadmin' ? 'error' : admin.role === 'admin' ? 'primary' : 'default'}
+                    />
+                  </TableCell>
+                  <TableCell>
+                    {new Date(admin.created_at).toLocaleDateString('id-ID', {
+                      year: 'numeric',
+                      month: 'short',
+                      day: 'numeric',
+                    })}
+                  </TableCell>
+                  <TableCell align="right">
+                    <IconButton
+                      size="small"
+                      color="primary"
+                      onClick={() => handleEditAdmin(admin)}
+                      sx={{ mr: 1 }}
+                    >
+                      <EditIcon />
+                    </IconButton>
+                    <IconButton
+                      size="small"
+                      color="error"
+                      onClick={() => handleDeleteAdmin(admin)}
+                      disabled={loadingStates.delete[admin.id]}
+                    >
+                      <DeleteIcon />
+                    </IconButton>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      ) : (
+        <Paper sx={{ 
+          p: 4, 
+          textAlign: 'center', 
+          borderRadius: 3,
+          border: `1px dashed ${theme.palette.divider}`,
+          mb: 4
+        }}>
+          <Typography variant="h6" color="text.secondary" sx={{ mb: 1 }}>
+            {searchTerm || roleFilter ? 'Tidak ada admin yang sesuai dengan filter' : 'Belum ada admin'}
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+            {searchTerm || roleFilter ? 'Coba ubah kriteria pencarian atau filter' : 'Tambahkan admin pertama dengan mengklik tombol "Tambah Admin"'}
+          </Typography>
+        </Paper>
+      )}
 
       {/* Pending Admins Section */}
       <Typography variant="h6" sx={{ mt: 4, mb: 2, fontWeight: 600 }}>
@@ -585,112 +718,6 @@ export default function AdminManagement() {
           </Typography>
         </Paper>
       )}
-
-      {/* Approved Admins Section */}
-      <Typography variant="h6" sx={{ mt: 4, mb: 2, fontWeight: 600 }}>
-        Admin Terdaftar
-      </Typography>
-      <TableContainer component={Paper} elevation={0} sx={{ 
-        borderRadius: 3,
-        overflow: 'hidden',
-        boxShadow: theme.palette.mode === 'dark'
-          ? '0 4px 12px rgba(0,0,0,0.2)'
-          : '0 4px 12px rgba(0,0,0,0.1)',
-        padding: 0.5, // Add padding to separate container border from table
-        background: theme.palette.mode === 'dark'
-          ? alpha(theme.palette.background.paper, 0.8)
-          : alpha(theme.palette.background.paper, 0.8),
-      }}>
-        <Table>
-          <TableHead sx={{ 
-            backgroundColor: theme.palette.mode === 'dark'
-              ? alpha(theme.palette.primary.main, 0.1)
-              : alpha(theme.palette.primary.main, 0.05)
-          }}>
-            <TableRow>
-              <TableCell>ID</TableCell>
-              <TableCell>Username</TableCell>
-              <TableCell>Nama</TableCell>
-              <TableCell>Role</TableCell>
-              <TableCell>Terdaftar</TableCell>
-              <TableCell align="right">Aksi</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {filteredAdmins.length > 0 ? (
-              filteredAdmins.map((admin) => (
-                <TableRow key={admin.id} hover>
-                  <TableCell>{admin.id}</TableCell>
-                  <TableCell>{admin.username}</TableCell>
-                  <TableCell>{admin.name}</TableCell>
-                  <TableCell>
-                    <Chip 
-                      size="small"
-                      icon={<AdminIcon />}
-                      label={
-                        admin.role === 'superadmin' ? 'Super Admin' : 
-                        admin.role === 'petugas' ? 'Petugas' : 'Admin'
-                      }
-                      color={
-                        admin.role === 'superadmin' ? 'primary' : 
-                        admin.role === 'petugas' ? 'secondary' : 'default'
-                      }
-                    />
-                  </TableCell>
-                  <TableCell>
-                    {new Date(admin.created_at).toLocaleDateString('id-ID', {
-                      day: 'numeric',
-                      month: 'short',
-                      year: 'numeric'
-                    })}
-                  </TableCell>
-                  <TableCell align="right">
-                    <IconButton 
-                      size="small" 
-                      onClick={() => handleEditAdmin(admin)}
-                      color="primary"
-                      disabled={admin.id === Number(user?.id) && admin.role === 'superadmin'}
-                      title={admin.id === Number(user?.id) && admin.role === 'superadmin' ? 
-                        "Anda tidak dapat mengedit akun superadmin Anda sendiri" : ""}
-                    >
-                      <EditIcon fontSize="small" />
-                    </IconButton>
-                    <IconButton 
-                      size="small" 
-                      onClick={() => handleDeleteAdmin(admin)}
-                      color="error"
-                      disabled={admin.id === Number(user?.id)}
-                      title={admin.id === Number(user?.id) ? "Anda tidak dapat menghapus akun Anda sendiri" : ""}
-                      sx={{ ml: 1 }}
-                    >
-                      <DeleteIcon fontSize="small" />
-                    </IconButton>
-                  </TableCell>
-                </TableRow>
-              ))
-            ) : (
-              <TableRow>
-                <TableCell colSpan={6} align="center" sx={{ py: 3 }}>
-                  <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', py: 2 }}>
-                    <AdminIcon sx={{ fontSize: 40, color: 'text.secondary', mb: 1 }} />
-                    <Typography variant="body1" color="text.secondary">
-                      Tidak ada data admin
-                    </Typography>
-                    <Button 
-                      variant="contained" 
-                      startIcon={<AddIcon />}
-                      onClick={handleAddAdmin}
-                      sx={{ mt: 2, borderRadius: 2 }}
-                    >
-                      Tambah Admin
-                    </Button>
-                  </Box>
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
-      </TableContainer>
 
       {/* Admin Form Dialog */}
       <Dialog 

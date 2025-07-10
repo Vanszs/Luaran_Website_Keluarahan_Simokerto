@@ -182,7 +182,7 @@ export default function AdminDashboard() {
                   </Box>
                   
                   {loading ? (
-                    <LinearProgress sx={{ my: 1 }} />
+                    <Skeleton variant="text" width={60} height={40} sx={{ my: 1 }} />
                   ) : (
                     <Typography variant="h6" fontWeight={600}>
                       {refreshing ? '-' : card.value}
