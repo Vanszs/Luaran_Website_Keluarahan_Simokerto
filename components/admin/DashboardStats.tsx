@@ -14,7 +14,6 @@ import {
   Chip,
   useTheme,
   alpha,
-  LinearProgress,
   Alert,
   TablePagination,
 } from '@mui/material';
@@ -104,8 +103,6 @@ export default function DashboardStats({ useMockData = false }: DashboardStatsPr
         </Typography>
       </Box>
       
-      {loading && <LinearProgress />}
-
       {error && (
         <Box sx={{ p: 3 }}>
           <Alert severity="error">

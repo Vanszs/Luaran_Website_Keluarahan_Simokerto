@@ -8,11 +8,11 @@ import {
   Paper,
   IconButton,
   Tooltip,
-  LinearProgress,
   alpha,
   useTheme,
   Stack,
-  Button
+  Button,
+  Skeleton,
 } from '@mui/material';
 import {
   Dashboard as DashboardIcon,
@@ -200,19 +200,6 @@ export default function AdminDashboard() {
 
         {/* Main dashboard content */}
         <DashboardStats useMockData={false} />
-        
-        {/* Refresh indicator */}
-        {refreshing && (
-          <LinearProgress
-            sx={{
-              position: 'fixed',
-              top: 0,
-              left: 0,
-              right: 0,
-              zIndex: 9999,
-            }}
-          />
-        )}
       </Box>
     </Layout>
   );

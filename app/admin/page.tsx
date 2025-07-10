@@ -10,7 +10,6 @@ import {
   useTheme,
   IconButton,
   Tooltip,
-  LinearProgress,
   Chip,
   Stack,
   alpha,
@@ -272,20 +271,6 @@ export default function AdminDashboard() {
 
         {/* Recent Reports */}
         <DashboardStats useMockData={false} />
-
-        {/* Loading Progress */}
-        {(refreshing || loading) && (
-          <LinearProgress
-            sx={{
-              position: 'fixed',
-              top: 64,
-              left: 0,
-              right: 0,
-              zIndex: 9999,
-              height: '2px',
-            }}
-          />
-        )}
       </Box>
     </Layout>
   );

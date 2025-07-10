@@ -29,7 +29,7 @@ import {
   Groups,
 } from '@mui/icons-material';
 import { useMockApi } from '../hooks/useMockApi';
-import { useIndividualStats } from '../hooks/useIndividualStats';
+import { useTodayReports, useTotalReports, useTotalUsers, useActiveAdmins } from '../hooks/useStatsHooks';
 
 interface DashboardHomeProps {
   onViewChange: (view: string) => void;
@@ -144,8 +144,11 @@ export default function DashboardHome({ onViewChange }: DashboardHomeProps) {
   const [currentTime, setCurrentTime] = React.useState(new Date());
   const { submissions, users } = useMockApi();
   
-  // Use individual stats hook with separate loading for each stat
-  const { todayReports, totalReports, totalUsers, activeAdmins } = useIndividualStats();
+  // Use individual hooks with separate loading for each stat
+  const todayReports = useTodayReports();
+  const totalReports = useTotalReports();
+  const totalUsers = useTotalUsers();
+  const activeAdmins = useActiveAdmins();
 
   React.useEffect(() => {
     const timer = setInterval(() => {
