@@ -16,32 +16,44 @@ export async function GET(req: NextRequest) {
       });
     }
     
-    // Query reports with user information using JOIN, including all new fields
+    // Query reports with user information using JOIN, also get admin info if reporter_type is admin
     const reportsResult = await query(`
       SELECT r.id, r.user_id, r.address, r.description, r.created_at, 
              r.pelapor, r.jenis_laporan, r.reporter_type, r.status,
-             u.name as user_name, u.phone as user_phone
+             u.name as user_name, u.phone as user_phone,
+             a.id as admin_id, a.name as admin_name
       FROM reports r
       JOIN users u ON r.user_id = u.id
+      LEFT JOIN admin a ON r.reporter_type = 'admin' AND a.name = r.pelapor
       ORDER BY r.created_at DESC
       LIMIT 50
     `);
 
-    const processed = (reportsResult as any[]).map((r) => ({
-      id: r.id,
-      user_id: r.user_id,
-      address: r.address,
-      description: r.description,
-      created_at: r.created_at,
-      pelapor: r.pelapor || r.user_name, // Use pelapor if available, otherwise user_name
-      jenis_laporan: r.jenis_laporan || 'Umum', // Default to 'Umum' if not specified
-      reporter_type: r.reporter_type || 'user', // Default to 'user' if not specified
-      status: r.status || 'pending', // Use status from DB if available
-      user: { 
-        name: r.user_name,
-        phone: r.user_phone || null
+    const processed = (reportsResult as any[]).map((r) => {
+      // Determine the correct name to display based on reporter_type
+      let displayName = r.user_name; // Default to user name
+      
+      // If it's an admin report, use the pelapor field which contains admin name
+      if (r.reporter_type === 'admin') {
+        displayName = r.pelapor || 'Admin';
       }
-    }));
+      
+      return {
+        id: r.id,
+        user_id: r.user_id,
+        address: r.address,
+        description: r.description,
+        created_at: r.created_at,
+        pelapor: displayName,
+        jenis_laporan: r.jenis_laporan || 'Umum',
+        reporter_type: r.reporter_type || 'user',
+        status: r.status || 'pending',
+        user: { 
+          name: displayName,
+          phone: r.user_phone || null
+        }
+      };
+    });
 
     return NextResponse.json({
       reports: processed

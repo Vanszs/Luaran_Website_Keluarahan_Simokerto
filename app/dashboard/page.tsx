@@ -55,97 +55,124 @@ export default function AdminDashboard() {
   // Quick stats cards data
   const quickStatsCards = [
     {
-      title: 'Laporan Hari Ini',            value: stats?.todayReports || 0,
-            icon: <WarningIcon fontSize="small" />,
-            color: theme.palette.primary.main,
-            path: '/dashboard/reports',
-            loading: loading
-          },
-          {
-            title: 'Total Laporan',
-            value: stats?.totalReports || 0,
-            icon: <AlertIcon fontSize="small" />,
-            color: theme.palette.error.main,
-            path: '/dashboard/reports',
-            loading: loading
-          },
-          {
-            title: 'Warga Terdaftar',
-            value: stats?.totalUsers || 0,
-            icon: <PeopleIcon fontSize="small" />,
-            color: theme.palette.success.main,
-            path: '/dashboard/citizens',
-            loading: loading
-          },
-          {
-            title: 'Perangkat Aktif',
-            value: stats?.activeDevices || 0,
-            icon: <DashboardIcon fontSize="small" />,
-            color: theme.palette.warning.main,
-            path: '/dashboard/devices',
-            loading: loading
-          }
+      title: 'Laporan Hari Ini',
+      value: stats?.todayReports || 0,
+      icon: <WarningIcon fontSize="small" />,
+      color: theme.palette.primary.main,
+      path: '/dashboard/reports',
+      loading: loading
+    },
+    {
+      title: 'Total Laporan',
+      value: stats?.totalReports || 0,
+      icon: <AlertIcon fontSize="small" />,
+      color: theme.palette.error.main,
+      path: '/dashboard/reports',
+      loading: loading
+    },
+    {
+      title: 'Warga Terdaftar',
+      value: stats?.totalUsers || 0,
+      icon: <PeopleIcon fontSize="small" />,
+      color: theme.palette.success.main,
+      path: '/dashboard/citizens',
+      loading: loading
+    },
+    {
+      title: 'Perangkat Aktif',
+      value: stats?.activeDevices || 0,
+      icon: <DashboardIcon fontSize="small" />,
+      color: theme.palette.warning.main,
+      path: '/dashboard/devices',
+      loading: loading
+    }
   ];
 
   return (
     <Layout title="Dashboard Admin">
       <Box>
-        {/* Simple header with refresh button */}
+        {/* Welcome header with refresh button */}
         <Paper
           elevation={0}
           sx={{
-            p: 3,
             mb: 3,
-            borderRadius: 3,
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
+            borderRadius: 2,
+            position: 'relative',
+            overflow: 'hidden',
+            border: `1px solid ${theme.palette.divider}`,
             background: theme.palette.mode === 'dark'
-              ? 'linear-gradient(135deg, #1e293b 0%, #283c56 100%)'
-              : 'linear-gradient(135deg, #f8fafc 0%, #e0e7ff 100%)',
-            boxShadow: theme.palette.mode === 'dark'
-              ? '0 8px 24px rgba(0,0,0,0.2)'
-              : '0 8px 24px rgba(0,0,0,0.1)'
+              ? `linear-gradient(to right, ${alpha(theme.palette.background.paper, 0.9)}, ${alpha(theme.palette.background.paper, 0.95)})`
+              : `linear-gradient(to right, ${alpha(theme.palette.background.paper, 0.9)}, ${alpha(theme.palette.background.paper, 0.95)})`,
+            '&::before': {
+              content: '""',
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              width: '100%',
+              height: '100%',
+              backgroundImage: theme.palette.mode === 'dark'
+                ? 'radial-gradient(circle at 15% 50%, rgba(59, 130, 246, 0.08), transparent 25%)'
+                : 'radial-gradient(circle at 15% 50%, rgba(59, 130, 246, 0.05), transparent 25%)',
+              pointerEvents: 'none',
+            }
           }}
         >
-          <Box>
-            <Typography variant="h4" fontWeight={700}>
-              {loading ?
-                'Memuat data...' :
-                `Selamat Datang, ${user?.name?.split(' ')[0] || 'Admin'}`
-              }
-            </Typography>
-            <Typography variant="body2" color="text.secondary">
-              Dashboard Admin PINTAR - Pelaporan Instant Tangkal Ancaman Rawan
-            </Typography>
+          <Box sx={{ p: 3, position: 'relative' }}>
+            <Grid container spacing={3} alignItems="center">
+              <Grid item xs={12} md={8}>
+                <Typography
+                  variant="h5"
+                  sx={{
+                    fontWeight: 700,
+                    color: theme.palette.text.primary,
+                    fontSize: { xs: '1.15rem', md: '1.35rem' },
+                    mb: 0.5,
+                  }}
+                >
+                  {loading ? 'Memuat...' : `Selamat Datang, ${user?.name?.split(' ')[0] || 'Admin'}`}
+                </Typography>
+                <Typography 
+                  variant="body1" 
+                  color="text.secondary"
+                >
+                  Dashboard Admin PINTAR - Pelaporan Instant Tangkal Ancaman Rawan
+                </Typography>
+              </Grid>
+              <Grid item xs={12} md={4}>
+                <Stack 
+                  direction="row" 
+                  spacing={2} 
+                  justifyContent={{ xs: 'flex-start', md: 'flex-end' }}
+                  alignItems="center"
+                >
+                  <Button
+                    variant="contained"
+                    size="small"
+                    startIcon={<WarningIcon />}
+                    onClick={() => router.push('/dashboard/reports')}
+                  >
+                    Lihat Laporan
+                  </Button>
+                  
+                  <Tooltip title="Refresh Data">
+                    <IconButton 
+                      onClick={fetchData} 
+                      disabled={refreshing || loading}
+                      size="small"
+                      sx={{ 
+                        bgcolor: alpha(theme.palette.primary.main, 0.1),
+                        '&:hover': {
+                          bgcolor: alpha(theme.palette.primary.main, 0.2),
+                        }
+                      }}
+                    >
+                      <RefreshIcon fontSize="small" />
+                    </IconButton>
+                  </Tooltip>
+                </Stack>
+              </Grid>
+            </Grid>
           </Box>
-          
-          <Stack direction="row" spacing={1}>
-            <Button
-              variant="contained"
-              size="small"
-              startIcon={<WarningIcon />}
-              onClick={() => router.push('/dashboard/reports')}
-            >
-              Lihat Laporan
-            </Button>
-            
-            <Tooltip title="Refresh Data">
-              <IconButton 
-                onClick={fetchData} 
-                disabled={refreshing || loading}
-                size="small"
-                sx={{ 
-                  bgcolor: alpha(theme.palette.primary.main, 0.1),
-                  '&:hover': {
-                    bgcolor: alpha(theme.palette.primary.main, 0.2),
-                  }
-                }}
-              >
-                <RefreshIcon fontSize="small" />
-              </IconButton>
-            </Tooltip>
-          </Stack>
         </Paper>
 
         {/* Quick stats cards */}

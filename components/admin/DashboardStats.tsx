@@ -158,9 +158,16 @@ export default function DashboardStats({ useMockData = false }: DashboardStatsPr
                     #{report.id}
                   </TableCell>
                   <TableCell>
-                    <Typography variant="body2" fontWeight={500}>
-                      {report.user?.name || report.submittedBy || 'Warga'}
-                    </Typography>
+                    <Box>
+                      <Typography variant="body2" fontWeight={500}>
+                        {report.reporter_type === 'admin' 
+                          ? (report.pelapor || report.submittedBy || 'Admin') 
+                          : (report.user?.name || 'Warga')}
+                      </Typography>
+                      <Typography variant="caption" color="text.secondary">
+                        {report.reporter_type === 'admin' ? '(Admin)' : '(Warga)'}
+                      </Typography>
+                    </Box>
                   </TableCell>
                   <TableCell sx={{ display: { xs: 'none', sm: 'table-cell' } }}>
                     <Typography variant="body2" sx={{ 

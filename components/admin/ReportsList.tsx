@@ -369,7 +369,9 @@ export default function ReportsList() {
                   <TableCell>
                     <Box>
                       <Typography variant="body2" fontWeight={500}>
-                        {report.pelapor || report.user.name}
+                        {report.reporter_type === 'admin' 
+                          ? (report.pelapor || 'Admin') 
+                          : (report.user.name || 'Warga')}
                       </Typography>
                       <Typography variant="caption" color="text.secondary">
                         {report.reporter_type === 'admin' ? '(Admin)' : '(Warga)'}
