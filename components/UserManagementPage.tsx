@@ -53,25 +53,76 @@ export default function UserManagementPage() {
   ];
 
   return (
-    <Paper sx={{ p: 4 }}>
-      <Typography variant="h5" sx={{ fontWeight: 700, mb: 2 }}>
+    <Paper sx={{ 
+      p: { xs: 2, sm: 3, md: 4 }, 
+      borderRadius: 3,
+      boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+    }}>
+      <Typography variant="h5" sx={{ fontWeight: 700, mb: 3 }}>
         Kelola Akun Warga
       </Typography>
-      <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} sx={{ mb: 2 }}>
-        <TextField label="Cari" value={search} onChange={e => setSearch(e.target.value)} size="small" />
-        <TextField label="Status" select value={statusFilter} onChange={e => setStatusFilter(e.target.value)} size="small" sx={{ width: 140 }}>
+      <Stack 
+        direction={{ xs: 'column', sm: 'row' }} 
+        spacing={2} 
+        sx={{ mb: 3 }}
+      >
+        <TextField 
+          label="Cari" 
+          value={search} 
+          onChange={e => setSearch(e.target.value)} 
+          size="small" 
+          fullWidth={true}
+          sx={{ 
+            maxWidth: { sm: 300 },
+            '& .MuiOutlinedInput-root': {
+              borderRadius: 2,
+            }
+          }}
+        />
+        <TextField 
+          label="Status" 
+          select 
+          value={statusFilter} 
+          onChange={e => setStatusFilter(e.target.value)} 
+          size="small" 
+          sx={{ 
+            width: { xs: '100%', sm: 140 },
+            '& .MuiOutlinedInput-root': {
+              borderRadius: 2,
+            }
+          }}
+        >
           <MenuItem value="">Semua</MenuItem>
           <MenuItem value="Aktif">Aktif</MenuItem>
           <MenuItem value="Nonaktif">Nonaktif</MenuItem>
         </TextField>
       </Stack>
-      <Box sx={{ height: 420, width: '100%' }}>
+      <Box sx={{ 
+        height: { xs: 400, sm: 420 }, 
+        width: '100%',
+        '& .MuiDataGrid-root': {
+          borderRadius: 2,
+          border: 'none',
+          '& .MuiDataGrid-main': {
+            borderRadius: 2,
+          }
+        }
+      }}>
         <DataGrid
           rows={rows}
           columns={columns}
           checkboxSelection
           disableRowSelectionOnClick
           hideFooterSelectedRowCount
+          sx={{
+            '& .MuiDataGrid-columnHeaders': {
+              backgroundColor: 'rgba(0,0,0,0.05)',
+              borderRadius: '8px 8px 0 0',
+            },
+            '& .MuiDataGrid-cell': {
+              borderBottom: '1px solid rgba(0,0,0,0.05)',
+            },
+          }}
         />
       </Box>
     </Paper>

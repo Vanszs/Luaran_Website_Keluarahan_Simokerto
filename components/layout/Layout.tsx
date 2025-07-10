@@ -74,7 +74,7 @@ const LayoutContainer = styled(Box)(({ theme }) => ({
   padding: 0,
 }));
 
-// Modern AppBar with glassmorphism - Reduced opacity for light theme
+// Modern AppBar with glassmorphism - Position to work with sticky sidebar
 const ModernAppBar = styled(AppBar, {
   shouldForwardProp: (prop) => prop !== 'open',
 })<{ open?: boolean }>(({ theme, open }) => ({
@@ -86,16 +86,23 @@ const ModernAppBar = styled(AppBar, {
   boxShadow: theme.palette.mode === 'dark'
     ? '0 4px 20px rgba(0, 0, 0, 0.2)'
     : '0 4px 20px rgba(0, 0, 0, 0.05)',
-  zIndex: theme.zIndex.drawer + 1, // Keep navbar ABOVE drawer to prevent logo overlap issues
+  zIndex: theme.zIndex.drawer + 1, // Keep navbar ABOVE drawer
   transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-  width: '100%',
   position: 'fixed',
   top: 0,
-  left: 0,
-  right: 0,
+  // Desktop: leave space for sidebar
+  [theme.breakpoints.up('md')]: {
+    left: `${drawerWidth}px`,
+    width: `calc(100% - ${drawerWidth}px)`,
+  },
+  // Mobile: full width
+  [theme.breakpoints.down('md')]: {
+    left: 0,
+    width: '100%',
+  },
 }));
 
-// Main content area with smooth transitions - Remove all gaps
+// Main content area with smooth transitions - Always account for sidebar space on desktop
 const MainContent = styled(Box, {
   shouldForwardProp: (prop) => prop !== 'open',
 })<{ open?: boolean }>(({ theme, open }) => ({
@@ -106,32 +113,35 @@ const MainContent = styled(Box, {
   transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
   paddingTop: '74px', // Padding to ensure content is below AppBar
   // Mobile: full width, no margin
-  width: '100%',
-  marginLeft: 0,
-  paddingLeft: 0,
-  paddingRight: 0,
-  // Desktop: adjust margin based on sidebar state, no width calculation
+  [theme.breakpoints.down('md')]: {
+    width: '100%',
+    marginLeft: 0,
+  },
+  // Desktop: always leave space for sidebar since it's always visible
   [theme.breakpoints.up('md')]: {
-    marginLeft: open ? `${drawerWidth}px` : 0,
-    paddingLeft: 0,
-    paddingRight: 0,
-    width: 'auto', // Let it fill remaining space naturally
+    marginLeft: `${drawerWidth}px`,
+    width: `calc(100% - ${drawerWidth}px)`,
   },
 }));
 
-// Content wrapper with consistent spacing - Remove all unnecessary padding
+// Content wrapper with consistent spacing - Responsive padding
 const ContentWrapper = styled(Box)(({ theme }) => ({
   flexGrow: 1,
-  padding: theme.spacing(3),
-  margin: 0, // Remove any default margin
-  [theme.breakpoints.down('sm')]: {
-    padding: theme.spacing(2),
+  padding: theme.spacing(2), // Base padding for mobile
+  margin: 0,
+  [theme.breakpoints.up('sm')]: {
+    padding: theme.spacing(3), // Medium padding for tablets
   },
   [theme.breakpoints.up('md')]: {
-    padding: theme.spacing(4),
+    padding: theme.spacing(4), // Larger padding for desktop
+  },
+  [theme.breakpoints.up('lg')]: {
+    padding: theme.spacing(4, 5), // Even more horizontal padding for large screens
   },
   animation: `${fadeInUp} 0.6s ease-out both`,
   position: 'relative',
+  width: '100%', // Ensure full width usage
+  boxSizing: 'border-box', // Include padding in width calculation
   '&::before': {
     content: '""',
     position: 'absolute',
@@ -143,7 +153,6 @@ const ContentWrapper = styled(Box)(({ theme }) => ({
       ? 'rgba(15, 23, 42, 0.02)'
       : 'rgba(255, 255, 255, 0.02)',
     pointerEvents: 'none',
-    // Removed border radius to eliminate any visual gaps
   },
 }));
 
@@ -168,17 +177,24 @@ interface LayoutProps {
 
 const Layout: React.FC<LayoutProps> = ({ children, title = 'PINTAR Admin' }) => {
   const theme = useTheme();
-  const isSmallScreen = useMediaQuery(theme.breakpoints.down('md'));
-  const [drawerOpen, setDrawerOpen] = useState(!isSmallScreen);
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const [notificationAnchorEl, setNotificationAnchorEl] = useState<null | HTMLElement>(null); // Re-add notificationAnchorEl
+  const [notificationAnchorEl, setNotificationAnchorEl] = useState<null | HTMLElement>(null);
   const { user, logout } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
 
+  // Close mobile drawer when route changes
   useEffect(() => {
-    setDrawerOpen(!isSmallScreen);
-  }, [isSmallScreen]);
+    if (isMobile) {
+      setMobileDrawerOpen(false);
+    }
+  }, [pathname, isMobile]);
+
+  const handleMobileDrawerToggle = () => {
+    setMobileDrawerOpen(!mobileDrawerOpen);
+  };
 
   const handleProfileMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -188,11 +204,11 @@ const Layout: React.FC<LayoutProps> = ({ children, title = 'PINTAR Admin' }) => 
     setAnchorEl(null);
   };
 
-  const handleNotificationMenuOpen = (event: React.MouseEvent<HTMLElement>) => { // Re-add handler
+  const handleNotificationMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
     setNotificationAnchorEl(event.currentTarget);
   };
 
-  const handleNotificationMenuClose = () => { // Re-add handler
+  const handleNotificationMenuClose = () => {
     setNotificationAnchorEl(null);
   };
 
@@ -274,26 +290,28 @@ const Layout: React.FC<LayoutProps> = ({ children, title = 'PINTAR Admin' }) => 
 
   return (
     <LayoutContainer>
-      <ModernAppBar position="fixed" open={drawerOpen}>
+      <ModernAppBar position="fixed">
         <Toolbar sx={{ px: { xs: 2, sm: 3 } }}>
-          <IconButton
-            color="inherit"
-            aria-label="toggle drawer"
-            edge="start"
-            onClick={() => setDrawerOpen(!drawerOpen)}
-            sx={{
-              mr: 2,
-              borderRadius: 2,
-              transition: 'all 0.3s ease',
-              display: 'flex', // Always visible on all breakpoints
-              '&:hover': {
-                transform: 'scale(1.05)',
-                bgcolor: 'rgba(255, 255, 255, 0.1)',
-              },
-            }}
-          >
-            <MenuIcon />
-          </IconButton>
+          {/* Mobile menu button - only show on mobile */}
+          {isMobile && (
+            <IconButton
+              color="inherit"
+              aria-label="toggle drawer"
+              edge="start"
+              onClick={handleMobileDrawerToggle}
+              sx={{
+                mr: 2,
+                borderRadius: 2,
+                transition: 'all 0.3s ease',
+                '&:hover': {
+                  transform: 'scale(1.05)',
+                  bgcolor: 'rgba(255, 255, 255, 0.1)',
+                },
+              }}
+            >
+              <MenuIcon />
+            </IconButton>
+          )}
           
           {/* Enhanced logo/title styling */}
           <Box 
@@ -365,7 +383,7 @@ const Layout: React.FC<LayoutProps> = ({ children, title = 'PINTAR Admin' }) => 
                   fontSize: { xs: '1rem', sm: '1.125rem' },
                 }}
               >
-                {title}
+                Dashboard Pintar
               </Typography>
               <Typography
                 variant="caption"
@@ -378,6 +396,7 @@ const Layout: React.FC<LayoutProps> = ({ children, title = 'PINTAR Admin' }) => 
                   ml: 0.1,
                 }}
               >
+                Kelurahan Simokerto
               </Typography>
             </Box>
           </Box>
@@ -433,13 +452,14 @@ const Layout: React.FC<LayoutProps> = ({ children, title = 'PINTAR Admin' }) => 
         </Toolbar>
       </ModernAppBar>
 
+      {/* Sidebar */}
       <Sidebar 
-        open={drawerOpen} 
-        onClose={() => setDrawerOpen(false)} 
-        variant={isSmallScreen ? "temporary" : "permanent"} 
+        open={isMobile ? mobileDrawerOpen : true} 
+        onClose={() => setMobileDrawerOpen(false)} 
+        variant={isMobile ? "temporary" : "permanent"} 
       />
 
-      <MainContent open={drawerOpen}>
+      <MainContent>
         <ContentWrapper>
           {generateBreadcrumbs()}
           <Fade in timeout={800}>

@@ -33,6 +33,7 @@ import {
   Menu,
   ListItemIcon,
   ListItemText,
+  Tooltip,
 } from '@mui/material';
 import {
   Search as SearchIcon,
@@ -42,7 +43,10 @@ import {
   Engineering as ProcessingIcon,
   CheckCircle as CompletedIcon,
   Cancel as RejectedIcon,
+  Visibility as VisibilityIcon,
+  CalendarToday as CalendarIcon,
 } from '@mui/icons-material';
+import { getStatusChipStyle, getStatusInIndonesian, standardChipStyles } from '../../utils/statusStyles';
 
 interface Report {
   id: number;
@@ -159,16 +163,16 @@ export default function ReportsList() {
     }
   };
 
-  // Helper function to get status in Indonesian
-  const getStatusInIndonesian = (status: string): string => {
-    switch (status) {
-      case 'pending': return 'Menunggu';
-      case 'processing': return 'Diproses';
-      case 'completed': return 'Selesai';
-      case 'rejected': return 'Ditolak';
-      default: return status;
-    }
-  };
+  // Helper function to get status in Indonesian (now using utility)
+  // const getStatusInIndonesian = (status: string): string => {
+  //   switch (status) {
+  //     case 'pending': return 'Menunggu';
+  //     case 'processing': return 'Diproses';
+  //     case 'completed': return 'Selesai';
+  //     case 'rejected': return 'Ditolak';
+  //     default: return status;
+  //   }
+  // };
 
   // Helper function to get status icon
   const getStatusIcon = (status: string) => {
@@ -181,16 +185,49 @@ export default function ReportsList() {
     }
   };
 
-  // Helper function to get status color
-  const getStatusColor = (status: string): "default" | "primary" | "secondary" | "error" | "info" | "success" | "warning" => {
-    switch (status) {
-      case 'pending': return 'warning';
-      case 'processing': return 'info';
-      case 'completed': return 'success';
-      case 'rejected': return 'error';
-      default: return 'default';
-    }
-  };
+  // Helper function to get status color and style (now using utility)
+  // const getStatusChipStyle = (status: string) => {
+  //   const normalizedStatus = status?.toLowerCase();
+  //   
+  //   switch (normalizedStatus) {
+  //     case 'completed':
+  //     case 'approved':
+  //     case 'selesai':
+  //       return {
+  //         backgroundColor: alpha(theme.palette.success.main, 0.15),
+  //         color: theme.palette.success.main,
+  //         border: `1px solid ${alpha(theme.palette.success.main, 0.3)}`,
+  //       };
+  //     case 'processing':
+  //     case 'in progress':
+  //     case 'diproses':
+  //       return {
+  //         backgroundColor: alpha(theme.palette.warning.main, 0.15),
+  //         color: theme.palette.warning.main,
+  //         border: `1px solid ${alpha(theme.palette.warning.main, 0.3)}`,
+  //       };
+  //     case 'pending':
+  //     case 'menunggu':
+  //       return {
+  //         backgroundColor: alpha(theme.palette.info.main, 0.15),
+  //         color: theme.palette.info.main,
+  //         border: `1px solid ${alpha(theme.palette.info.main, 0.3)}`,
+  //       };
+  //     case 'rejected':
+  //     case 'ditolak':
+  //       return {
+  //         backgroundColor: alpha(theme.palette.error.main, 0.15),
+  //         color: theme.palette.error.main,
+  //         border: `1px solid ${alpha(theme.palette.error.main, 0.3)}`,
+  //       };
+  //     default:
+  //       return {
+  //         backgroundColor: alpha(theme.palette.grey[500], 0.15),
+  //         color: theme.palette.grey[600],
+  //         border: `1px solid ${alpha(theme.palette.grey[500], 0.3)}`,
+  //       };
+  //   }
+  // };
 
   const handleViewDetails = (report: Report) => {
     setDetailDialogOpen(true);
@@ -301,21 +338,27 @@ export default function ReportsList() {
         background: theme.palette.mode === 'dark'
           ? alpha(theme.palette.background.paper, 0.8)
           : alpha(theme.palette.background.paper, 0.8),
+        // Make table horizontally scrollable on small screens
+        [theme.breakpoints.down('md')]: {
+          overflowX: 'auto',
+        },
       }}>
-        <Table>
+        <Table sx={{ 
+          minWidth: { xs: 600, md: 'auto' }, // Set minimum width for horizontal scroll on mobile
+        }}>
           <TableHead sx={{ 
             backgroundColor: theme.palette.mode === 'dark'
               ? alpha(theme.palette.primary.main, 0.1)
               : alpha(theme.palette.primary.main, 0.05)
           }}>
             <TableRow>
-              <TableCell>ID</TableCell>
-              <TableCell>Nama Pelapor</TableCell>
-              <TableCell>Jenis</TableCell>
-              <TableCell>Alamat</TableCell>
-              <TableCell>Waktu Laporan</TableCell>
-              <TableCell>Status</TableCell>
-              <TableCell align="right">Aksi</TableCell>
+              <TableCell sx={{ minWidth: 60 }}>ID</TableCell>
+              <TableCell sx={{ minWidth: 150 }}>Nama Pelapor</TableCell>
+              <TableCell sx={{ minWidth: 100, display: { xs: 'none', md: 'table-cell' } }}>Jenis</TableCell>
+              <TableCell sx={{ minWidth: 200 }}>Alamat</TableCell>
+              <TableCell sx={{ minWidth: 120, display: { xs: 'none', sm: 'table-cell' } }}>Waktu Laporan</TableCell>
+              <TableCell sx={{ minWidth: 120 }}>Status</TableCell>
+              <TableCell align="right" sx={{ minWidth: 100 }}>Aksi</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -324,103 +367,88 @@ export default function ReportsList() {
                 <TableRow key={report.id} hover>
                   <TableCell>{report.id}</TableCell>
                   <TableCell>
-                    {report.pelapor || report.user.name}
-                    <Typography variant="caption" display="block" color="text.secondary">
-                      {report.reporter_type === 'admin' ? '(Admin)' : '(Warga)'}
-                    </Typography>
-                  </TableCell>
-                  <TableCell>{report.jenis_laporan || 'Umum'}</TableCell>
-                  <TableCell>{report.address}</TableCell>
-                  <TableCell>
-                    {new Date(report.created_at).toLocaleDateString('id-ID', {
-                      day: 'numeric',
-                      month: 'short',
-                      year: 'numeric',
-                      hour: '2-digit',
-                      minute: '2-digit'
-                    })}
-                  </TableCell>
-                  <TableCell>
-                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                      <Chip
-                        icon={getStatusIcon(report.status)}
-                        label={getStatusInIndonesian(report.status)}
-                        color={getStatusColor(report.status)}
-                        size="small"
-                        sx={{ mr: 1 }}
-                      />
-                      <IconButton 
-                        size="small"
-                        onClick={(e) => handleStatusMenuOpen(e, report.id)}
-                        disabled={statusUpdateLoading}
-                      >
-                        <MoreVertIcon fontSize="small" />
-                      </IconButton>
+                    <Box>
+                      <Typography variant="body2" fontWeight={500}>
+                        {report.pelapor || report.user.name}
+                      </Typography>
+                      <Typography variant="caption" color="text.secondary">
+                        {report.reporter_type === 'admin' ? '(Admin)' : '(Warga)'}
+                      </Typography>
                     </Box>
                   </TableCell>
-                  <TableCell align="right">
-                    <IconButton
+                  <TableCell sx={{ display: { xs: 'none', md: 'table-cell' } }}>
+                    {report.jenis_laporan || 'Umum'}
+                  </TableCell>
+                  <TableCell>
+                    <Typography variant="body2" sx={{ 
+                      maxWidth: { xs: 150, sm: 200, md: 250 },
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      whiteSpace: 'nowrap'
+                    }}>
+                      {report.address}
+                    </Typography>
+                  </TableCell>
+                  <TableCell sx={{ display: { xs: 'none', sm: 'table-cell' } }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                      <CalendarIcon fontSize="small" color="action" />
+                      <Typography variant="body2">
+                        {new Date(report.created_at).toLocaleDateString('id-ID', {
+                          day: 'numeric',
+                          month: 'short',
+                          year: 'numeric'
+                        })}
+                      </Typography>
+                    </Box>
+                  </TableCell>
+                  <TableCell>
+                    <Chip
+                      label={getStatusInIndonesian(report.status)}
                       size="small"
-                      onClick={(e) => handleStatusMenuOpen(e, report.id)}
-                    >
-                      <MoreVertIcon fontSize="small" />
-                    </IconButton>
-                    <Menu
-                      anchorEl={statusMenuAnchorEl}
-                      open={Boolean(statusMenuAnchorEl) && selectedReportForStatus === report.id}
-                      onClose={handleStatusMenuClose}
-                    >
-                      <MenuItem
-                        onClick={() => {
-                          handleStatusChange('pending');
-                        }}
-                        disabled={report.status === 'pending'}
-                      >
-                        <ListItemIcon>
-                          <PendingIcon fontSize="small" />
-                        </ListItemIcon>
-                        <ListItemText primary="Tandai Sebagai Pending" />
-                      </MenuItem>
-                      <MenuItem
-                        onClick={() => {
-                          handleStatusChange('processing');
-                        }}
-                        disabled={report.status === 'processing'}
-                      >
-                        <ListItemIcon>
-                          <ProcessingIcon fontSize="small" />
-                        </ListItemIcon>
-                        <ListItemText primary="Tandai Sedang Diproses" />
-                      </MenuItem>
-                      <MenuItem
-                        onClick={() => {
-                          handleStatusChange('completed');
-                        }}
-                        disabled={report.status === 'completed'}
-                      >
-                        <ListItemIcon>
-                          <CompletedIcon fontSize="small" />
-                        </ListItemIcon>
-                        <ListItemText primary="Tandai Selesai" />
-                      </MenuItem>
-                      <MenuItem
-                        onClick={() => {
-                          handleStatusChange('rejected');
-                        }}
-                        disabled={report.status === 'rejected'}
-                      >
-                        <ListItemIcon>
-                          <RejectedIcon fontSize="small" />
-                        </ListItemIcon>
-                        <ListItemText primary="Tandai Ditolak" />
-                      </MenuItem>
-                    </Menu>
+                      sx={{
+                        ...standardChipStyles,
+                        ...getStatusChipStyle(report.status, theme),
+                      }}
+                    />
+                  </TableCell>
+                  <TableCell align="right">
+                    <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
+                      <Tooltip title="Lihat Detail">
+                        <IconButton
+                          size="small"
+                          onClick={() => handleViewDetails(report)}
+                          sx={{
+                            color: theme.palette.primary.main,
+                            '&:hover': {
+                              backgroundColor: alpha(theme.palette.primary.main, 0.1),
+                            },
+                          }}
+                        >
+                          <VisibilityIcon fontSize="small" />
+                        </IconButton>
+                      </Tooltip>
+                      <Tooltip title="Ubah Status">
+                        <IconButton
+                          size="small"
+                          onClick={(e) => handleStatusMenuOpen(e, report.id)}
+                          disabled={statusUpdateLoading}
+                          sx={{
+                            color: theme.palette.text.secondary,
+                            '&:hover': {
+                              backgroundColor: alpha(theme.palette.text.secondary, 0.1),
+                            },
+                          }}
+                        >
+                          <MoreVertIcon fontSize="small" />
+                        </IconButton>
+                      </Tooltip>
+                    </Box>
                   </TableCell>
                 </TableRow>
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={6} align="center" sx={{ py: 3 }}>
+                <TableCell colSpan={7} align="center" sx={{ py: 3 }}>
                   <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', py: 2 }}>
                     <WarningIcon sx={{ fontSize: 40, color: 'text.secondary', mb: 1 }} />
                     <Typography variant="body1" color="text.secondary">
@@ -433,6 +461,52 @@ export default function ReportsList() {
           </TableBody>
         </Table>
       </TableContainer>
+
+      {/* Status Update Menu */}
+      <Menu
+        anchorEl={statusMenuAnchorEl}
+        open={Boolean(statusMenuAnchorEl)}
+        onClose={handleStatusMenuClose}
+        transformOrigin={{ horizontal: 'right', vertical: 'top' }}
+        anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
+      >
+        <MenuItem
+          onClick={() => handleStatusChange('pending')}
+          disabled={Boolean(selectedReportForStatus && reports.find(r => r.id === selectedReportForStatus)?.status === 'pending')}
+        >
+          <ListItemIcon>
+            <PendingIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText primary="Tandai Sebagai Pending" />
+        </MenuItem>
+        <MenuItem
+          onClick={() => handleStatusChange('processing')}
+          disabled={Boolean(selectedReportForStatus && reports.find(r => r.id === selectedReportForStatus)?.status === 'processing')}
+        >
+          <ListItemIcon>
+            <ProcessingIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText primary="Tandai Sedang Diproses" />
+        </MenuItem>
+        <MenuItem
+          onClick={() => handleStatusChange('completed')}
+          disabled={Boolean(selectedReportForStatus && reports.find(r => r.id === selectedReportForStatus)?.status === 'completed')}
+        >
+          <ListItemIcon>
+            <CompletedIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText primary="Tandai Selesai" />
+        </MenuItem>
+        <MenuItem
+          onClick={() => handleStatusChange('rejected')}
+          disabled={Boolean(selectedReportForStatus && reports.find(r => r.id === selectedReportForStatus)?.status === 'rejected')}
+        >
+          <ListItemIcon>
+            <RejectedIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText primary="Tandai Ditolak" />
+        </MenuItem>
+      </Menu>
 
       {/* Report Detail Dialog */}
       <Dialog

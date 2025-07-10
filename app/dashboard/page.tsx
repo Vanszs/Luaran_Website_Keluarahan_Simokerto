@@ -55,33 +55,36 @@ export default function AdminDashboard() {
   // Quick stats cards data
   const quickStatsCards = [
     {
-      title: 'Laporan Hari Ini',
-      value: stats?.todayReports || 0,
-      icon: <WarningIcon fontSize="small" />,
-      color: theme.palette.primary.main,
-      path: '/dashboard/reports'
-    },
-    {
-      title: 'Total Laporan',
-      value: stats?.totalReports || 0,
-      icon: <AlertIcon fontSize="small" />,
-      color: theme.palette.error.main,
-      path: '/dashboard/reports'
-    },
-    {
-      title: 'Warga Terdaftar',
-      value: stats?.totalUsers || 0,
-      icon: <PeopleIcon fontSize="small" />,
-      color: theme.palette.success.main,
-      path: '/dashboard/citizens'
-    },
-    {
-      title: 'Perangkat Aktif',
-      value: stats?.activeDevices || 0,
-      icon: <DashboardIcon fontSize="small" />,
-      color: theme.palette.warning.main,
-      path: '/dashboard/devices'
-    }
+      title: 'Laporan Hari Ini',            value: stats?.todayReports || 0,
+            icon: <WarningIcon fontSize="small" />,
+            color: theme.palette.primary.main,
+            path: '/dashboard/reports',
+            loading: loading
+          },
+          {
+            title: 'Total Laporan',
+            value: stats?.totalReports || 0,
+            icon: <AlertIcon fontSize="small" />,
+            color: theme.palette.error.main,
+            path: '/dashboard/reports',
+            loading: loading
+          },
+          {
+            title: 'Warga Terdaftar',
+            value: stats?.totalUsers || 0,
+            icon: <PeopleIcon fontSize="small" />,
+            color: theme.palette.success.main,
+            path: '/dashboard/citizens',
+            loading: loading
+          },
+          {
+            title: 'Perangkat Aktif',
+            value: stats?.activeDevices || 0,
+            icon: <DashboardIcon fontSize="small" />,
+            color: theme.palette.warning.main,
+            path: '/dashboard/devices',
+            loading: loading
+          }
   ];
 
   return (

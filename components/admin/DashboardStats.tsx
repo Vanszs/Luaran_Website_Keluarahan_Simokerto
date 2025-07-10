@@ -21,6 +21,7 @@ import {
   CalendarToday as CalendarIcon,
 } from '@mui/icons-material';
 import { useApiData } from '../../hooks/useMockApi';
+import { getStatusChipStyle, getStatusInIndonesian, standardChipStyles } from '../../utils/statusStyles';
 
 // Define proper types for our data
 interface Report {
@@ -121,20 +122,26 @@ export default function DashboardStats({ useMockData = false }: DashboardStatsPr
         background: theme.palette.mode === 'dark'
           ? alpha(theme.palette.background.paper, 0.8)
           : alpha(theme.palette.background.paper, 0.8),
+        // Make table horizontally scrollable on small screens
+        [theme.breakpoints.down('md')]: {
+          overflowX: 'auto',
+        },
       }}>
-        <Table>
+        <Table sx={{ 
+          minWidth: { xs: 600, md: 'auto' }, // Set minimum width for horizontal scroll on mobile
+        }}>
           <TableHead sx={{
             backgroundColor: theme.palette.mode === 'dark'
               ? alpha(theme.palette.primary.main, 0.1)
               : alpha(theme.palette.primary.main, 0.05)
           }}>
             <TableRow>
-              <TableCell>ID</TableCell>
-              <TableCell>Pelapor</TableCell>
-              <TableCell>Lokasi</TableCell>
-              <TableCell>Deskripsi</TableCell>
-              <TableCell>Tanggal</TableCell>
-              <TableCell>Status</TableCell>
+              <TableCell sx={{ minWidth: 60 }}>ID</TableCell>
+              <TableCell sx={{ minWidth: 120 }}>Pelapor</TableCell>
+              <TableCell sx={{ minWidth: 150, display: { xs: 'none', sm: 'table-cell' } }}>Lokasi</TableCell>
+              <TableCell sx={{ minWidth: 200, display: { xs: 'none', md: 'table-cell' } }}>Deskripsi</TableCell>
+              <TableCell sx={{ minWidth: 120 }}>Tanggal</TableCell>
+              <TableCell sx={{ minWidth: 120 }}>Status</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -151,13 +158,22 @@ export default function DashboardStats({ useMockData = false }: DashboardStatsPr
                     #{report.id}
                   </TableCell>
                   <TableCell>
-                    {report.user?.name || report.submittedBy || 'Warga'}
+                    <Typography variant="body2" fontWeight={500}>
+                      {report.user?.name || report.submittedBy || 'Warga'}
+                    </Typography>
                   </TableCell>
-                  <TableCell>
-                    {report.address}
+                  <TableCell sx={{ display: { xs: 'none', sm: 'table-cell' } }}>
+                    <Typography variant="body2" sx={{ 
+                      maxWidth: 150,
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      whiteSpace: 'nowrap'
+                    }}>
+                      {report.address}
+                    </Typography>
                   </TableCell>
-                  <TableCell>
-                    <Typography noWrap sx={{ maxWidth: 250 }}>
+                  <TableCell sx={{ display: { xs: 'none', md: 'table-cell' } }}>
+                    <Typography noWrap sx={{ maxWidth: { md: 200, lg: 250 } }}>
                       {report.description}
                     </Typography>
                   </TableCell>
@@ -175,18 +191,11 @@ export default function DashboardStats({ useMockData = false }: DashboardStatsPr
                   </TableCell>
                   <TableCell>
                     <Chip
-                      label={report.status || 'Pending'}
+                      label={getStatusInIndonesian(report.status || 'Pending')}
                       size="small"
                       sx={{
-                        fontWeight: 500,
-                        backgroundColor:
-                          report.status === 'Completed' ? alpha((theme.palette.success as any).main, 0.1) :
-                          report.status === 'In Progress' ? alpha((theme.palette.warning as any).main, 0.1) :
-                          alpha((theme.palette.info as any).main, 0.1),
-                        color:
-                          report.status === 'Completed' ? (theme.palette.success as any).main :
-                          report.status === 'In Progress' ? (theme.palette.warning as any).main :
-                          (theme.palette.info as any).main,
+                        ...standardChipStyles,
+                        ...getStatusChipStyle(report.status || 'pending', theme),
                       }}
                     />
                   </TableCell>
@@ -211,6 +220,15 @@ export default function DashboardStats({ useMockData = false }: DashboardStatsPr
         page={page}
         onPageChange={handleChangePage}
         onRowsPerPageChange={handleChangeRowsPerPage}
+        sx={{
+          '& .MuiTablePagination-toolbar': {
+            padding: { xs: 1, sm: 2 },
+            fontSize: { xs: '0.75rem', sm: '0.875rem' },
+          },
+          '& .MuiTablePagination-selectLabel, & .MuiTablePagination-displayedRows': {
+            fontSize: { xs: '0.75rem', sm: '0.875rem' },
+          },
+        }}
       />
     </Paper>
   );

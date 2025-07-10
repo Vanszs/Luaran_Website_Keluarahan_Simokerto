@@ -43,7 +43,7 @@ import { useAuth } from '../../contexts/AuthContext';
 // Constants
 const drawerWidth = 280;
 
-// Modern Sidebar with glassmorphism - updated with proper z-index and no gaps
+// Modern Sidebar with glassmorphism - Always visible on desktop, sticky positioning
 const ModernDrawer = styled(Drawer)(({ theme }) => ({
   width: drawerWidth,
   flexShrink: 0,
@@ -54,34 +54,22 @@ const ModernDrawer = styled(Drawer)(({ theme }) => ({
       ? 'linear-gradient(135deg, rgba(15, 23, 42, 0.95) 0%, rgba(30, 41, 59, 0.95) 100%)'
       : 'linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 250, 252, 0.95) 100%)',
     backdropFilter: 'blur(20px)',
-    borderRight: 'none', // Remove border to eliminate visual gap
-    boxShadow: 'none', // Remove shadow to eliminate visual gap
+    borderRight: 'none',
+    boxShadow: 'none',
     transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
     overflowX: 'hidden',
     position: 'fixed',
     top: 0,
     left: 0,
     height: '100vh',
-    paddingTop: '64px', // Add padding to avoid overlap with AppBar
-    zIndex: theme.zIndex.drawer, // Use default drawer z-index (lower than appbar)
+    paddingTop: '74px', // Space for AppBar
+    zIndex: theme.zIndex.drawer,
   },
 }));
 
-// Modern header with animation - Removed extra padding and borders for seamless connection
+// Modern header - Remove header entirely since we have AppBar
 const ModernDrawerHeader = styled('div')(({ theme }) => ({
-  display: 'flex',
-  alignItems: 'center',
-  padding: theme.spacing(2, 2.5),
-  minHeight: '64px',
-  justifyContent: 'space-between',
-  background: theme.palette.mode === 'dark'
-    ? 'rgba(30, 41, 59, 0.95)' // More opaque for better contrast
-    : 'rgba(255, 255, 255, 0.95)', // More opaque for better contrast
-  backdropFilter: 'blur(10px)',
-  borderBottom: 'none', // Remove border for seamless connection
-  position: 'sticky',
-  top: 0,
-  zIndex: 10,
+  display: 'none', // Hide the header since we have AppBar
 }));
 
 const NavSection = styled(Box)(({ theme }) => ({
