@@ -440,6 +440,10 @@ export default function AdminManagement() {
             boxShadow: theme.palette.mode === 'dark'
               ? '0 4px 12px rgba(0,0,0,0.2)'
               : '0 4px 12px rgba(0,0,0,0.1)',
+            padding: 0.5, // Add padding to separate container border from table
+            background: theme.palette.mode === 'dark'
+              ? alpha(theme.palette.background.paper, 0.8)
+              : alpha(theme.palette.background.paper, 0.8),
           }}>
             <Table>
               <TableHead sx={{ 
@@ -508,6 +512,10 @@ export default function AdminManagement() {
         boxShadow: theme.palette.mode === 'dark'
           ? '0 4px 12px rgba(0,0,0,0.2)'
           : '0 4px 12px rgba(0,0,0,0.1)',
+        padding: 0.5, // Add padding to separate container border from table
+        background: theme.palette.mode === 'dark'
+          ? alpha(theme.palette.background.paper, 0.8)
+          : alpha(theme.palette.background.paper, 0.8),
       }}>
         <Table>
           <TableHead sx={{ 

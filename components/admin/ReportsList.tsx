@@ -28,10 +28,20 @@ import {
   DialogTitle,
   Button,
   Grid,
+  Chip,
+  IconButton,
+  Menu,
+  ListItemIcon,
+  ListItemText,
 } from '@mui/material';
 import {
   Search as SearchIcon,
   Warning as WarningIcon,
+  MoreVert as MoreVertIcon,
+  HourglassEmpty as PendingIcon,
+  Engineering as ProcessingIcon,
+  CheckCircle as CompletedIcon,
+  Cancel as RejectedIcon,
 } from '@mui/icons-material';
 
 interface Report {
@@ -54,16 +64,22 @@ export default function ReportsList() {
   const theme = useTheme();
   const [reports, setReports] = useState<Report[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<Error | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
-  const [detailDialog, setDetailDialog] = useState({
-    open: false,
-    report: null as Report | null
-  });
+  const [reportTypeFilter, setReportTypeFilter] = useState('all');
+  const [reporterTypeFilter, setReporterTypeFilter] = useState('all');
+  const [selectedReport, setSelectedReport] = useState<Report | null>(null);
+  const [detailDialogOpen, setDetailDialogOpen] = useState(false);
+  
+  // Status update related state
+  const [statusMenuAnchorEl, setStatusMenuAnchorEl] = useState<null | HTMLElement>(null);
+  const [selectedReportForStatus, setSelectedReportForStatus] = useState<number | null>(null);
+  const [statusUpdateLoading, setStatusUpdateLoading] = useState(false);
   const [snackbar, setSnackbar] = useState({
     open: false,
     message: '',
-    severity: 'success' as 'success' | 'error' | 'info'
+    severity: 'success' as 'success' | 'error' | 'info' | 'warning'
   });
 
   useEffect(() => {
@@ -74,29 +90,111 @@ export default function ReportsList() {
     setLoading(true);
     try {
       const response = await fetch('/api/admin/reports');
-      if (response.ok) {
-        const data = await response.json();
-        setReports(data.reports ?? data);
-      } else {
+      if (!response.ok) {
         throw new Error('Failed to fetch reports');
       }
+      const data = await response.json();
+      setReports(data.reports);
     } catch (error) {
+      setError(error as Error);
       console.error('Error fetching reports:', error);
-      setSnackbar({
-        open: true,
-        message: 'Failed to load reports',
-        severity: 'error'
-      });
     } finally {
       setLoading(false);
     }
   };
 
+  // Status menu handlers
+  const handleStatusMenuOpen = (event: React.MouseEvent<HTMLButtonElement>, reportId: number) => {
+    setStatusMenuAnchorEl(event.currentTarget);
+    setSelectedReportForStatus(reportId);
+  };
+
+  const handleStatusMenuClose = () => {
+    setStatusMenuAnchorEl(null);
+    setSelectedReportForStatus(null);
+  };
+
+  const handleStatusChange = async (newStatus: string) => {
+    if (!selectedReportForStatus) return;
+    
+    setStatusUpdateLoading(true);
+    try {
+      const response = await fetch('/api/admin/reports/status', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          reportId: selectedReportForStatus,
+          status: newStatus
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to update status');
+      }
+
+      // Update local reports state with new status
+      setReports(prevReports => 
+        prevReports.map(report => 
+          report.id === selectedReportForStatus ? { ...report, status: newStatus } : report
+        )
+      );
+
+      setSnackbar({
+        open: true,
+        message: `Status berhasil diubah menjadi ${getStatusInIndonesian(newStatus)}`,
+        severity: 'success'
+      });
+    } catch (error) {
+      console.error('Error updating status:', error);
+      setSnackbar({
+        open: true,
+        message: 'Gagal mengubah status laporan',
+        severity: 'error'
+      });
+    } finally {
+      setStatusUpdateLoading(false);
+      handleStatusMenuClose();
+    }
+  };
+
+  // Helper function to get status in Indonesian
+  const getStatusInIndonesian = (status: string): string => {
+    switch (status) {
+      case 'pending': return 'Menunggu';
+      case 'processing': return 'Diproses';
+      case 'completed': return 'Selesai';
+      case 'rejected': return 'Ditolak';
+      default: return status;
+    }
+  };
+
+  // Helper function to get status icon
+  const getStatusIcon = (status: string) => {
+    switch (status) {
+      case 'pending': return <PendingIcon fontSize="small" />;
+      case 'processing': return <ProcessingIcon fontSize="small" />;
+      case 'completed': return <CompletedIcon fontSize="small" />;
+      case 'rejected': return <RejectedIcon fontSize="small" />;
+      default: return <PendingIcon fontSize="small" />;
+    }
+  };
+
+  // Helper function to get status color
+  const getStatusColor = (status: string): "default" | "primary" | "secondary" | "error" | "info" | "success" | "warning" => {
+    switch (status) {
+      case 'pending': return 'warning';
+      case 'processing': return 'info';
+      case 'completed': return 'success';
+      case 'rejected': return 'error';
+      default: return 'default';
+    }
+  };
+
   const handleViewDetails = (report: Report) => {
-    setDetailDialog({
-      open: true,
-      report
-    });
+    setDetailDialogOpen(true);
+    setSelectedReport(report);
   };
 
   const filteredReports = reports.filter(report => {
@@ -199,6 +297,10 @@ export default function ReportsList() {
         boxShadow: theme.palette.mode === 'dark'
           ? '0 4px 12px rgba(0,0,0,0.2)'
           : '0 4px 12px rgba(0,0,0,0.1)',
+        padding: 0.5, // Add padding to separate container border from table
+        background: theme.palette.mode === 'dark'
+          ? alpha(theme.palette.background.paper, 0.8)
+          : alpha(theme.palette.background.paper, 0.8),
       }}>
         <Table>
           <TableHead sx={{ 
@@ -238,16 +340,81 @@ export default function ReportsList() {
                       minute: '2-digit'
                     })}
                   </TableCell>
-                  <TableCell>{report.status}</TableCell>
+                  <TableCell>
+                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                      <Chip
+                        icon={getStatusIcon(report.status)}
+                        label={getStatusInIndonesian(report.status)}
+                        color={getStatusColor(report.status)}
+                        size="small"
+                        sx={{ mr: 1 }}
+                      />
+                      <IconButton 
+                        size="small"
+                        onClick={(e) => handleStatusMenuOpen(e, report.id)}
+                        disabled={statusUpdateLoading}
+                      >
+                        <MoreVertIcon fontSize="small" />
+                      </IconButton>
+                    </Box>
+                  </TableCell>
                   <TableCell align="right">
-                    <Button
-                      variant="outlined"
+                    <IconButton
                       size="small"
-                      onClick={() => handleViewDetails(report)}
-                      sx={{ borderRadius: 2 }}
+                      onClick={(e) => handleStatusMenuOpen(e, report.id)}
                     >
-                      Detail
-                    </Button>
+                      <MoreVertIcon fontSize="small" />
+                    </IconButton>
+                    <Menu
+                      anchorEl={statusMenuAnchorEl}
+                      open={Boolean(statusMenuAnchorEl) && selectedReportForStatus === report.id}
+                      onClose={handleStatusMenuClose}
+                    >
+                      <MenuItem
+                        onClick={() => {
+                          handleStatusChange('pending');
+                        }}
+                        disabled={report.status === 'pending'}
+                      >
+                        <ListItemIcon>
+                          <PendingIcon fontSize="small" />
+                        </ListItemIcon>
+                        <ListItemText primary="Tandai Sebagai Pending" />
+                      </MenuItem>
+                      <MenuItem
+                        onClick={() => {
+                          handleStatusChange('processing');
+                        }}
+                        disabled={report.status === 'processing'}
+                      >
+                        <ListItemIcon>
+                          <ProcessingIcon fontSize="small" />
+                        </ListItemIcon>
+                        <ListItemText primary="Tandai Sedang Diproses" />
+                      </MenuItem>
+                      <MenuItem
+                        onClick={() => {
+                          handleStatusChange('completed');
+                        }}
+                        disabled={report.status === 'completed'}
+                      >
+                        <ListItemIcon>
+                          <CompletedIcon fontSize="small" />
+                        </ListItemIcon>
+                        <ListItemText primary="Tandai Selesai" />
+                      </MenuItem>
+                      <MenuItem
+                        onClick={() => {
+                          handleStatusChange('rejected');
+                        }}
+                        disabled={report.status === 'rejected'}
+                      >
+                        <ListItemIcon>
+                          <RejectedIcon fontSize="small" />
+                        </ListItemIcon>
+                        <ListItemText primary="Tandai Ditolak" />
+                      </MenuItem>
+                    </Menu>
                   </TableCell>
                 </TableRow>
               ))
@@ -269,21 +436,21 @@ export default function ReportsList() {
 
       {/* Report Detail Dialog */}
       <Dialog
-        open={detailDialog.open}
-        onClose={() => setDetailDialog({ ...detailDialog, open: false })}
+        open={detailDialogOpen}
+        onClose={() => setDetailDialogOpen(false)}
         fullWidth
         maxWidth="sm"
       >
-        <DialogTitle>Detail Laporan #{detailDialog.report?.id}</DialogTitle>
+        <DialogTitle>Detail Laporan #{selectedReport?.id}</DialogTitle>
         <DialogContent>
-          {detailDialog.report && (
+          {selectedReport && (
             <Grid container spacing={2} sx={{ mt: 1 }}>
               <Grid item xs={12} sm={4}>
                 <Typography variant="subtitle2" color="text.secondary">
                   ID Laporan
                 </Typography>
                 <Typography variant="body1" fontWeight={500}>
-                  {detailDialog.report.id}
+                  {selectedReport.id}
                 </Typography>
               </Grid>
               <Grid item xs={12} sm={8}>
@@ -291,7 +458,7 @@ export default function ReportsList() {
                   Waktu Laporan
                 </Typography>
                 <Typography variant="body1" fontWeight={500}>
-                  {new Date(detailDialog.report.created_at).toLocaleDateString('id-ID', {
+                  {new Date(selectedReport.created_at).toLocaleDateString('id-ID', {
                     day: 'numeric',
                     month: 'long',
                     year: 'numeric',
@@ -305,7 +472,7 @@ export default function ReportsList() {
                   Nama Pelapor
                 </Typography>
                 <Typography variant="body1" fontWeight={500}>
-                  {detailDialog.report.pelapor || detailDialog.report.user.name}
+                  {selectedReport.pelapor || selectedReport.user.name}
                 </Typography>
               </Grid>
               <Grid item xs={12} sm={6}>
@@ -313,7 +480,7 @@ export default function ReportsList() {
                   Tipe Pelapor
                 </Typography>
                 <Typography variant="body1" fontWeight={500}>
-                  {detailDialog.report.reporter_type === 'admin' ? 'Admin' : 'Warga'}
+                  {selectedReport.reporter_type === 'admin' ? 'Admin' : 'Warga'}
                 </Typography>
               </Grid>
               <Grid item xs={12} sm={6}>
@@ -321,7 +488,7 @@ export default function ReportsList() {
                   No. Telepon
                 </Typography>
                 <Typography variant="body1" fontWeight={500}>
-                  {detailDialog.report.user.phone || '-'}
+                  {selectedReport.user.phone || '-'}
                 </Typography>
               </Grid>
               <Grid item xs={12} sm={6}>
@@ -329,7 +496,7 @@ export default function ReportsList() {
                   Jenis Laporan
                 </Typography>
                 <Typography variant="body1" fontWeight={500}>
-                  {detailDialog.report.jenis_laporan || 'Umum'}
+                  {selectedReport.jenis_laporan || 'Umum'}
                 </Typography>
               </Grid>
               <Grid item xs={12}>
@@ -337,7 +504,7 @@ export default function ReportsList() {
                   Alamat Kejadian
                 </Typography>
                 <Typography variant="body1" fontWeight={500}>
-                  {detailDialog.report.address}
+                  {selectedReport.address}
                 </Typography>
               </Grid>
               <Grid item xs={12}>
@@ -345,14 +512,14 @@ export default function ReportsList() {
                   Deskripsi
                 </Typography>
                 <Typography variant="body1" fontWeight={500}>
-                  {detailDialog.report.description}
+                  {selectedReport.description}
                 </Typography>
               </Grid>
             </Grid>
           )}
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setDetailDialog({ ...detailDialog, open: false })}>
+          <Button onClick={() => setDetailDialogOpen(false)}>
             Tutup
           </Button>
         </DialogActions>

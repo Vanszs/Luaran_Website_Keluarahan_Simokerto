@@ -106,8 +106,9 @@ const MainContent = styled(Box, {
   paddingTop: '74px', // Increased padding to ensure content is below AppBar
   marginLeft: 0, // Default margin for mobile
   [theme.breakpoints.up('md')]: {
-    width: open ? `calc(100% - ${drawerWidth}px)` : '100%',
-    marginLeft: open ? `${drawerWidth}px` : 0, // Add margin when sidebar is open on desktop
+    width: '100%', // Full width always
+    marginLeft: open ? `${drawerWidth}px` : 0, // Only add margin when sidebar is open
+    paddingLeft: 0, // Remove default padding to eliminate gap
   },
 }));
 
@@ -117,6 +118,9 @@ const ContentWrapper = styled(Box)(({ theme }) => ({
   padding: theme.spacing(3),
   [theme.breakpoints.down('sm')]: {
     padding: theme.spacing(2),
+  },
+  [theme.breakpoints.up('md')]: {
+    padding: theme.spacing(4),
   },
   animation: `${fadeInUp} 0.6s ease-out both`,
   position: 'relative',
