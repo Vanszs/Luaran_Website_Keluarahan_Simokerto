@@ -48,7 +48,7 @@ interface Admin {
   username: string;
   name: string | null;
   created_at: string;
-  role: 'superadmin' | 'admin' | null; // Allow null for pending admins
+  role: 'superadmin' | 'admin' | 'petugas' | null; // Allow null for pending admins
   pending: boolean; // Add pending status
 }
 
@@ -74,7 +74,7 @@ export default function AdminManagement() {
     username: '',
     name: '',
     password: '',
-    role: 'admin' as 'admin' | 'superadmin',
+    role: 'admin' as 'admin' | 'superadmin' | 'petugas',
   });
   const [snackbar, setSnackbar] = useState({
     open: false,
@@ -85,6 +85,26 @@ export default function AdminManagement() {
   useEffect(() => {
     fetchAdmins();
   }, []);
+
+  // Reset the form when opening the dialog in add mode
+  const resetForm = () => {
+    setFormData({
+      username: '',
+      name: '',
+      password: '',
+      role: 'admin', // Default role for new admins
+    });
+  };
+
+  // Populate form with admin data when editing
+  const populateForm = (admin: Admin) => {
+    setFormData({
+      username: admin.username,
+      name: admin.name || '',
+      password: '', // Don't populate password for security
+      role: admin.role || 'admin', // Default to admin if role is null
+    });
+  };
 
   const fetchAdmins = async () => {
     setLoading(true);
@@ -114,12 +134,7 @@ export default function AdminManagement() {
   };
 
   const handleAddAdmin = () => {
-    setFormData({
-      username: '',
-      name: '',
-      password: '',
-      role: 'admin',
-    });
+    resetForm();
     setAdminDialog({
       open: true,
       admin: null,
@@ -128,12 +143,7 @@ export default function AdminManagement() {
   };
 
   const handleEditAdmin = (admin: Admin) => {
-    setFormData({
-      username: admin.username,
-      name: admin.name || '',
-      password: '', // Don't prefill password when editing
-      role: admin.role!, // Assert non-null as edit is only for approved admins
-    });
+    populateForm(admin);
     setAdminDialog({
       open: true,
       admin,
@@ -159,12 +169,18 @@ export default function AdminManagement() {
     });
   };
 
+  // State for approval role selection
+  const [approvalRole, setApprovalRole] = useState<'admin' | 'petugas' | 'superadmin'>('admin');
+  const [approvalDialog, setApprovalDialog] = useState({
+    open: false,
+    admin: null as Admin | null
+  });
+  
   const handleApproveAdmin = (admin: Admin) => {
-    setConfirmDialog({
+    setApprovalRole('admin'); // Reset to default role
+    setApprovalDialog({
       open: true,
-      title: 'Setujui Admin',
-      message: `Apakah Anda yakin ingin menyetujui "${admin.name}" sebagai admin?`,
-      onConfirm: () => confirmApproveAdmin(admin.id)
+      admin
     });
   };
 
@@ -248,29 +264,46 @@ export default function AdminManagement() {
     }
   };
 
-  const confirmApproveAdmin = async (adminId: number) => {
+  const confirmApproveAdmin = async (adminId: number, selectedRole: 'admin' | 'petugas' | 'superadmin') => {
     try {
       const response = await fetch(`/api/admin/admins/approve/${adminId}`, {
-        method: 'PUT'
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ role: selectedRole }) // Pass the selected role
       });
 
-      if (!response.ok) {
-        throw new Error('Failed to approve admin');
-      }
-
-      // Refresh admin lists
-      fetchAdmins();
+      const data = await response.json();
       
-      setSnackbar({
-        open: true,
-        message: 'Admin approved successfully',
-        severity: 'success'
-      });
+      if (data.alreadyApproved) {
+        setSnackbar({
+          open: true,
+          message: 'Admin ini telah disetujui sebelumnya',
+          severity: 'info'
+        });
+        
+        // Even if already approved, refresh the lists
+        // This ensures UI consistency when admins click multiple times
+        fetchAdmins();
+      } else if (response.ok) {
+        // Remove from pending list
+        setPendingAdmins(pendingAdmins.filter(admin => admin.id !== adminId));
+        
+        // Refresh admin lists
+        fetchAdmins();
+        
+        setSnackbar({
+          open: true,
+          message: 'Admin berhasil disetujui',
+          severity: 'success'
+        });
+      } else {
+        throw new Error(data.message || 'Failed to approve admin');
+      }
     } catch (error) {
       console.error('Error approving admin:', error);
       setSnackbar({
         open: true,
-        message: 'Failed to approve admin',
+        message: error instanceof Error ? error.message : 'Failed to approve admin',
         severity: 'error'
       });
     } finally {
@@ -499,10 +532,17 @@ export default function AdminManagement() {
                   <TableCell>{admin.username}</TableCell>
                   <TableCell>{admin.name}</TableCell>
                   <TableCell>
-                    <Chip
-                      label={admin.role === 'superadmin' ? 'Super Admin' : 'Admin'}
-                      color={admin.role === 'superadmin' ? 'primary' : 'default'}
+                    <Chip 
                       size="small"
+                      icon={<AdminIcon />}
+                      label={
+                        admin.role === 'superadmin' ? 'Super Admin' : 
+                        admin.role === 'petugas' ? 'Petugas' : 'Admin'
+                      }
+                      color={
+                        admin.role === 'superadmin' ? 'primary' : 
+                        admin.role === 'petugas' ? 'secondary' : 'default'
+                      }
                     />
                   </TableCell>
                   <TableCell>
@@ -614,6 +654,7 @@ export default function AdminManagement() {
                   disabled={adminDialog.admin?.id === user?.id} // Cannot change own role
                 >
                   <MenuItem value="admin">Admin</MenuItem>
+                  <MenuItem value="petugas">Petugas</MenuItem>
                   <MenuItem value="superadmin">Super Admin</MenuItem>
                 </Select>
               </FormControl>
@@ -626,6 +667,51 @@ export default function AdminManagement() {
           </Button>
           <Button onClick={submitAdminForm} variant="contained">
             Simpan
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Approval Dialog with Role Selection */}
+      <Dialog
+        open={approvalDialog.open}
+        onClose={() => setApprovalDialog({ ...approvalDialog, open: false })}
+      >
+        <DialogTitle>Setujui Admin</DialogTitle>
+        <DialogContent>
+          <Box sx={{ pt: 2 }}>
+            <Typography variant="body1" gutterBottom>
+              Pilih role untuk {approvalDialog.admin?.name}:
+            </Typography>
+            <FormControl fullWidth sx={{ mt: 2 }}>
+              <InputLabel id="approval-role-label">Role</InputLabel>
+              <Select
+                labelId="approval-role-label"
+                value={approvalRole}
+                label="Role"
+                onChange={(e) => setApprovalRole(e.target.value as 'admin' | 'petugas' | 'superadmin')}
+              >
+                <MenuItem value="admin">Admin</MenuItem>
+                <MenuItem value="petugas">Petugas</MenuItem>
+                <MenuItem value="superadmin">Super Admin</MenuItem>
+              </Select>
+            </FormControl>
+          </Box>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setApprovalDialog({ ...approvalDialog, open: false })}>
+            Batal
+          </Button>
+          <Button 
+            onClick={() => {
+              if (approvalDialog.admin) {
+                confirmApproveAdmin(approvalDialog.admin.id, approvalRole);
+                setApprovalDialog({ ...approvalDialog, open: false });
+              }
+            }} 
+            variant="contained"
+            color="primary"
+          >
+            Setujui
           </Button>
         </DialogActions>
       </Dialog>

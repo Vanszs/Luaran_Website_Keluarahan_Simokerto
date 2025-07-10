@@ -77,14 +77,14 @@ const ModernAppBar = styled(AppBar, {
   shouldForwardProp: (prop) => prop !== 'open',
 })<{ open?: boolean }>(({ theme, open }) => ({
   background: theme.palette.mode === 'dark'
-    ? 'rgba(15, 23, 42, 0.75)'
+    ? 'rgba(15, 23, 42, 0.85)'
     : 'rgba(255, 255, 255, 0.95)',
-  backdropFilter: 'blur(6px)',
+  backdropFilter: 'blur(12px)',
   borderBottom: `1px solid ${theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.08)'}`,
   boxShadow: theme.palette.mode === 'dark'
     ? '0 4px 20px rgba(0, 0, 0, 0.2)'
     : '0 4px 20px rgba(0, 0, 0, 0.05)',
-  zIndex: theme.zIndex.drawer - 1, // Keep navbar below drawer to prevent overlap with logo
+  zIndex: theme.zIndex.drawer + 1, // Keep navbar ABOVE drawer to prevent logo overlap issues
   transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
   width: '100%',
   position: 'fixed',
@@ -103,9 +103,11 @@ const MainContent = styled(Box, {
   minHeight: '100vh',
   transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
   width: '100%',
-  paddingTop: '64px',
+  paddingTop: '74px', // Increased padding to ensure content is below AppBar
+  marginLeft: 0, // Default margin for mobile
   [theme.breakpoints.up('md')]: {
     width: open ? `calc(100% - ${drawerWidth}px)` : '100%',
+    marginLeft: open ? `${drawerWidth}px` : 0, // Add margin when sidebar is open on desktop
   },
 }));
 

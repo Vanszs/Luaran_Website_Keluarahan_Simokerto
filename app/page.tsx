@@ -146,14 +146,20 @@ function LoginContent() {
       if (result?.success) {
         console.log('Login successful, redirecting based on role...');
         
-        // Redirect based on user role
-        if (result.user.role === 'superadmin') {
-          console.log('Redirecting superadmin to /admin');
-          router.push('/admin');
-        } else {
-          console.log('Redirecting regular admin to /dashboard');
-          router.push('/dashboard');
-        }
+        // Set a short timeout to ensure state updates and cookie is set properly before redirect
+        setTimeout(() => {
+          // Redirect based on user role
+          if (result.user.role === 'superadmin') {
+            console.log('Redirecting superadmin to /admin');
+            window.location.href = '/admin'; // Use direct navigation instead of router
+          } else if (result.user.role === 'admin') {
+            console.log('Redirecting regular admin to /dashboard');
+            window.location.href = '/dashboard'; // Use direct navigation instead of router
+          } else if (result.user.role === 'petugas') {
+            console.log('Petugas role - staying on main page');
+            setSuccessMessage('Logged in successfully as Petugas. This role cannot access dashboards.');
+          }
+        }, 500);
       } else {
         console.error('Login failed with result:', result);
         setError(result?.message || 'Login failed. Please try again.');

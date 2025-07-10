@@ -32,7 +32,7 @@ export async function POST(request: NextRequest) {
     }
     
     // Validate role
-    if (role !== 'admin' && role !== 'superadmin') {
+    if (role !== 'admin' && role !== 'superadmin' && role !== 'petugas') {
       return NextResponse.json(
         { message: 'Invalid role' },
         { status: 400 }

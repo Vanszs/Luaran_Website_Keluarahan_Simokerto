@@ -7,7 +7,7 @@ export const dynamic = 'force-dynamic';
 export async function GET(request: NextRequest) {
   try {
     const users = await query(
-      'SELECT id, username, name, address, created_at FROM users ORDER BY id DESC'
+      'SELECT id, username, name, address, phone, created_at FROM users ORDER BY id DESC'
     );
 
     return NextResponse.json(users);
@@ -23,7 +23,7 @@ export async function GET(request: NextRequest) {
 // POST new user
 export async function POST(request: NextRequest) {
   try {
-    const { username, password, name, address } = await request.json();
+    const { username, password, name, address, phone } = await request.json();
     
     // Validate input
     if (!username || !password || !name || !address) {
@@ -32,6 +32,8 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       );
     }
+    
+    // Phone is optional
     
     // Check if username already exists
     const existingUsers = await query(
@@ -48,8 +50,8 @@ export async function POST(request: NextRequest) {
 
     // Insert new user
     await query(
-      'INSERT INTO users (username, password, name, address) VALUES (?, ?, ?, ?)',
-      [username, password, name, address]
+      'INSERT INTO users (username, password, name, address, phone) VALUES (?, ?, ?, ?, ?)',
+      [username, password, name, address, phone || null]
     );
 
     return NextResponse.json({ message: 'User created successfully' });

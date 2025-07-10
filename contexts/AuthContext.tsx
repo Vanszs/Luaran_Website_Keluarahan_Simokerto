@@ -8,14 +8,14 @@ interface User {
   id: string;
   username: string;
   name: string;
-  role: 'admin' | 'superadmin';
+  role: 'admin' | 'superadmin' | 'petugas';
 }
 
 interface AuthContextType {
   user: User | null;
   login: (username: string, password: string) => Promise<any>;
   logout: () => Promise<void>;
-  registerAdmin: (data: { username: string; password: string; name: string }) => Promise<any>;
+  registerAdmin: (data: { username: string; password: string; name: string; address?: string; phone?: string }) => Promise<any>;
   loading: boolean;
 }
 
@@ -67,6 +67,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
 
       setUser(data.user);
+      console.log('User data set in context:', data.user);
+      
+      // Manually navigate based on role after successful login
+      if (data.user && data.user.role) {
+        // A slight delay to ensure cookie is properly set
+        setTimeout(() => {
+          if (data.user.role === 'superadmin') {
+            router.push('/admin');
+          } else if (data.user.role === 'admin') {
+            router.push('/dashboard');
+          } else {
+            router.push('/');
+          }
+        }, 100);
+      }
+      
       return data; // This will include user with role information
     } catch (error) {
       console.error('Login error:', error);
@@ -92,7 +108,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const registerAdmin = async (data: { username: string; password: string; name: string }) => {
+  const registerAdmin = async (data: { username: string; password: string; name: string; address?: string; phone?: string }) => {
     setLoading(true);
     try {
       const response = await fetch('/api/auth/register', {

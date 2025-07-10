@@ -43,7 +43,7 @@ import { useAuth } from '../../contexts/AuthContext';
 // Constants
 const drawerWidth = 280;
 
-// Modern Sidebar with glassmorphism - updated with higher z-index
+// Modern Sidebar with glassmorphism - updated with proper z-index
 const ModernDrawer = styled(Drawer)(({ theme }) => ({
   width: drawerWidth,
   flexShrink: 0,
@@ -64,17 +64,17 @@ const ModernDrawer = styled(Drawer)(({ theme }) => ({
     top: 0,
     left: 0,
     height: '100vh',
-    zIndex: theme.zIndex.drawer + 2, // Increased z-index to ensure it's above navbar
+    paddingTop: '64px', // Add padding to avoid overlap with AppBar
+    zIndex: theme.zIndex.drawer, // Use default drawer z-index (lower than appbar)
   },
 }));
 
-// Modern header with animation - Add padding for logo area
+// Modern header with animation - Removed extra padding since we added paddingTop to the drawer
 const ModernDrawerHeader = styled('div')(({ theme }) => ({
   display: 'flex',
   alignItems: 'center',
   padding: theme.spacing(2, 2.5),
   minHeight: '64px',
-  paddingTop: theme.spacing(2.5), // Added extra top padding for logo area
   justifyContent: 'space-between',
   background: theme.palette.mode === 'dark'
     ? 'rgba(30, 41, 59, 0.95)' // More opaque for better contrast

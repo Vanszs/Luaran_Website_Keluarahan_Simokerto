@@ -7,7 +7,7 @@ import { Box, CircularProgress, Typography } from '@mui/material';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
-  allowedRoles?: ('admin' | 'superadmin')[];
+  allowedRoles?: ('admin' | 'superadmin' | 'petugas')[];
   redirectTo?: string;
 }
 

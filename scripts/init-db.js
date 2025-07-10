@@ -8,8 +8,8 @@ dotenv.config({ path: path.join(__dirname, '..', '.env.local') });
 
 const dbConfig = {
   host: process.env.DB_HOST || 'localhost',
-  user: process.env.DB_USER || 'root',
-  password: process.env.DB_PASSWORD || '',
+  user: process.env.DB_USER || 'laporuser',
+  password: process.env.DB_PASSWORD || '1346792581!aA',
   multipleStatements: true
 };
 

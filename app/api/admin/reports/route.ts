@@ -16,9 +16,11 @@ export async function GET(req: NextRequest) {
       });
     }
     
-    // Query reports with user information using JOIN
+    // Query reports with user information using JOIN, including all new fields
     const reportsResult = await query(`
-      SELECT r.id, r.user_id, r.address, r.description, r.created_at, u.name as user_name
+      SELECT r.id, r.user_id, r.address, r.description, r.created_at, 
+             r.pelapor, r.jenis_laporan, r.reporter_type, r.status,
+             u.name as user_name, u.phone as user_phone
       FROM reports r
       JOIN users u ON r.user_id = u.id
       ORDER BY r.created_at DESC
@@ -31,9 +33,14 @@ export async function GET(req: NextRequest) {
       address: r.address,
       description: r.description,
       created_at: r.created_at,
-      user: { name: r.user_name },
-      // generate pseudo status since column doesn't exist
-      status: ['pending', 'processing', 'completed'][r.id % 3]
+      pelapor: r.pelapor || r.user_name, // Use pelapor if available, otherwise user_name
+      jenis_laporan: r.jenis_laporan || 'Umum', // Default to 'Umum' if not specified
+      reporter_type: r.reporter_type || 'user', // Default to 'user' if not specified
+      status: r.status || 'pending', // Use status from DB if available
+      user: { 
+        name: r.user_name,
+        phone: r.user_phone || null
+      }
     }));
 
     return NextResponse.json({
@@ -52,18 +59,84 @@ export async function GET(req: NextRequest) {
   }
 }
 
+// POST endpoint to create a new report (for admin reporting)
+export async function POST(req: NextRequest) {
+  try {
+    const body = await req.json();
+    const { user_id, address, description, jenis_laporan } = body;
+    
+    // Get admin info from session
+    const sessionCookie = req.cookies.get('admin_session');
+    const authHeader = req.headers.get('Authorization');
+    let sessionValue = sessionCookie?.value;
+    
+    // Extract token from Authorization header if present
+    if (!sessionValue && authHeader?.startsWith('Bearer ')) {
+      sessionValue = authHeader.substring(7);
+    }
+    
+    if (!sessionValue) {
+      return NextResponse.json(
+        { message: 'Unauthorized: No session found' },
+        { status: 401 }
+      );
+    }
+    
+    // Decode admin session
+    const decoded = Buffer.from(sessionValue, 'base64').toString('utf8');
+    const sessionData = JSON.parse(decoded);
+    const adminName = sessionData.name;
+    
+    // Validate input
+    if (!user_id || !address || !description || !jenis_laporan) {
+      return NextResponse.json(
+        { message: 'Missing required fields' },
+        { status: 400 }
+      );
+    }
+    
+    // Insert new report as admin
+    const result = await query(
+      `INSERT INTO reports 
+       (user_id, address, description, jenis_laporan, reporter_type, pelapor, status) 
+       VALUES (?, ?, ?, ?, ?, ?, ?)`,
+      [user_id, address, description, jenis_laporan, 'admin', adminName, 'pending']
+    );
+    
+    return NextResponse.json({
+      message: 'Report created successfully',
+      report_id: (result as any).insertId
+    }, { status: 201 });
+    
+  } catch (error) {
+    console.error('Error creating report:', error);
+    return NextResponse.json(
+      { message: 'Failed to create report', error: String(error) },
+      { status: 500 }
+    );
+  }
+}
+
 function generateMockReports() {
-  // Create an array of mock reports
+  // Create an array of mock reports with the updated fields
   const reports = [];
+  const reportTypes = ['kemalingan', 'kebakaran', 'tawuran', 'hmmm', 'jaguh', 'jatuh', 'ngantuk'];
   
   for (let i = 1; i <= 35; i++) {
     reports.push({
       id: i,
+      user_id: i % 5 + 1,
       address: `Jl. Contoh No. ${i}, Surabaya`,
       description: `Laporan kejadian ${i}: Lorem ipsum dolor sit amet, consectetur adipiscing elit.`,
       created_at: new Date(Date.now() - i * 3600000).toISOString(),
-      submittedBy: `Warga ${i % 5 + 1}`,
-      status: i % 3 === 0 ? 'Completed' : i % 3 === 1 ? 'In Progress' : 'Pending'
+      pelapor: `Warga ${i % 5 + 1}`,
+      jenis_laporan: reportTypes[i % reportTypes.length],
+      reporter_type: i % 10 === 0 ? 'admin' : 'user',
+      status: i % 3 === 0 ? 'completed' : i % 3 === 1 ? 'processing' : 'pending',
+      user: {
+        name: `Warga ${i % 5 + 1}`,
+        phone: `0812345${i.toString().padStart(4, '0')}`
+      }
     });
   }
   

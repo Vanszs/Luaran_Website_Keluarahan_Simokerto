@@ -28,8 +28,8 @@ export async function GET(req: NextRequest) {
         expires: new Date(0),
         path: '/',
         httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'strict',
+        secure: false, // Setting to false to work in all environments including HTTP
+        sameSite: 'lax',
       });
       return NextResponse.json({ authenticated: false, message: 'Invalid session data' }, { status: 401 });
     }

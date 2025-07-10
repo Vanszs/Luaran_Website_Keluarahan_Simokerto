@@ -40,6 +40,7 @@ interface User {
   username: string;
   name: string;
   address: string;
+  phone: string | null;
   created_at: string;
 }
 
@@ -62,6 +63,7 @@ export default function UserManagement() {
     username: '',
     name: '',
     address: '',
+    phone: '',
     password: '',
   });
   const [snackbar, setSnackbar] = useState({
@@ -101,6 +103,7 @@ export default function UserManagement() {
       username: '',
       name: '',
       address: '',
+      phone: '',
       password: '',
     });
     setUserDialog({
@@ -115,6 +118,7 @@ export default function UserManagement() {
       username: user.username,
       name: user.name,
       address: user.address,
+      phone: user.phone || '',
       password: '', // Don't prefill password when editing
     });
     setUserDialog({
@@ -304,6 +308,7 @@ export default function UserManagement() {
               <TableCell>Username</TableCell>
               <TableCell>Nama</TableCell>
               <TableCell>Alamat</TableCell>
+              <TableCell>No. Telepon</TableCell>
               <TableCell>Terdaftar</TableCell>
               <TableCell align="right">Aksi</TableCell>
             </TableRow>
@@ -316,6 +321,7 @@ export default function UserManagement() {
                   <TableCell>{user.username}</TableCell>
                   <TableCell>{user.name}</TableCell>
                   <TableCell>{user.address}</TableCell>
+                  <TableCell>{user.phone || '-'}</TableCell>
                   <TableCell>
                     {new Date(user.created_at).toLocaleDateString('id-ID', {
                       day: 'numeric',
@@ -406,6 +412,16 @@ export default function UserManagement() {
                 onChange={handleInputChange}
                 multiline
                 rows={2}
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                fullWidth
+                label="Nomor Telepon"
+                name="phone"
+                value={formData.phone}
+                onChange={handleInputChange}
+                placeholder="Contoh: 081234567890"
               />
             </Grid>
             <Grid item xs={12}>

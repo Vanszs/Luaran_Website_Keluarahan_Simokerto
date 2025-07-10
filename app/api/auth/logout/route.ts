@@ -17,7 +17,7 @@ export async function POST(request: NextRequest) {
         expires: new Date(0),
         path: '/',
         httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
+        secure: false, // Setting to false to work in all environments including HTTP
         sameSite: 'lax', // Changed from "strict" to "lax"
       });
     }

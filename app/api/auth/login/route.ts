@@ -20,6 +20,9 @@ export async function POST(req: NextRequest) {
     const isDatabaseAvailable = await checkDatabaseConnection();
     console.log(`Database available: ${isDatabaseAvailable}`);
     
+    // Clear any existing session cookies first
+    cookies().delete('admin_session');
+    
     // Query the database, including the pending status
     const results = await query(
       'SELECT id, username, name, role, pending FROM admin WHERE username = ? AND password = ?',
@@ -44,29 +47,40 @@ export async function POST(req: NextRequest) {
     }
     
     // Generate a simple session ID
-    const sessionId = Buffer.from(JSON.stringify({ id: userData.id, role: userData.role, username: userData.username, name: userData.name })).toString('base64');
+    const sessionId = Buffer.from(JSON.stringify({ 
+      id: userData.id, 
+      role: userData.role, 
+      username: userData.username, 
+      name: userData.name,
+      timestamp: new Date().getTime()
+    })).toString('base64');
     
-    // Set secure HTTP-only cookie
-    cookies().set({
-      name: 'admin_session',
-      value: sessionId,
-      httpOnly: true,
-      path: '/',
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
-      // 7 day expiration
-      maxAge: 7 * 24 * 60 * 60
-    });
-    
-    return NextResponse.json({
+    // Create response with JSON data first
+    const response = NextResponse.json({
       success: true,
       user: {
         id: userData.id,
         username: userData.username,
         name: userData.name,
         role: userData.role
-      }
+      },
+      // Also include session token in the response body for mobile clients
+      sessionToken: sessionId
     });
+    
+    // Set secure HTTP-only cookie with more compatible settings
+    response.cookies.set({
+      name: 'admin_session',
+      value: sessionId,
+      httpOnly: true,
+      path: '/',
+      secure: false, // Setting to false to work in all environments including HTTP
+      sameSite: 'lax', // Using lax as a safer option that still works in most environments
+      // 7 day expiration
+      maxAge: 7 * 24 * 60 * 60
+    });
+    
+    return response;
     
   } catch (error) {
     console.error('Login error:', error);

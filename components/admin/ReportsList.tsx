@@ -40,10 +40,14 @@ interface Report {
   address: string;
   description: string;
   created_at: string;
+  pelapor: string;
+  jenis_laporan: string;
+  reporter_type: string;
+  status: string;
   user: {
     name: string;
+    phone: string | null;
   };
-  status?: string;
 }
 
 export default function ReportsList() {
@@ -98,9 +102,12 @@ export default function ReportsList() {
   const filteredReports = reports.filter(report => {
     const matchesSearch =
       report.address.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      report.user.name.toLowerCase().includes(searchTerm.toLowerCase());
+      (report.pelapor && report.pelapor.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      (report.user.name && report.user.name.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      (report.jenis_laporan && report.jenis_laporan.toLowerCase().includes(searchTerm.toLowerCase()));
     const matchesStatus =
-      statusFilter === 'all' || report.status === statusFilter;
+      statusFilter === 'all' || 
+      (report.status && report.status.toLowerCase() === statusFilter.toLowerCase());
     return matchesSearch && matchesStatus;
   });
 
@@ -177,9 +184,9 @@ export default function ReportsList() {
                 onChange={(e) => setStatusFilter(e.target.value)}
               >
                 <MenuItem value="all">Semua Status</MenuItem>
-                <MenuItem value="Pending">Pending</MenuItem>
-                <MenuItem value="In Progress">In Progress</MenuItem>
-                <MenuItem value="Completed">Completed</MenuItem>
+                <MenuItem value="pending">Pending</MenuItem>
+                <MenuItem value="processing">Sedang Diproses</MenuItem>
+                <MenuItem value="completed">Selesai</MenuItem>
               </Select>
             </FormControl>
           </Grid>
@@ -201,7 +208,8 @@ export default function ReportsList() {
           }}>
             <TableRow>
               <TableCell>ID</TableCell>
-              <TableCell>Nama Warga</TableCell>
+              <TableCell>Nama Pelapor</TableCell>
+              <TableCell>Jenis</TableCell>
               <TableCell>Alamat</TableCell>
               <TableCell>Waktu Laporan</TableCell>
               <TableCell>Status</TableCell>
@@ -213,7 +221,13 @@ export default function ReportsList() {
               filteredReports.map((report) => (
                 <TableRow key={report.id} hover>
                   <TableCell>{report.id}</TableCell>
-                  <TableCell>{report.user.name}</TableCell>
+                  <TableCell>
+                    {report.pelapor || report.user.name}
+                    <Typography variant="caption" display="block" color="text.secondary">
+                      {report.reporter_type === 'admin' ? '(Admin)' : '(Warga)'}
+                    </Typography>
+                  </TableCell>
+                  <TableCell>{report.jenis_laporan || 'Umum'}</TableCell>
                   <TableCell>{report.address}</TableCell>
                   <TableCell>
                     {new Date(report.created_at).toLocaleDateString('id-ID', {
@@ -286,12 +300,36 @@ export default function ReportsList() {
                   })}
                 </Typography>
               </Grid>
-              <Grid item xs={12}>
+              <Grid item xs={12} sm={6}>
                 <Typography variant="subtitle2" color="text.secondary">
                   Nama Pelapor
                 </Typography>
                 <Typography variant="body1" fontWeight={500}>
-                  {detailDialog.report.user.name}
+                  {detailDialog.report.pelapor || detailDialog.report.user.name}
+                </Typography>
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <Typography variant="subtitle2" color="text.secondary">
+                  Tipe Pelapor
+                </Typography>
+                <Typography variant="body1" fontWeight={500}>
+                  {detailDialog.report.reporter_type === 'admin' ? 'Admin' : 'Warga'}
+                </Typography>
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <Typography variant="subtitle2" color="text.secondary">
+                  No. Telepon
+                </Typography>
+                <Typography variant="body1" fontWeight={500}>
+                  {detailDialog.report.user.phone || '-'}
+                </Typography>
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <Typography variant="subtitle2" color="text.secondary">
+                  Jenis Laporan
+                </Typography>
+                <Typography variant="body1" fontWeight={500}>
+                  {detailDialog.report.jenis_laporan || 'Umum'}
                 </Typography>
               </Grid>
               <Grid item xs={12}>
