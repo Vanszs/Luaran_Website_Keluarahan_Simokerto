@@ -30,6 +30,7 @@ import {
   Visibility as ViewIcon
 } from '@mui/icons-material';
 import Layout from '../../../components/layout/Layout';
+import ProtectedRoute from '../../../components/ProtectedRoute';
 
 interface Report {
   id: number;
@@ -120,7 +121,8 @@ export default function ReportsPage() {
   };
   
   return (
-    <Layout title="Laporan">
+    <ProtectedRoute allowedRoles={['admin1']}>
+      <Layout title="Laporan">
       <Box>
         <Typography variant="h5" fontWeight={600} sx={{ mb: 3 }}>
           Daftar Laporan
@@ -352,5 +354,6 @@ export default function ReportsPage() {
         </DialogActions>
       </Dialog>
     </Layout>
+    </ProtectedRoute>
   );
 }

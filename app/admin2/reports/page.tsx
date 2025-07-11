@@ -1,0 +1,24 @@
+'use client';
+
+export const dynamic = 'force-dynamic';
+
+import React from 'react';
+import { Box, Typography } from '@mui/material';
+import Layout from '../../../components/layout/Layout';
+import ProtectedRoute from '../../../components/ProtectedRoute';
+import ReportsList from '../../../components/admin/ReportsList';
+
+export default function Admin2ReportsPage() {
+  return (
+    <ProtectedRoute allowedRoles={['admin2']}>
+      <Layout>
+        <Box sx={{ flexGrow: 1, p: 3 }}>
+          <Typography variant="h4" component="h1" sx={{ mb: 3, fontWeight: 700 }}>
+            Laporan Warga
+          </Typography>
+          <ReportsList />
+        </Box>
+      </Layout>
+    </ProtectedRoute>
+  );
+}

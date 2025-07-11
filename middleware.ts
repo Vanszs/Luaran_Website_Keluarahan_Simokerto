@@ -46,6 +46,7 @@ export function middleware(request: NextRequest) {
     const decoded = Buffer.from(sessionValue, 'base64').toString('utf8');
     const sessionData = JSON.parse(decoded);
     userRole = sessionData.role;
+    console.log(`Decoded user role: ${userRole} for path: ${request.nextUrl.pathname}`);
     
     // Check for session expiration (optional - 7 days)
     // Only apply this check if timestamp exists in the session
@@ -87,31 +88,78 @@ export function middleware(request: NextRequest) {
   
   // Role-based redirection for UI routes
   if (request.nextUrl.pathname.startsWith('/admin')) {
-    if (userRole === 'admin') {
+    if (userRole === 'admin1' || userRole === 'admin2') {
       // Regular admin trying to access superadmin area, redirect to their dashboard
       return NextResponse.redirect(new URL('/dashboard', request.url));
     } else if (userRole === 'superadmin') {
       // Superadmin can access /admin
       return NextResponse.next();
     } else if (userRole === 'petugas') {
-      // Petugas role cannot access any dashboard
-      return NextResponse.redirect(new URL('/', request.url));
+      // Petugas role redirect to petugas dashboard
+      return NextResponse.redirect(new URL('/petugas', request.url));
     } else {
       // Unknown role trying to access admin, redirect to main page
       return NextResponse.redirect(new URL('/', request.url));
     }
   } else if (request.nextUrl.pathname.startsWith('/dashboard')) {
+    console.log(`Dashboard access: user role = ${userRole}`);
     if (userRole === 'superadmin') {
       // Superadmin trying to access regular admin dashboard, redirect to their admin page
+      console.log('Redirecting superadmin from dashboard to admin');
       return NextResponse.redirect(new URL('/admin', request.url));
-    } else if (userRole === 'admin') {
-      // Regular admin can access /dashboard
+    } else if (userRole === 'admin1') {
+      // Regular admin1 can access /dashboard
+      console.log('Admin1 accessing dashboard - allowing');
       return NextResponse.next();
+    } else if (userRole === 'admin2') {
+      // Admin2 redirect to admin2 dashboard
+      console.log('Redirecting admin2 from dashboard to admin2');
+      return NextResponse.redirect(new URL('/admin2', request.url));
     } else if (userRole === 'petugas') {
-      // Petugas role cannot access any dashboard
-      return NextResponse.redirect(new URL('/', request.url));
+      // Petugas role redirect to petugas dashboard
+      console.log('Redirecting petugas from dashboard to petugas');
+      return NextResponse.redirect(new URL('/petugas', request.url));
     } else {
       // Unknown role trying to access dashboard, redirect to main page
+      console.log('Unknown role trying to access dashboard, redirecting to main');
+      return NextResponse.redirect(new URL('/', request.url));
+    }
+  } else if (request.nextUrl.pathname.startsWith('/admin2')) {
+    console.log(`Admin2 access: user role = ${userRole}`);
+    if (userRole === 'admin2') {
+      // Admin2 can access /admin2
+      console.log('Admin2 accessing admin2 - allowing');
+      return NextResponse.next();
+    } else if (userRole === 'superadmin') {
+      // Superadmin trying to access admin2, redirect to admin
+      console.log('Redirecting superadmin from admin2 to admin');
+      return NextResponse.redirect(new URL('/admin', request.url));
+    } else if (userRole === 'admin1') {
+      // Admin1 trying to access admin2, redirect to dashboard
+      console.log('Redirecting admin1 from admin2 to dashboard');
+      return NextResponse.redirect(new URL('/dashboard', request.url));
+    } else if (userRole === 'petugas') {
+      // Petugas trying to access admin2, redirect to petugas
+      return NextResponse.redirect(new URL('/petugas', request.url));
+    } else {
+      // Unknown role trying to access admin2, redirect to main page
+      return NextResponse.redirect(new URL('/', request.url));
+    }
+  } else if (request.nextUrl.pathname.startsWith('/petugas')) {
+    if (userRole === 'petugas') {
+      // Petugas can access /petugas
+      return NextResponse.next();
+    } else if (userRole === 'superadmin') {
+      // Superadmin trying to access petugas, redirect to admin
+      return NextResponse.redirect(new URL('/admin', request.url));
+    } else if (userRole === 'admin1') {
+      // Admin1 trying to access petugas, redirect to dashboard
+      return NextResponse.redirect(new URL('/dashboard', request.url));
+    } else if (userRole === 'admin2') {
+      // Admin2 trying to access petugas, redirect to admin2
+      return NextResponse.redirect(new URL('/admin2', request.url));
+    } else {
+      // Unknown role trying to access petugas, redirect to main page
       return NextResponse.redirect(new URL('/', request.url));
     }
   } else if (request.nextUrl.pathname === '/' || request.nextUrl.pathname === '/register') {
@@ -119,12 +167,12 @@ export function middleware(request: NextRequest) {
     if (sessionCookie) {
       if (userRole === 'superadmin') {
         return NextResponse.redirect(new URL('/admin', request.url));
-      } else if (userRole === 'admin') {
+      } else if (userRole === 'admin1') {
         return NextResponse.redirect(new URL('/dashboard', request.url));
+      } else if (userRole === 'admin2') {
+        return NextResponse.redirect(new URL('/admin2', request.url));
       } else if (userRole === 'petugas') {
-        // Petugas should stay on the landing page
-        // No redirection needed
-        return NextResponse.next();
+        return NextResponse.redirect(new URL('/petugas', request.url));
       }
     }
   }
@@ -137,6 +185,8 @@ export const config = {
   matcher: [
     '/',
     '/admin/:path*',
+    '/admin2/:path*',
+    '/petugas/:path*',
     '/api/admin/:path*',
     '/dashboard/:path*',
     '/api/auth/:path*',

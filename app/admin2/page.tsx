@@ -8,11 +8,9 @@ import {
   Grid,
   Paper,
   Typography,
-  Button,
   useTheme,
   IconButton,
   Tooltip,
-  Chip,
   Stack,
   alpha,
   Card,
@@ -25,16 +23,14 @@ import {
   Refresh as RefreshIcon,
   ArrowUpward as ArrowUpwardIcon,
   ArrowDownward as ArrowDownwardIcon,
-  PersonAdd as PersonAddIcon,
 } from '@mui/icons-material';
 import { useAuth } from '../../contexts/AuthContext';
 import DashboardStats from '../../components/admin/DashboardStats';
 import { useRouter } from 'next/navigation';
 import { useRealStats } from '../../hooks/useRealStats';
 import Layout from '../../components/layout/Layout';
-import ProtectedRoute from '../../components/ProtectedRoute';
 
-export default function Admin1Dashboard() {
+export default function Admin2Dashboard() {
   const theme = useTheme();
   const { user } = useAuth();
   const router = useRouter();
@@ -52,41 +48,40 @@ export default function Admin1Dashboard() {
     {
       title: 'Laporan Hari Ini',
       value: stats?.todayReports || 0,
-      icon: <AlertIcon fontSize="small" />,
-      color: theme.palette.error.main,
-      path: '/dashboard/reports',
+      icon: <WarningIcon fontSize="small" />,
+      color: theme.palette.primary.main,
+      path: '/admin2/reports',
       change: stats?.todayChange || 0,
     },
     {
       title: 'Total Laporan',
       value: stats?.totalReports || 0,
-      icon: <DashboardIcon fontSize="small" />,
-      color: theme.palette.primary.main,
-      path: '/dashboard/reports',
+      icon: <AlertIcon fontSize="small" />,
+      color: theme.palette.error.main,
+      path: '/admin2/reports',
       change: stats?.totalReportsChange || 0,
     },
     {
-      title: 'Total Warga',
+      title: 'Warga Terdaftar',
       value: stats?.totalUsers || 0,
       icon: <PeopleIcon fontSize="small" />,
       color: theme.palette.success.main,
-      path: '/dashboard/citizens',
+      path: '/admin2/citizens',
       change: stats?.userChange || 0,
     },
     {
-      title: 'Kelola Petugas',
+      title: 'Total Admin',
       value: stats?.activeAdmins || 0,
-      icon: <PersonAddIcon fontSize="small" />,
+      icon: <DashboardIcon fontSize="small" />,
       color: theme.palette.warning.main,
-      path: '/dashboard/manage-staff',
+      path: '/admin2',
       change: 0,
     }
   ];
 
   return (
-    <ProtectedRoute allowedRoles={['admin1']}>
-      <Layout title="">
-        <Box>
+    <Layout title="">
+      <Box>
           {/* Welcome Card */}
           <Card
             elevation={0}
@@ -125,53 +120,33 @@ export default function Admin1Dashboard() {
                       mb: 0.5,
                     }}
                   >
-                    {loading ? 'Memuat...' : `Selamat Datang, ${user?.name?.split(' ')[0] || 'Admin'}`}
+                    {loading ? 'Memuat...' : `Selamat Datang, ${user?.name?.split(' ')[0] || 'Admin2'}`}
                   </Typography>
                   
                   <Typography 
                     variant="body1" 
                     color="text.secondary"
+                    sx={{ fontSize: '0.9rem' }}
                   >
-                    PINTAR Control Panel - Sistem Pelaporan Instant Tangkal Ancaman Rawan
+                    Dashboard Admin2 - Kelola laporan dan data warga (read-only mode)
                   </Typography>
                 </Grid>
                 
                 <Grid item xs={12} md={4}>
-                  <Stack 
-                    direction="row" 
-                    spacing={2} 
-                    justifyContent={{ xs: 'flex-start', md: 'flex-end' }}
-                    alignItems="center"
-                  >
-                    <Button
-                      variant="contained"
-                      startIcon={<WarningIcon />}
-                      onClick={() => router.push('/dashboard/reports')}
-                      sx={{
-                        borderRadius: 2,
-                        boxShadow: `0 4px 14px ${alpha(theme.palette.primary.main, 0.3)}`,
-                        transition: 'all 0.3s ease',
-                        background: 'linear-gradient(90deg, #3b82f6, #2563eb)',
-                        '&:hover': {
-                          transform: 'translateY(-2px)',
-                          boxShadow: `0 6px 18px ${alpha(theme.palette.primary.main, 0.4)}`,
-                        }
-                      }}
-                    >
-                      Lihat Laporan
-                    </Button>
-                    
-                    <Tooltip title="Refresh Data" arrow>
+                  <Stack direction="row" justifyContent={{ xs: 'flex-start', md: 'flex-end' }} spacing={2}>
+                    <Tooltip title="Refresh Data">
                       <IconButton 
-                        onClick={fetchData} 
-                        disabled={refreshing || loading}
+                        onClick={fetchData}
+                        disabled={refreshing}
                         size="small"
-                        sx={{ 
-                          width: 38,
-                          height: 38,
-                          bgcolor: alpha(theme.palette.primary.main, 0.08),
+                        sx={{
+                          bgcolor: alpha(theme.palette.primary.main, 0.1),
+                          color: theme.palette.primary.main,
                           '&:hover': {
-                            bgcolor: alpha(theme.palette.primary.main, 0.16),
+                            bgcolor: alpha(theme.palette.primary.main, 0.2),
+                          },
+                          '&:disabled': {
+                            opacity: 0.6,
                           }
                         }}
                       >
@@ -184,76 +159,89 @@ export default function Admin1Dashboard() {
             </Box>
           </Card>
 
-          {/* Stats Cards Grid */}
-          <Grid container spacing={2} sx={{ mb: 3 }}>
+          {/* Quick Stats Cards */}
+          <Grid container spacing={3} sx={{ mb: 4 }}>
             {quickStatsCards.map((card, index) => (
-              <Grid item xs={6} sm={6} md={3} key={index}>
+              <Grid item xs={12} sm={6} md={3} key={index}>
                 <Paper
                   elevation={0}
                   sx={{
-                    p: 2.5,
+                    p: 3,
                     height: '100%',
-                    cursor: 'pointer',
                     borderRadius: 2,
                     border: `1px solid ${theme.palette.divider}`,
-                    transition: 'all 0.2s',
+                    transition: 'all 0.3s ease',
+                    cursor: 'pointer',
                     '&:hover': {
-                      transform: 'translateY(-4px)',
-                      boxShadow: 2,
-                    },
+                      transform: 'translateY(-2px)',
+                      boxShadow: theme.palette.mode === 'dark'
+                        ? `0 8px 32px ${alpha(theme.palette.common.black, 0.4)}`
+                        : `0 8px 32px ${alpha(theme.palette.common.black, 0.12)}`,
+                    }
                   }}
                   onClick={() => router.push(card.path)}
                 >
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1.5 }}>
+                  <Stack direction="row" spacing={2} alignItems="flex-start">
                     <Box
                       sx={{
+                        p: 1.5,
+                        borderRadius: 2,
+                        bgcolor: alpha(card.color, 0.1),
+                        color: card.color,
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        width: 36,
-                        height: 36,
-                        borderRadius: 1.5,
-                        bgcolor: alpha(card.color, 0.12),
-                        color: card.color,
                       }}
                     >
                       {card.icon}
                     </Box>
                     
-                    {card.change !== 0 && (
-                      <Chip
-                        icon={card.change > 0 ? <ArrowUpwardIcon sx={{ fontSize: '0.75rem !important' }} /> : <ArrowDownwardIcon sx={{ fontSize: '0.75rem !important' }} />}
-                        label={`${card.change > 0 ? '+' : ''}${card.change}%`}
-                        size="small"
-                        color={card.change > 0 ? 'success' : 'error'}
-                        sx={{ 
-                          height: 20, 
-                          fontSize: '0.7rem',
-                          fontWeight: 600,
-                          '& .MuiChip-icon': { 
-                            fontSize: '0.75rem',
-                          }
+                    <Box sx={{ flex: 1, minWidth: 0 }}>
+                      <Typography
+                        variant="body2"
+                        color="text.secondary"
+                        sx={{ mb: 0.5, fontSize: '0.8rem' }}
+                      >
+                        {card.title}
+                      </Typography>
+                      
+                      <Typography
+                        variant="h5"
+                        sx={{
+                          fontWeight: 700,
+                          color: theme.palette.text.primary,
+                          mb: 0.5,
                         }}
-                      />
-                    )}
-                  </Box>
-                  
-                  <Typography variant="h5" fontWeight={700} sx={{ mb: 0.5, fontSize: '1.5rem' }}>
-                    {refreshing ? '...' : card.value.toLocaleString()}
-                  </Typography>
-                  
-                  <Typography variant="body2" color="text.secondary" fontWeight={500}>
-                    {card.title}
-                  </Typography>
+                      >
+                        {loading ? '...' : card.value.toLocaleString()}
+                      </Typography>
+                      
+                      {card.change !== 0 && (
+                        <Stack direction="row" alignItems="center" spacing={0.5}>
+                          {card.change > 0 ? (
+                            <ArrowUpwardIcon sx={{ fontSize: 12, color: theme.palette.success.main }} />
+                          ) : (
+                            <ArrowDownwardIcon sx={{ fontSize: 12, color: theme.palette.error.main }} />
+                          )}
+                          <Typography
+                            variant="caption"
+                            color={card.change > 0 ? "success.main" : "error.main"}
+                            sx={{ fontWeight: 500 }}
+                          >
+                            {Math.abs(card.change)}%
+                          </Typography>
+                        </Stack>
+                      )}
+                    </Box>
+                  </Stack>
                 </Paper>
               </Grid>
             ))}
           </Grid>
 
-          {/* Recent Reports */}
+          {/* Dashboard Stats Component */}
           <DashboardStats useMockData={false} />
         </Box>
       </Layout>
-    </ProtectedRoute>
   );
 }

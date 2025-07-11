@@ -36,11 +36,11 @@ export async function PUT(
       });
     }
       
-    // Get the role from the request body if available, otherwise default to 'admin'
-    let role = 'admin';
+    // Get the role from the request body if available, otherwise default to 'admin1'
+    let role = 'admin1';
     try {
       const body = await request.json();
-      if (body && body.role && ['admin', 'superadmin', 'petugas'].includes(body.role)) {
+      if (body && body.role && ['admin1', 'admin2', 'petugas', 'superadmin'].includes(body.role)) {
         role = body.role;
       }
     } catch (e) {

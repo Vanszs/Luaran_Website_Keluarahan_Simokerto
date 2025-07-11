@@ -265,13 +265,21 @@ const Sidebar: React.FC<SidebarProps> = ({ open, onClose, variant = 'permanent' 
   
   // Define navigation items based on user role
   const isSuperAdmin = user?.role === 'superadmin';
-  const basePath = isSuperAdmin ? '/admin' : '/dashboard';
+  const isAdmin1 = user?.role === 'admin1';
+  const isAdmin2 = user?.role === 'admin2';
+  const isPetugas = user?.role === 'petugas';
+  
+  // Determine base path based on role
+  const basePath = isSuperAdmin ? '/admin' : 
+                   isAdmin1 ? '/dashboard' : 
+                   isAdmin2 ? '/admin2' : 
+                   isPetugas ? '/petugas' : '/dashboard';
   
   const mainNavItems = [
     {
       title: 'Dashboard',
       icon: <DashboardIcon />,
-      path: isSuperAdmin ? '/admin' : '/dashboard',
+      path: basePath,
       exact: true,
       badge: undefined,
     },
@@ -289,7 +297,7 @@ const Sidebar: React.FC<SidebarProps> = ({ open, onClose, variant = 'permanent' 
     },
   ];
 
-  // Only show admin management to superadmins
+  // Only show admin management to superadmins and staff management to admin1
   const adminNavItems = isSuperAdmin ? [
     {
       title: 'Manajemen Admin',
@@ -300,6 +308,17 @@ const Sidebar: React.FC<SidebarProps> = ({ open, onClose, variant = 'permanent' 
       title: 'Pengaturan',
       icon: <SettingsIcon />,
       path: '/admin/settings',
+    },
+  ] : isAdmin1 ? [
+    {
+      title: 'Kelola Petugas',
+      icon: <AdminIcon />,
+      path: `${basePath}/manage-staff`,
+    },
+    {
+      title: 'Pengaturan',
+      icon: <SettingsIcon />,
+      path: `${basePath}/settings`,
     },
   ] : [];
 
@@ -487,8 +506,8 @@ const Sidebar: React.FC<SidebarProps> = ({ open, onClose, variant = 'permanent' 
           </List>
         </NavSection>
 
-        {/* Admin Navigation - Only for superadmin */}
-        {isSuperAdmin && adminNavItems.length > 0 && (
+        {/* Admin Navigation - For superadmin and admin1 */}
+        {(isSuperAdmin || isAdmin1) && adminNavItems.length > 0 && (
           <NavSection>
             <NavLabel>Admin</NavLabel>
             <List disablePadding>

@@ -34,6 +34,7 @@ import {
   Delete as DeleteIcon,
   PersonAdd as PersonAddIcon,
 } from '@mui/icons-material';
+import { useAuth } from '../../contexts/AuthContext';
 
 interface User {
   id: number;
@@ -46,6 +47,11 @@ interface User {
 
 export default function UserManagement() {
   const theme = useTheme();
+  const { user } = useAuth();
+  
+  // Check if current user can add users
+  const canAddUsers = user?.role !== 'admin2'; // Admin2 cannot add users
+
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -232,15 +238,17 @@ export default function UserManagement() {
         <Typography variant="h5" fontWeight={700}>
           Manajemen Warga
         </Typography>
-        <Button
-          variant="contained"
-          color="primary"
-          startIcon={<AddIcon />}
-          onClick={handleAddUser}
-          sx={{ borderRadius: 2 }}
-        >
-          Tambah Warga
-        </Button>
+        {canAddUsers && (
+          <Button
+            variant="contained"
+            color="primary"
+            startIcon={<AddIcon />}
+            onClick={handleAddUser}
+            sx={{ borderRadius: 2 }}
+          >
+            Tambah Warga
+          </Button>
+        )}
       </Box>
 
       {/* Enhanced Search Bar */}
@@ -334,21 +342,29 @@ export default function UserManagement() {
                     })}
                   </TableCell>
                   <TableCell align="right">
-                    <IconButton 
-                      size="small" 
-                      onClick={() => handleEditUser(user)}
-                      color="primary"
-                    >
-                      <EditIcon fontSize="small" />
-                    </IconButton>
-                    <IconButton 
-                      size="small" 
-                      onClick={() => handleDeleteUser(user)}
-                      color="error"
-                      sx={{ ml: 1 }}
-                    >
-                      <DeleteIcon fontSize="small" />
-                    </IconButton>
+                    {canAddUsers ? (
+                      <>
+                        <IconButton 
+                          size="small" 
+                          onClick={() => handleEditUser(user)}
+                          color="primary"
+                        >
+                          <EditIcon fontSize="small" />
+                        </IconButton>
+                        <IconButton 
+                          size="small" 
+                          onClick={() => handleDeleteUser(user)}
+                          color="error"
+                          sx={{ ml: 1 }}
+                        >
+                          <DeleteIcon fontSize="small" />
+                        </IconButton>
+                      </>
+                    ) : (
+                      <Typography variant="body2" color="text.secondary">
+                        Read Only
+                      </Typography>
+                    )}
                   </TableCell>
                 </TableRow>
               ))
@@ -360,14 +376,16 @@ export default function UserManagement() {
                     <Typography variant="body1" color="text.secondary">
                       Tidak ada data warga
                     </Typography>
-                    <Button 
-                      variant="contained" 
-                      startIcon={<AddIcon />}
-                      onClick={handleAddUser}
-                      sx={{ mt: 2, borderRadius: 2 }}
-                    >
-                      Tambah Warga
-                    </Button>
+                    {canAddUsers && (
+                      <Button 
+                        variant="contained" 
+                        startIcon={<AddIcon />}
+                        onClick={handleAddUser}
+                        sx={{ mt: 2, borderRadius: 2 }}
+                      >
+                        Tambah Warga
+                      </Button>
+                    )}
                   </Box>
                 </TableCell>
               </TableRow>

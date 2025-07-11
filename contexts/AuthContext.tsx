@@ -9,7 +9,7 @@ interface User {
   id: string;
   username: string;
   name: string;
-  role: 'admin' | 'superadmin' | 'petugas';
+  role: 'admin1' | 'admin2' | 'superadmin' | 'petugas';
 }
 
 interface AuthContextType {
@@ -76,8 +76,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setTimeout(() => {
           if (data.user.role === 'superadmin') {
             router.push('/admin');
-          } else if (data.user.role === 'admin') {
+          } else if (data.user.role === 'admin1') {
             router.push('/dashboard');
+          } else if (data.user.role === 'admin2') {
+            router.push('/admin2');
+          } else if (data.user.role === 'petugas') {
+            router.push('/petugas');
           } else {
             router.push('/');
           }

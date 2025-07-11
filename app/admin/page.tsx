@@ -1,5 +1,7 @@
 'use client';
 
+export const dynamic = 'force-dynamic';
+
 import React, { useState } from 'react';
 import {
   Box,
@@ -27,20 +29,8 @@ import {
 import { useAuth } from '../../contexts/AuthContext';
 import DashboardStats from '../../components/admin/DashboardStats';
 import { useRouter } from 'next/navigation';
-import { useApiData } from '../../hooks/useMockApi';
+import { useRealStats } from '../../hooks/useRealStats';
 import Layout from '../../components/layout/Layout';
-
-// Define the interface for stats data
-interface StatsData {
-  todayReports: number;
-  todayChange: number;
-  totalReports: number;
-  totalReportsChange: number;
-  totalUsers: number;
-  userChange: number;
-  activeAdmins: number;
-  activeDevices?: number;
-}
 
 export default function AdminDashboard() {
   const theme = useTheme();
@@ -48,23 +38,11 @@ export default function AdminDashboard() {
   const router = useRouter();
   const [refreshing, setRefreshing] = useState(false);
   
-  const { data: stats, loading, refresh } = useApiData<StatsData>({
-    endpoint: '/api/admin/stats',
-    useMock: false,
-    initialData: {
-      todayReports: 0,
-      todayChange: 0,
-      totalReports: 0,
-      totalReportsChange: 0,
-      totalUsers: 0,
-      userChange: 0,
-      activeAdmins: 0,
-    }
-  });
-  
+  const { data: stats, loading, refresh } = useRealStats();
+
   const fetchData = async () => {
     setRefreshing(true);
-    refresh();
+    await refresh();
     setTimeout(() => setRefreshing(false), 1000);
   };
 

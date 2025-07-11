@@ -139,7 +139,7 @@ export default function DashboardStats({ useMockData = false }: DashboardStatsPr
               <TableCell sx={{ minWidth: 60 }}>ID</TableCell>
               <TableCell sx={{ minWidth: 120 }}>Pelapor</TableCell>
               <TableCell sx={{ minWidth: 150, display: { xs: 'none', sm: 'table-cell' } }}>Lokasi</TableCell>
-              <TableCell sx={{ minWidth: 200, display: { xs: 'none', md: 'table-cell' } }}>Deskripsi</TableCell>
+              <TableCell sx={{ minWidth: 200, display: { xs: 'none', md: 'table-cell' } }}>Waktu Kejadian</TableCell>
               <TableCell sx={{ minWidth: 120 }}>Tanggal</TableCell>
               <TableCell sx={{ minWidth: 120 }}>Status</TableCell>
             </TableRow>
@@ -180,9 +180,18 @@ export default function DashboardStats({ useMockData = false }: DashboardStatsPr
                     </Typography>
                   </TableCell>
                   <TableCell sx={{ display: { xs: 'none', md: 'table-cell' } }}>
-                    <Typography noWrap sx={{ maxWidth: { md: 200, lg: 250 } }}>
-                      {report.description}
-                    </Typography>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                      <CalendarIcon fontSize="small" color="action" />
+                      <Typography variant="body2">
+                        {new Date(report.created_at).toLocaleString('id-ID', {
+                          day: 'numeric',
+                          month: 'short',
+                          year: 'numeric',
+                          hour: '2-digit',
+                          minute: '2-digit'
+                        })}
+                      </Typography>
+                    </Box>
                   </TableCell>
                   <TableCell>
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>

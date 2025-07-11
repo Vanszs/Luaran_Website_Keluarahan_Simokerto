@@ -28,10 +28,10 @@ export async function POST(req: NextRequest) {
       );
     }
     
-    // Insert new admin with default role as 'admin' and pending status as TRUE
+    // Insert new admin with default role as 'admin1' and pending status as TRUE
     await query(
       'INSERT INTO admin (username, password, name, role, pending) VALUES (?, ?, ?, ?, TRUE)',
-      [username, password, name, 'admin']
+      [username, password, name, 'admin1']
     );
     
     // Insert notification for superadmin about new pending admin

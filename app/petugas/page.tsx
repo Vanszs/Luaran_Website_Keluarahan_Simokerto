@@ -32,9 +32,8 @@ import DashboardStats from '../../components/admin/DashboardStats';
 import { useRouter } from 'next/navigation';
 import { useRealStats } from '../../hooks/useRealStats';
 import Layout from '../../components/layout/Layout';
-import ProtectedRoute from '../../components/ProtectedRoute';
 
-export default function Admin1Dashboard() {
+export default function PetugasDashboard() {
   const theme = useTheme();
   const { user } = useAuth();
   const router = useRouter();
@@ -54,7 +53,7 @@ export default function Admin1Dashboard() {
       value: stats?.todayReports || 0,
       icon: <AlertIcon fontSize="small" />,
       color: theme.palette.error.main,
-      path: '/dashboard/reports',
+      path: '/petugas/reports',
       change: stats?.todayChange || 0,
     },
     {
@@ -62,7 +61,7 @@ export default function Admin1Dashboard() {
       value: stats?.totalReports || 0,
       icon: <DashboardIcon fontSize="small" />,
       color: theme.palette.primary.main,
-      path: '/dashboard/reports',
+      path: '/petugas/reports',
       change: stats?.totalReportsChange || 0,
     },
     {
@@ -70,23 +69,22 @@ export default function Admin1Dashboard() {
       value: stats?.totalUsers || 0,
       icon: <PeopleIcon fontSize="small" />,
       color: theme.palette.success.main,
-      path: '/dashboard/citizens',
+      path: '/petugas/citizens',
       change: stats?.userChange || 0,
     },
     {
-      title: 'Kelola Petugas',
-      value: stats?.activeAdmins || 0,
+      title: 'Kelola Warga',
+      value: stats?.totalUsers || 0,
       icon: <PersonAddIcon fontSize="small" />,
-      color: theme.palette.warning.main,
-      path: '/dashboard/manage-staff',
+      color: theme.palette.info.main,
+      path: '/petugas/citizens',
       change: 0,
     }
   ];
 
   return (
-    <ProtectedRoute allowedRoles={['admin1']}>
-      <Layout title="">
-        <Box>
+    <Layout title="">
+      <Box>
           {/* Welcome Card */}
           <Card
             elevation={0}
@@ -125,7 +123,7 @@ export default function Admin1Dashboard() {
                       mb: 0.5,
                     }}
                   >
-                    {loading ? 'Memuat...' : `Selamat Datang, ${user?.name?.split(' ')[0] || 'Admin'}`}
+                    {loading ? 'Memuat...' : `Selamat Datang, ${user?.name?.split(' ')[0] || 'Petugas'}`}
                   </Typography>
                   
                   <Typography 
@@ -146,7 +144,7 @@ export default function Admin1Dashboard() {
                     <Button
                       variant="contained"
                       startIcon={<WarningIcon />}
-                      onClick={() => router.push('/dashboard/reports')}
+                      onClick={() => router.push('/petugas/reports')}
                       sx={{
                         borderRadius: 2,
                         boxShadow: `0 4px 14px ${alpha(theme.palette.primary.main, 0.3)}`,
@@ -254,6 +252,5 @@ export default function Admin1Dashboard() {
           <DashboardStats useMockData={false} />
         </Box>
       </Layout>
-    </ProtectedRoute>
   );
 }

@@ -15,7 +15,9 @@ export async function PUT(
       );
     }
     
-    const { name, role, password } = await request.json();
+    const { name, role, password, username } = await request.json();
+    
+    console.log('Update admin request:', { adminId, name, role, password: password ? '[provided]' : '[empty]', username });
     
     // Validate input
     if (!name || !role) {
@@ -26,7 +28,7 @@ export async function PUT(
     }
     
     // Validate role
-    if (role !== 'admin' && role !== 'superadmin') {
+    if (!['admin1', 'admin2', 'petugas', 'superadmin'].includes(role)) {
       return NextResponse.json(
         { message: 'Invalid role' },
         { status: 400 }

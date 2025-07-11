@@ -152,12 +152,15 @@ function LoginContent() {
           if (result.user.role === 'superadmin') {
             console.log('Redirecting superadmin to /admin');
             window.location.href = '/admin'; // Use direct navigation instead of router
-          } else if (result.user.role === 'admin') {
-            console.log('Redirecting regular admin to /dashboard');
+          } else if (result.user.role === 'admin1') {
+            console.log('Redirecting admin1 to /dashboard');
             window.location.href = '/dashboard'; // Use direct navigation instead of router
+          } else if (result.user.role === 'admin2') {
+            console.log('Redirecting admin2 to /admin2');
+            window.location.href = '/admin2'; // Use direct navigation instead of router
           } else if (result.user.role === 'petugas') {
-            console.log('Petugas role - staying on main page');
-            setSuccessMessage('Logged in successfully as Petugas. This role cannot access dashboards.');
+            console.log('Redirecting petugas to /petugas');
+            window.location.href = '/petugas'; // Use direct navigation instead of router
           }
         }, 500);
       } else {

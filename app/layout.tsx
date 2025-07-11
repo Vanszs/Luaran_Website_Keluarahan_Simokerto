@@ -1,6 +1,5 @@
 import type { Metadata } from 'next';
 import './globals.css';
-import { link } from 'fs';
 
 export const metadata: Metadata = {
   title: 'Kelurahan Simokerto - Sistem Informasi',

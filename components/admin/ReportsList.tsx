@@ -47,6 +47,7 @@ import {
   CalendarToday as CalendarIcon,
 } from '@mui/icons-material';
 import { getStatusChipStyle, getStatusInIndonesian, standardChipStyles } from '../../utils/statusStyles';
+import { useAuth } from '../../contexts/AuthContext';
 
 interface Report {
   id: number;
@@ -64,8 +65,9 @@ interface Report {
   };
 }
 
-export default function ReportsList() {
+export default function ReportsList({ isReadOnly = false }: { isReadOnly?: boolean }) {
   const theme = useTheme();
+  const { user } = useAuth();
   const [reports, setReports] = useState<Report[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
@@ -105,6 +107,12 @@ export default function ReportsList() {
     } finally {
       setLoading(false);
     }
+  };
+
+  // Check if user can update status
+  const canUpdateStatus = () => {
+    // Petugas cannot update status, only superadmin, admin1, and admin2 can
+    return user?.role !== 'petugas' && !isReadOnly;
   };
 
   // Status menu handlers
@@ -429,21 +437,23 @@ export default function ReportsList() {
                           <VisibilityIcon fontSize="small" />
                         </IconButton>
                       </Tooltip>
-                      <Tooltip title="Ubah Status">
-                        <IconButton
-                          size="small"
-                          onClick={(e) => handleStatusMenuOpen(e, report.id)}
-                          disabled={statusUpdateLoading}
-                          sx={{
-                            color: theme.palette.text.secondary,
-                            '&:hover': {
-                              backgroundColor: alpha(theme.palette.text.secondary, 0.1),
-                            },
-                          }}
-                        >
-                          <MoreVertIcon fontSize="small" />
-                        </IconButton>
-                      </Tooltip>
+                      {canUpdateStatus() && (
+                        <Tooltip title="Ubah Status">
+                          <IconButton
+                            size="small"
+                            onClick={(e) => handleStatusMenuOpen(e, report.id)}
+                            disabled={statusUpdateLoading}
+                            sx={{
+                              color: theme.palette.text.secondary,
+                              '&:hover': {
+                                backgroundColor: alpha(theme.palette.text.secondary, 0.1),
+                              },
+                            }}
+                          >
+                            <MoreVertIcon fontSize="small" />
+                          </IconButton>
+                        </Tooltip>
+                      )}
                     </Box>
                   </TableCell>
                 </TableRow>

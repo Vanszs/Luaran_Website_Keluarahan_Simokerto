@@ -49,7 +49,7 @@ interface Admin {
   username: string;
   name: string | null;
   created_at: string;
-  role: 'superadmin' | 'admin' | 'petugas' | null; // Allow null for pending admins
+  role: 'superadmin' | 'admin1' | 'admin2' | 'petugas' | null; // Updated roles
   pending: boolean; // Add pending status
 }
 
@@ -85,7 +85,7 @@ export default function AdminManagement() {
     username: '',
     name: '',
     password: '',
-    role: 'admin' as 'admin' | 'superadmin' | 'petugas',
+    role: 'admin1' as 'admin1' | 'admin2' | 'superadmin' | 'petugas',
   });
   const [snackbar, setSnackbar] = useState({
     open: false,
@@ -98,12 +98,52 @@ export default function AdminManagement() {
   }, []);
 
   // Reset the form when opening the dialog in add mode
+  // Function to get available roles based on current user's role
+  const getAvailableRoles = () => {
+    if (user?.role === 'superadmin') {
+      // Superadmin can create admin1, admin2, and superadmin
+      return [
+        { value: 'admin1', label: 'Admin 1' },
+        { value: 'admin2', label: 'Admin 2' },
+        { value: 'superadmin', label: 'Super Admin' }
+      ];
+    } else if (user?.role === 'admin1') {
+      // Admin1 can create admin2 and petugas
+      return [
+        { value: 'admin2', label: 'Admin 2' },
+        { value: 'petugas', label: 'Petugas' }
+      ];
+    }
+    return [];
+  };
+
+  const getAvailableApprovalRoles = () => {
+    if (user?.role === 'superadmin') {
+      // Superadmin can approve as admin1, admin2, and superadmin
+      return [
+        { value: 'admin1', label: 'Admin 1' },
+        { value: 'admin2', label: 'Admin 2' },
+        { value: 'superadmin', label: 'Super Admin' }
+      ];
+    } else if (user?.role === 'admin1') {
+      // Admin1 can approve as admin2 and petugas
+      return [
+        { value: 'admin2', label: 'Admin 2' },
+        { value: 'petugas', label: 'Petugas' }
+      ];
+    }
+    return [];
+  };
+
   const resetForm = () => {
+    const availableRoles = getAvailableRoles();
+    const defaultRole = availableRoles.length > 0 ? availableRoles[0].value : 'admin1';
+    
     setFormData({
       username: '',
       name: '',
       password: '',
-      role: 'admin', // Default role for new admins
+      role: defaultRole as 'admin1' | 'admin2' | 'superadmin' | 'petugas',
     });
   };
 
@@ -113,8 +153,23 @@ export default function AdminManagement() {
       username: admin.username,
       name: admin.name || '',
       password: '', // Don't populate password for security
-      role: admin.role || 'admin', // Default to admin if role is null
+      role: admin.role || 'admin1', // Default to admin1 if role is null
     });
+  };
+
+  // Filter admins based on current user's role permissions
+  const filterAdminsByRole = (adminsList: any[]) => {
+    if (user?.role === 'superadmin') {
+      // Superadmin can see all admins
+      return adminsList;
+    } else if (user?.role === 'admin1') {
+      // Admin1 can only see petugas and admin2
+      return adminsList.filter(admin => 
+        admin.role === 'petugas' || admin.role === 'admin2'
+      );
+    }
+    // Other roles can't see any admins
+    return [];
   };
 
   const fetchAdmins = async () => {
@@ -134,8 +189,12 @@ export default function AdminManagement() {
         console.log('Admins data:', adminsData);
         console.log('Pending data:', pendingData);
         
-        setAdmins(adminsData);
-        setPendingAdmins(pendingData);
+        // Filter data based on user role
+        const filteredAdmins = filterAdminsByRole(adminsData);
+        const filteredPending = filterAdminsByRole(pendingData);
+        
+        setAdmins(filteredAdmins);
+        setPendingAdmins(filteredPending);
       } else {
         console.error('Failed to fetch admins:', {
           adminsStatus: adminsResponse.status,
@@ -192,14 +251,17 @@ export default function AdminManagement() {
   };
 
   // State for approval role selection
-  const [approvalRole, setApprovalRole] = useState<'admin' | 'petugas' | 'superadmin'>('admin');
+  const [approvalRole, setApprovalRole] = useState<'admin1' | 'admin2' | 'petugas' | 'superadmin'>('admin1');
   const [approvalDialog, setApprovalDialog] = useState({
     open: false,
     admin: null as Admin | null
   });
   
   const handleApproveAdmin = (admin: Admin) => {
-    setApprovalRole('admin'); // Reset to default role
+    const availableRoles = getAvailableApprovalRoles();
+    const defaultRole = availableRoles.length > 0 ? availableRoles[0].value : 'admin1';
+    
+    setApprovalRole(defaultRole as 'admin1' | 'admin2' | 'petugas' | 'superadmin'); // Reset to default role
     setApprovalDialog({
       open: true,
       admin
@@ -309,7 +371,7 @@ export default function AdminManagement() {
     }
   };
 
-  const confirmApproveAdmin = async (adminId: number, selectedRole: 'admin' | 'petugas' | 'superadmin') => {
+  const confirmApproveAdmin = async (adminId: number, selectedRole: 'admin1' | 'admin2' | 'petugas' | 'superadmin') => {
     // Set loading state
     setLoadingStates(prev => ({
       ...prev,
@@ -510,9 +572,11 @@ export default function AdminManagement() {
             }}
           >
             <MenuItem value="">Semua Role</MenuItem>
-            <MenuItem value="superadmin">Super Admin</MenuItem>
-            <MenuItem value="admin">Admin</MenuItem>
-            <MenuItem value="petugas">Petugas</MenuItem>
+            {getAvailableRoles().map((role) => (
+              <MenuItem key={role.value} value={role.value}>
+                {role.label}
+              </MenuItem>
+            ))}
           </TextField>
         </Stack>
       </Paper>
@@ -575,9 +639,19 @@ export default function AdminManagement() {
                   <TableCell>{admin.name || '-'}</TableCell>
                   <TableCell>
                     <Chip 
-                      label={admin.role} 
+                      label={
+                        admin.role === 'superadmin' ? 'Super Admin' : 
+                        admin.role === 'admin1' ? 'Admin' : 
+                        admin.role === 'admin2' ? 'Admin2' : 
+                        admin.role === 'petugas' ? 'Petugas' : admin.role
+                      } 
                       size="small" 
-                      color={admin.role === 'superadmin' ? 'error' : admin.role === 'admin' ? 'primary' : 'default'}
+                      color={
+                        admin.role === 'superadmin' ? 'error' : 
+                        admin.role === 'admin1' ? 'primary' : 
+                        admin.role === 'admin2' ? 'secondary' : 
+                        'default'
+                      }
                     />
                   </TableCell>
                   <TableCell>
@@ -772,9 +846,11 @@ export default function AdminManagement() {
                   onChange={handleSelectChange}
                   disabled={adminDialog.admin?.id === user?.id} // Cannot change own role
                 >
-                  <MenuItem value="admin">Admin</MenuItem>
-                  <MenuItem value="petugas">Petugas</MenuItem>
-                  <MenuItem value="superadmin">Super Admin</MenuItem>
+                  {getAvailableRoles().map((role) => (
+                    <MenuItem key={role.value} value={role.value}>
+                      {role.label}
+                    </MenuItem>
+                  ))}
                 </Select>
               </FormControl>
             </Grid>
@@ -812,11 +888,13 @@ export default function AdminManagement() {
                 labelId="approval-role-label"
                 value={approvalRole}
                 label="Role"
-                onChange={(e) => setApprovalRole(e.target.value as 'admin' | 'petugas' | 'superadmin')}
+                onChange={(e) => setApprovalRole(e.target.value as 'admin1' | 'admin2' | 'petugas' | 'superadmin')}
               >
-                <MenuItem value="admin">Admin</MenuItem>
-                <MenuItem value="petugas">Petugas</MenuItem>
-                <MenuItem value="superadmin">Super Admin</MenuItem>
+                {getAvailableApprovalRoles().map((role) => (
+                  <MenuItem key={role.value} value={role.value}>
+                    {role.label}
+                  </MenuItem>
+                ))}
               </Select>
             </FormControl>
           </Box>

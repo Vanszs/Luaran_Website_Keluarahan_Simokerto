@@ -17,7 +17,9 @@ export async function PUT(
       );
     }
     
-    const { name, address, password } = await request.json();
+    const { name, address, password, phone } = await request.json();
+    
+    console.log('Update user request:', { userId, name, address, phone, password: password ? '[provided]' : '[empty]' });
     
     // Validate input
     if (!name || !address) {
@@ -42,13 +44,13 @@ export async function PUT(
     // Update user with or without password
     if (password) {
       await query(
-        'UPDATE users SET name = ?, address = ?, password = ? WHERE id = ?',
-        [name, address, password, userId]
+        'UPDATE users SET name = ?, address = ?, phone = ?, password = ? WHERE id = ?',
+        [name, address, phone, password, userId]
       );
     } else {
       await query(
-        'UPDATE users SET name = ?, address = ? WHERE id = ?',
-        [name, address, userId]
+        'UPDATE users SET name = ?, address = ?, phone = ? WHERE id = ?',
+        [name, address, phone, userId]
       );
     }
 
