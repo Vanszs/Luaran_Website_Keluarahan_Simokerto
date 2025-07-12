@@ -384,10 +384,7 @@ export default function AdminDashboardPage() {
                       <TableCell>{report.user?.name}</TableCell>
                       <TableCell>{report.address}</TableCell>
                       <TableCell>
-                        {new Date(report.created_at).toLocaleDateString('id-ID', {
-                          day: 'numeric',
-                          month: 'short',
-                          year: 'numeric',
+                        {new Date(report.created_at).toLocaleTimeString('id-ID', {
                           hour: '2-digit',
                           minute: '2-digit'
                         })}
@@ -664,10 +661,7 @@ export default function AdminDashboardPage() {
                 <TableCell>{report.user?.name}</TableCell>
                 <TableCell>{report.address}</TableCell>
                 <TableCell>
-                  {new Date(report.created_at).toLocaleDateString('id-ID', {
-                    day: 'numeric',
-                    month: 'short',
-                    year: 'numeric',
+                  {new Date(report.created_at).toLocaleTimeString('id-ID', {
                     hour: '2-digit',
                     minute: '2-digit'
                   })}

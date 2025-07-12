@@ -225,18 +225,27 @@ const Layout: React.FC<LayoutProps> = ({ children, title = 'PINTAR Admin' }) => 
 
     let breadcrumbPath = '';
     
+    // Determine the correct home path based on user role
+    const getHomePath = () => {
+      if (user?.role === 'superadmin') return '/admin';
+      if (user?.role === 'admin1') return '/dashboard';
+      if (user?.role === 'admin2') return '/admin2';
+      if (user?.role === 'petugas') return '/petugas';
+      return '/';
+    };
+    
     return (
       <ModernBreadcrumbs aria-label="breadcrumb">
-        <Link 
-          component={NextLink} 
-          href="/admin" 
-          color="inherit" 
-          sx={{ 
-            display: 'flex', 
+        <Link
+          component={NextLink}
+          href={getHomePath()}
+          color="inherit"
+          sx={{
+            display: 'flex',
             alignItems: 'center',
             textDecoration: 'none',
             fontWeight: 500,
-            '&:hover': { 
+            '&:hover': {
               textDecoration: 'underline',
               color: 'primary.main',
             },

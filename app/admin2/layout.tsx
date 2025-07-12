@@ -1,19 +1,20 @@
 'use client';
 
 import React from 'react';
-import ProtectedRoute from '../../components/ProtectedRoute';
+import { CssBaseline } from '@mui/material';
 import { AuthProvider } from '../../contexts/AuthContext';
+import ProtectedRoute from '../../components/ProtectedRoute';
+import AppTheme from '../../shared-theme/AppTheme';
 
-export default function Admin2Layout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function Admin2Layout({ children }: { children: React.ReactNode }) {
   return (
     <AuthProvider>
-      <ProtectedRoute allowedRoles={['admin2']}>
-        {children}
-      </ProtectedRoute>
+      <AppTheme>
+        <CssBaseline />
+        <ProtectedRoute allowedRoles={['admin2']}>
+          {children}
+        </ProtectedRoute>
+      </AppTheme>
     </AuthProvider>
   );
 }

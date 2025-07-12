@@ -244,6 +244,17 @@ const Sidebar: React.FC<SidebarProps> = ({ open, onClose, variant = 'permanent' 
   const pathname = usePathname();
   const { user, logout } = useAuth();
 
+  // Tentukan basePath sesuai role user
+  const isSuperAdmin = user?.role === 'superadmin';
+  const isAdmin1 = user?.role === 'admin1';
+  const isAdmin2 = user?.role === 'admin2';
+  const isPetugas = user?.role === 'petugas';
+
+  const basePath = isSuperAdmin ? '/admin' : 
+                   isAdmin1 ? '/dashboard' : 
+                   isAdmin2 ? '/admin2' : 
+                   isPetugas ? '/petugas' : '/';
+
   const isActive = (path: string, exact = false) => {
     if (exact) {
       return pathname === path;
@@ -263,18 +274,7 @@ const Sidebar: React.FC<SidebarProps> = ({ open, onClose, variant = 'permanent' 
     console.log(`${title} - Coming Soon`);
   };
   
-  // Define navigation items based on user role
-  const isSuperAdmin = user?.role === 'superadmin';
-  const isAdmin1 = user?.role === 'admin1';
-  const isAdmin2 = user?.role === 'admin2';
-  const isPetugas = user?.role === 'petugas';
-  
-  // Determine base path based on role
-  const basePath = isSuperAdmin ? '/admin' : 
-                   isAdmin1 ? '/dashboard' : 
-                   isAdmin2 ? '/admin2' : 
-                   isPetugas ? '/petugas' : '/dashboard';
-  
+  // Pastikan navigasi sidebar hanya mengarah ke path sesuai role
   const mainNavItems = [
     {
       title: 'Dashboard',
@@ -415,15 +415,16 @@ const Sidebar: React.FC<SidebarProps> = ({ open, onClose, variant = 'permanent' 
           <NavLabel>Utama</NavLabel>
           <List disablePadding>
             {mainNavItems.map((item) => (
-              <NavItem
-                key={item.path}
-                icon={item.icon}
-                title={item.title}
-                path={item.path}
-                active={isActive(item.path, item.exact)}
-                onClick={() => handleNavigation(item.path)}
-                badge={item.badge}
-              />
+              <ListItem key={item.title} disablePadding>
+                <ListItemButton
+                  selected={isActive(item.path, item.exact)}
+                  onClick={() => handleNavigation(item.path)}
+                  sx={{ borderRadius: 2, py: 1.25, px: 1.5 }}
+                >
+                  <ListItemIcon sx={{ minWidth: 36 }}>{item.icon}</ListItemIcon>
+                  <ListItemText primary={item.title} />
+                </ListItemButton>
+              </ListItem>
             ))}
           </List>
         </NavSection>

@@ -101,16 +101,14 @@ export default function AdminManagement() {
   // Function to get available roles based on current user's role
   const getAvailableRoles = () => {
     if (user?.role === 'superadmin') {
-      // Superadmin can create admin1, admin2, and superadmin
+      // Superadmin can only create admin1 and superadmin (not user or petugas)
       return [
         { value: 'admin1', label: 'Admin 1' },
-        { value: 'admin2', label: 'Admin 2' },
         { value: 'superadmin', label: 'Super Admin' }
       ];
     } else if (user?.role === 'admin1') {
-      // Admin1 can create admin2 and petugas
+      // Admin1 can only create petugas
       return [
-        { value: 'admin2', label: 'Admin 2' },
         { value: 'petugas', label: 'Petugas' }
       ];
     }
@@ -119,16 +117,14 @@ export default function AdminManagement() {
 
   const getAvailableApprovalRoles = () => {
     if (user?.role === 'superadmin') {
-      // Superadmin can approve as admin1, admin2, and superadmin
+      // Superadmin can approve as admin1 and superadmin (not user or petugas)
       return [
         { value: 'admin1', label: 'Admin 1' },
-        { value: 'admin2', label: 'Admin 2' },
         { value: 'superadmin', label: 'Super Admin' }
       ];
     } else if (user?.role === 'admin1') {
-      // Admin1 can approve as admin2 and petugas
+      // Admin1 can approve as petugas only
       return [
-        { value: 'admin2', label: 'Admin 2' },
         { value: 'petugas', label: 'Petugas' }
       ];
     }
@@ -163,12 +159,12 @@ export default function AdminManagement() {
       // Superadmin can see all admins
       return adminsList;
     } else if (user?.role === 'admin1') {
-      // Admin1 can only see petugas and admin2
-      return adminsList.filter(admin => 
-        admin.role === 'petugas' || admin.role === 'admin2'
+      // Admin1 can only see petugas (they can manage petugas and add citizen data)
+      return adminsList.filter(admin =>
+        admin.role === 'petugas'
       );
     }
-    // Other roles can't see any admins
+    // Other roles (admin2, petugas) can't see any admins
     return [];
   };
 

@@ -69,8 +69,20 @@ const Drawer = styled(MuiDrawer)(({ theme }) => ({
 }));
 
 export default function AdminSideMenu({ currentView, onViewChange }: AdminSideMenuProps) {
+  // Tambahkan logika agar menu dashboard admin2 mengarah ke /admin2, bukan /dashboard
+  const getDashboardPath = () => {
+    if (typeof window !== 'undefined') {
+      const userRole = window.localStorage.getItem('userRole');
+      if (userRole === 'admin2') return '/admin2';
+      if (userRole === 'admin1') return '/dashboard';
+      if (userRole === 'superadmin') return '/admin';
+      if (userRole === 'petugas') return '/petugas';
+    }
+    return '/';
+  };
+
   const menuItems = [
-    { id: 'dashboard', label: 'Dashboard', icon: <Dashboard sx={{ fontSize: 20 }} /> },
+    { id: 'dashboard', label: 'Dashboard', icon: <Dashboard sx={{ fontSize: 20 }} />, path: getDashboardPath() },
     { id: 'pengajuan', label: 'Pengajuan', icon: <Description sx={{ fontSize: 20 }} /> },
     { id: 'users', label: 'Data Akun Warga', icon: <Groups sx={{ fontSize: 20 }} /> },
     { id: 'templates', label: 'Kelola Template', icon: <DriveFolderUpload sx={{ fontSize: 20 }} /> },
@@ -157,7 +169,13 @@ export default function AdminSideMenu({ currentView, onViewChange }: AdminSideMe
               <ListItem key={item.id} disablePadding sx={{ mb: 1 }}>
                 <ListItemButton
                   selected={currentView === item.id}
-                  onClick={() => onViewChange(item.id)}
+                  onClick={() => {
+                    if (item.path) {
+                      window.location.href = item.path;
+                    } else {
+                      onViewChange(item.id);
+                    }
+                  }}
                   sx={{
                     borderRadius: 3,
                     minHeight: 52,

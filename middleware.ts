@@ -112,8 +112,8 @@ export function middleware(request: NextRequest) {
       console.log('Admin1 accessing dashboard - allowing');
       return NextResponse.next();
     } else if (userRole === 'admin2') {
-      // Admin2 redirect to admin2 dashboard
-      console.log('Redirecting admin2 from dashboard to admin2');
+      // Admin2 should NOT access /dashboard, redirect ke /admin2 agar login normal
+      console.log('Admin2 tried to access /dashboard, redirecting to /admin2');
       return NextResponse.redirect(new URL('/admin2', request.url));
     } else if (userRole === 'petugas') {
       // Petugas role redirect to petugas dashboard
@@ -174,6 +174,29 @@ export function middleware(request: NextRequest) {
       } else if (userRole === 'petugas') {
         return NextResponse.redirect(new URL('/petugas', request.url));
       }
+    }
+  } else if (
+    request.nextUrl.pathname.startsWith('/dashboard') ||
+    request.nextUrl.pathname.startsWith('/admin2') ||
+    request.nextUrl.pathname.startsWith('/admin') ||
+    request.nextUrl.pathname.startsWith('/petugas')
+  ) {
+    // Role-based dashboard redirect
+    if (userRole === 'admin1' && !request.nextUrl.pathname.startsWith('/dashboard')) {
+      // Admin1: redirect ke dashboard jika bukan di /dashboard
+      return NextResponse.redirect(new URL('/dashboard', request.url));
+    } else if (userRole === 'admin2' && !request.nextUrl.pathname.startsWith('/admin2')) {
+      // Admin2: redirect ke /admin2 jika bukan di /admin2
+      return NextResponse.redirect(new URL('/admin2', request.url));
+    } else if (userRole === 'superadmin' && !request.nextUrl.pathname.startsWith('/admin')) {
+      // Superadmin: redirect ke /admin jika bukan di /admin
+      return NextResponse.redirect(new URL('/admin', request.url));
+    } else if (userRole === 'petugas' && !request.nextUrl.pathname.startsWith('/petugas')) {
+      // Petugas: redirect ke /petugas jika bukan di /petugas
+      return NextResponse.redirect(new URL('/petugas', request.url));
+    } else {
+      // Jika sudah di path dashboard yang benar, allow
+      return NextResponse.next();
     }
   }
   
