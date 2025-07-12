@@ -38,6 +38,24 @@ export default function Admin2Dashboard() {
   
   const { data: stats, loading, refresh } = useRealStats();
 
+  // Debug logging for admin2 navigation
+  React.useEffect(() => {
+    console.log('🔍 Admin2Dashboard mounted, user:', user);
+    console.log('🔍 Current pathname:', window.location.pathname);
+    
+    // Listen for navigation events
+    const handleBeforeUnload = () => {
+      console.log('🔍 Admin2Dashboard: Page is being unloaded');
+    };
+    
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    
+    return () => {
+      console.log('🔍 Admin2Dashboard unmounting');
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  }, [user]);
+
   const fetchData = async () => {
     setRefreshing(true);
     await refresh();

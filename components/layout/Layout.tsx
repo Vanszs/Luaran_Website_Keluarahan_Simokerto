@@ -185,6 +185,14 @@ const Layout: React.FC<LayoutProps> = ({ children, title = 'PINTAR Admin' }) => 
   const router = useRouter();
   const pathname = usePathname();
 
+  // Debug logging for Layout component
+  useEffect(() => {
+    console.log('🔍 Layout component mounted/updated');
+    console.log('🔍 Layout - Current pathname:', pathname);
+    console.log('🔍 Layout - Current user:', user);
+    console.log('🔍 Layout - User role:', user?.role);
+  }, [pathname, user]);
+
   // Close mobile drawer when route changes
   useEffect(() => {
     if (isMobile) {

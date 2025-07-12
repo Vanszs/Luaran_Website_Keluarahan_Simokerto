@@ -55,7 +55,9 @@ export function middleware(request: NextRequest) {
       console.log(`[Middleware] Admin2 access granted to: ${pathname}`);
       return NextResponse.next();
     } else if (pathname.startsWith('/dashboard') || pathname.startsWith('/admin')) { // Admin2 trying to access dashboard or superadmin area
-      console.log(`[Middleware] Admin2 tried to access ${pathname}, redirecting to /admin2`);
+      console.log(`[Middleware] ⚠️  ADMIN2 REDIRECT: Admin2 tried to access ${pathname}, redirecting to /admin2`);
+      console.log(`[Middleware] ⚠️  ADMIN2 REDIRECT: Request referer: ${request.headers.get('referer')}`);
+      console.log(`[Middleware] ⚠️  ADMIN2 REDIRECT: Request user-agent: ${request.headers.get('user-agent')?.substring(0, 100)}`);
       return NextResponse.redirect(new URL('/admin2', request.url));
     }
   } else if (userRole === 'petugas') {
