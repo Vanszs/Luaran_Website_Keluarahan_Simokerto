@@ -11,7 +11,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     <AuthProvider>
       <AppTheme>
         <CssBaseline />
-        <ProtectedRoute allowedRoles={['admin1']}>
+        <ProtectedRoute allowedRoles={['admin1', 'superadmin']}>
           {children}
         </ProtectedRoute>
       </AppTheme>
