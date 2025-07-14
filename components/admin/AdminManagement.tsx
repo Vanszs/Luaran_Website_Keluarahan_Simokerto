@@ -101,10 +101,12 @@ export default function AdminManagement() {
   // Function to get available roles based on current user's role
   const getAvailableRoles = () => {
     if (user?.role === 'superadmin') {
-      // Superadmin can only create admin1 and superadmin (not user or petugas)
+      // Superadmin can create all admin roles
       return [
+        { value: 'superadmin', label: 'Super Admin' },
         { value: 'admin1', label: 'Admin 1' },
-        { value: 'superadmin', label: 'Super Admin' }
+        { value: 'admin2', label: 'Admin 2' },
+        { value: 'petugas', label: 'Petugas' }
       ];
     } else if (user?.role === 'admin1') {
       // Admin1 can only create petugas
@@ -117,10 +119,12 @@ export default function AdminManagement() {
 
   const getAvailableApprovalRoles = () => {
     if (user?.role === 'superadmin') {
-      // Superadmin can approve as admin1 and superadmin (not user or petugas)
+      // Superadmin can approve all admin roles
       return [
+        { value: 'superadmin', label: 'Super Admin' },
         { value: 'admin1', label: 'Admin 1' },
-        { value: 'superadmin', label: 'Super Admin' }
+        { value: 'admin2', label: 'Admin 2' },
+        { value: 'petugas', label: 'Petugas' }
       ];
     } else if (user?.role === 'admin1') {
       // Admin1 can approve as petugas only
