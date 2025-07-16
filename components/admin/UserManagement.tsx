@@ -26,6 +26,11 @@ import {
   Chip,
   Grid,
   InputAdornment,
+  MenuItem,
+  Select,
+  FormControl,
+  InputLabel,
+  ListSubheader,
 } from '@mui/material';
 import {
   Add as AddIcon,
@@ -33,6 +38,7 @@ import {
   Edit as EditIcon,
   Delete as DeleteIcon,
   PersonAdd as PersonAddIcon,
+  ExpandMore as ExpandMoreIcon,
 } from '@mui/icons-material';
 import { useAuth } from '../../contexts/AuthContext';
 
@@ -69,6 +75,8 @@ export default function UserManagement() {
     username: '',
     name: '',
     address: '',
+    rw: '',
+    rt: '',
     phone: '',
     password: '',
   });
@@ -81,6 +89,30 @@ export default function UserManagement() {
   useEffect(() => {
     fetchUsers();
   }, []);
+
+  // Generate RW options (1-14)
+  const generateRWOptions = () => {
+    const options = [];
+    for (let i = 1; i <= 14; i++) {
+      options.push({
+        value: `RW ${i.toString().padStart(2, '0')}`,
+        label: `RW ${i.toString().padStart(2, '0')}`
+      });
+    }
+    return options;
+  };
+
+  // Generate RT options (1-10)
+  const generateRTOptions = () => {
+    const options = [];
+    for (let i = 1; i <= 10; i++) {
+      options.push({
+        value: `RT ${i.toString().padStart(2, '0')}`,
+        label: `RT ${i.toString().padStart(2, '0')}`
+      });
+    }
+    return options;
+  };
 
   const fetchUsers = async () => {
     setLoading(true);
@@ -109,6 +141,8 @@ export default function UserManagement() {
       username: '',
       name: '',
       address: '',
+      rw: '',
+      rt: '',
       phone: '',
       password: '',
     });
@@ -120,10 +154,25 @@ export default function UserManagement() {
   };
 
   const handleEditUser = (user: User) => {
+    // Parse existing address to extract RW/RT if present
+    const addressParts = user.address.split(',');
+    let baseAddress = user.address;
+    let rw = '';
+    let rt = '';
+    
+    if (addressParts.length >= 3) {
+      // Address format: {address},{rw},{rt}
+      baseAddress = addressParts.slice(0, -2).join(',').trim();
+      rw = addressParts[addressParts.length - 2].trim();
+      rt = addressParts[addressParts.length - 1].trim();
+    }
+    
     setFormData({
       username: user.username,
       name: user.name,
-      address: user.address,
+      address: baseAddress,
+      rw: rw,
+      rt: rt,
       phone: user.phone || '',
       password: '', // Don't prefill password when editing
     });
@@ -144,6 +193,19 @@ export default function UserManagement() {
 
   const submitUserForm = async () => {
     try {
+      // Combine address with RW and RT
+      const fullAddress = formData.rw && formData.rt 
+        ? `${formData.address},${formData.rw},${formData.rt}`
+        : formData.address;
+      
+      const submitData = {
+        ...formData,
+        address: fullAddress
+      };
+      
+      // Remove rw and rt from submit data since they're now part of address
+      const { rw, rt, ...finalData } = submitData;
+      
       const url = userDialog.mode === 'add' 
         ? '/api/admin/users' 
         : `/api/admin/users/${userDialog.user?.id}`;
@@ -153,7 +215,7 @@ export default function UserManagement() {
       const response = await fetch(url, {
         method,
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData)
+        body: JSON.stringify(finalData)
       });
 
       if (!response.ok) {
@@ -434,7 +496,111 @@ export default function UserManagement() {
                 onChange={handleInputChange}
                 multiline
                 rows={2}
+                placeholder="Masukkan alamat lengkap (tanpa RW/RT)"
+                helperText="RW dan RT akan dipilih di form terpisah di bawah"
               />
+            </Grid>
+            <Grid item xs={6}>
+              <FormControl fullWidth>
+                <InputLabel id="rw-select-label">RW</InputLabel>
+                <Select
+                  labelId="rw-select-label"
+                  id="rw-select"
+                  value={formData.rw}
+                  label="RW"
+                  onChange={(e) => setFormData(prev => ({ ...prev, rw: e.target.value }))}
+                  MenuProps={{
+                    PaperProps: {
+                      style: {
+                        maxHeight: 200,
+                        width: 200,
+                      },
+                    },
+                  }}
+                  sx={{
+                    '& .MuiSelect-select': {
+                      borderRadius: 2,
+                    },
+                    '& .MuiOutlinedInput-root': {
+                      borderRadius: 2,
+                    }
+                  }}
+                >
+                  <MenuItem value="">
+                    <em>Pilih RW</em>
+                  </MenuItem>
+                  {generateRWOptions().map((option) => (
+                    <MenuItem 
+                      key={option.value} 
+                      value={option.value}
+                      sx={{
+                        '&:hover': {
+                          backgroundColor: alpha(theme.palette.primary.main, 0.08),
+                        },
+                        '&.Mui-selected': {
+                          backgroundColor: alpha(theme.palette.primary.main, 0.12),
+                          '&:hover': {
+                            backgroundColor: alpha(theme.palette.primary.main, 0.16),
+                          }
+                        }
+                      }}
+                    >
+                      {option.label}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Grid>
+            <Grid item xs={6}>
+              <FormControl fullWidth>
+                <InputLabel id="rt-select-label">RT</InputLabel>
+                <Select
+                  labelId="rt-select-label"
+                  id="rt-select"
+                  value={formData.rt}
+                  label="RT"
+                  onChange={(e) => setFormData(prev => ({ ...prev, rt: e.target.value }))}
+                  MenuProps={{
+                    PaperProps: {
+                      style: {
+                        maxHeight: 200,
+                        width: 200,
+                      },
+                    },
+                  }}
+                  sx={{
+                    '& .MuiSelect-select': {
+                      borderRadius: 2,
+                    },
+                    '& .MuiOutlinedInput-root': {
+                      borderRadius: 2,
+                    }
+                  }}
+                >
+                  <MenuItem value="">
+                    <em>Pilih RT</em>
+                  </MenuItem>
+                  {generateRTOptions().map((option) => (
+                    <MenuItem 
+                      key={option.value} 
+                      value={option.value}
+                      sx={{
+                        '&:hover': {
+                          backgroundColor: alpha(theme.palette.primary.main, 0.08),
+                        },
+                        '&.Mui-selected': {
+                          backgroundColor: alpha(theme.palette.primary.main, 0.12),
+                          '&:hover': {
+                            backgroundColor: alpha(theme.palette.primary.main, 0.16),
+                          }
+                        }
+                      }}
+                    >
+                      {option.label}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
             </Grid>
             <Grid item xs={12}>
               <TextField
