@@ -15,9 +15,9 @@ export async function PUT(
       );
     }
     
-    const { name, role, password, username, phone } = await request.json();
+    const { name, role, password, username, phone, address } = await request.json();
     
-    console.log('Update admin request:', { adminId, name, role, password: password ? '[provided]' : '[empty]', username, phone });
+    console.log('Update admin request:', { adminId, name, role, password: password ? '[provided]' : '[empty]', username, phone, address });
     
     // Validate input
     if (!name || !role) {
@@ -48,16 +48,16 @@ export async function PUT(
       );
     }
       
-    // Update admin with or without password, including phone
+    // Update admin with or without password, including phone and address
     if (password) {
       await query(
-        'UPDATE admin SET name = ?, role = ?, password = ?, phone = ? WHERE id = ?',
-        [name, role, password, phone || null, adminId]
+        'UPDATE admin SET name = ?, role = ?, password = ?, phone = ?, address = ? WHERE id = ?',
+        [name, role, password, phone || null, address || null, adminId]
       );
     } else {
       await query(
-        'UPDATE admin SET name = ?, role = ?, phone = ? WHERE id = ?',
-        [name, role, phone || null, adminId]
+        'UPDATE admin SET name = ?, role = ?, phone = ?, address = ? WHERE id = ?',
+        [name, role, phone || null, address || null, adminId]
       );
     }
       

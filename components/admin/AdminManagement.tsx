@@ -48,6 +48,7 @@ interface Admin {
   id: number;
   username: string;
   name: string | null;
+  address: string | null;
   created_at: string;
   role: 'superadmin' | 'admin1' | 'admin2' | 'petugas' | null; // Updated roles
   pending: boolean; // Add pending status
@@ -84,6 +85,9 @@ export default function AdminManagement() {
   const [formData, setFormData] = useState({
     username: '',
     name: '',
+    address: '',
+    rw: '',
+    rt: '',
     password: '',
     role: 'admin1' as 'admin1' | 'admin2' | 'superadmin' | 'petugas',
   });
@@ -135,6 +139,30 @@ export default function AdminManagement() {
     return [];
   };
 
+  // Generate RW options (1-14)
+  const generateRWOptions = () => {
+    const options = [];
+    for (let i = 1; i <= 14; i++) {
+      options.push({
+        value: `RW ${i.toString().padStart(2, '0')}`,
+        label: `RW ${i.toString().padStart(2, '0')}`
+      });
+    }
+    return options;
+  };
+
+  // Generate RT options (1-10)
+  const generateRTOptions = () => {
+    const options = [];
+    for (let i = 1; i <= 10; i++) {
+      options.push({
+        value: `RT ${i.toString().padStart(2, '0')}`,
+        label: `RT ${i.toString().padStart(2, '0')}`
+      });
+    }
+    return options;
+  };
+
   const resetForm = () => {
     const availableRoles = getAvailableRoles();
     const defaultRole = availableRoles.length > 0 ? availableRoles[0].value : 'admin1';
@@ -142,6 +170,9 @@ export default function AdminManagement() {
     setFormData({
       username: '',
       name: '',
+      address: '',
+      rw: '',
+      rt: '',
       password: '',
       role: defaultRole as 'admin1' | 'admin2' | 'superadmin' | 'petugas',
     });
@@ -149,9 +180,26 @@ export default function AdminManagement() {
 
   // Populate form with admin data when editing
   const populateForm = (admin: Admin) => {
+    // Parse existing address to extract RW/RT if present
+    const adminAddress = admin.address || '';
+    const addressParts = adminAddress.split(',');
+    let baseAddress = adminAddress;
+    let rw = '';
+    let rt = '';
+    
+    if (addressParts.length >= 3) {
+      // Address format: {address},{rw},{rt}
+      baseAddress = addressParts.slice(0, -2).join(',').trim();
+      rw = addressParts[addressParts.length - 2].trim();
+      rt = addressParts[addressParts.length - 1].trim();
+    }
+    
     setFormData({
       username: admin.username,
       name: admin.name || '',
+      address: baseAddress,
+      rw: rw,
+      rt: rt,
       password: '', // Don't populate password for security
       role: admin.role || 'admin1', // Default to admin1 if role is null
     });
@@ -285,6 +333,19 @@ export default function AdminManagement() {
     }));
     
     try {
+      // Combine address with RW and RT
+      const fullAddress = formData.rw && formData.rt 
+        ? `${formData.address},${formData.rw},${formData.rt}`
+        : formData.address;
+      
+      const submitData = {
+        ...formData,
+        address: fullAddress
+      };
+      
+      // Remove rw and rt from submit data since they're now part of address
+      const { rw, rt, ...finalData } = submitData;
+      
       const url = adminDialog.mode === 'add' 
         ? '/api/admin/admins' 
         : `/api/admin/admins/${adminDialog.admin?.id}`;
@@ -294,7 +355,7 @@ export default function AdminManagement() {
       const response = await fetch(url, {
         method,
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData)
+        body: JSON.stringify(finalData)
       });
 
       if (!response.ok) {
@@ -626,6 +687,7 @@ export default function AdminManagement() {
                 <TableCell>ID</TableCell>
                 <TableCell>Username</TableCell>
                 <TableCell>Nama</TableCell>
+                <TableCell>Alamat</TableCell>
                 <TableCell>Role</TableCell>
                 <TableCell>Bergabung</TableCell>
                 <TableCell align="right">Aksi</TableCell>
@@ -637,6 +699,7 @@ export default function AdminManagement() {
                   <TableCell>{admin.id}</TableCell>
                   <TableCell sx={{ fontWeight: 500 }}>{admin.username}</TableCell>
                   <TableCell>{admin.name || '-'}</TableCell>
+                  <TableCell>{admin.address || '-'}</TableCell>
                   <TableCell>
                     <Chip 
                       label={
@@ -729,6 +792,7 @@ export default function AdminManagement() {
                 <TableCell>ID</TableCell>
                 <TableCell>Username</TableCell>
                 <TableCell>Nama</TableCell>
+                <TableCell>Alamat</TableCell>
                 <TableCell>Mendaftar Pada</TableCell>
                 <TableCell align="right">Aksi</TableCell>
               </TableRow>
@@ -739,6 +803,7 @@ export default function AdminManagement() {
                   <TableCell>{admin.id}</TableCell>
                   <TableCell>{admin.username}</TableCell>
                   <TableCell>{admin.name}</TableCell>
+                  <TableCell>{admin.address || '-'}</TableCell>
                   <TableCell>
                     {new Date(admin.created_at).toLocaleDateString('id-ID', {
                       day: 'numeric',
@@ -823,6 +888,121 @@ export default function AdminManagement() {
                 value={formData.name}
                 onChange={handleInputChange}
               />
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                fullWidth
+                label="Alamat"
+                name="address"
+                value={formData.address}
+                onChange={handleInputChange}
+                multiline
+                rows={2}
+                placeholder="Masukkan alamat lengkap (tanpa RW/RT)"
+                helperText="RW dan RT akan dipilih di form terpisah di bawah"
+              />
+            </Grid>
+            <Grid item xs={6}>
+              <FormControl fullWidth>
+                <InputLabel id="rw-select-label">RW</InputLabel>
+                <Select
+                  labelId="rw-select-label"
+                  id="rw-select"
+                  value={formData.rw}
+                  label="RW"
+                  onChange={(e) => setFormData(prev => ({ ...prev, rw: e.target.value }))}
+                  MenuProps={{
+                    PaperProps: {
+                      style: {
+                        maxHeight: 200,
+                        width: 200,
+                      },
+                    },
+                  }}
+                  sx={{
+                    '& .MuiSelect-select': {
+                      borderRadius: 2,
+                    },
+                    '& .MuiOutlinedInput-root': {
+                      borderRadius: 2,
+                    }
+                  }}
+                >
+                  <MenuItem value="">
+                    <em>Pilih RW</em>
+                  </MenuItem>
+                  {generateRWOptions().map((option) => (
+                    <MenuItem 
+                      key={option.value} 
+                      value={option.value}
+                      sx={{
+                        '&:hover': {
+                          backgroundColor: alpha(theme.palette.primary.main, 0.08),
+                        },
+                        '&.Mui-selected': {
+                          backgroundColor: alpha(theme.palette.primary.main, 0.12),
+                          '&:hover': {
+                            backgroundColor: alpha(theme.palette.primary.main, 0.16),
+                          }
+                        }
+                      }}
+                    >
+                      {option.label}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Grid>
+            <Grid item xs={6}>
+              <FormControl fullWidth>
+                <InputLabel id="rt-select-label">RT</InputLabel>
+                <Select
+                  labelId="rt-select-label"
+                  id="rt-select"
+                  value={formData.rt}
+                  label="RT"
+                  onChange={(e) => setFormData(prev => ({ ...prev, rt: e.target.value }))}
+                  MenuProps={{
+                    PaperProps: {
+                      style: {
+                        maxHeight: 200,
+                        width: 200,
+                      },
+                    },
+                  }}
+                  sx={{
+                    '& .MuiSelect-select': {
+                      borderRadius: 2,
+                    },
+                    '& .MuiOutlinedInput-root': {
+                      borderRadius: 2,
+                    }
+                  }}
+                >
+                  <MenuItem value="">
+                    <em>Pilih RT</em>
+                  </MenuItem>
+                  {generateRTOptions().map((option) => (
+                    <MenuItem 
+                      key={option.value} 
+                      value={option.value}
+                      sx={{
+                        '&:hover': {
+                          backgroundColor: alpha(theme.palette.primary.main, 0.08),
+                        },
+                        '&.Mui-selected': {
+                          backgroundColor: alpha(theme.palette.primary.main, 0.12),
+                          '&:hover': {
+                            backgroundColor: alpha(theme.palette.primary.main, 0.16),
+                          }
+                        }
+                      }}
+                    >
+                      {option.label}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
             </Grid>
             <Grid item xs={12}>
               <TextField

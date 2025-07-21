@@ -5,7 +5,7 @@ import { query } from '../../../../utils/db';
 export async function GET(request: NextRequest) {
   try {
     const admins = await query(
-      'SELECT id, username, name, role, created_at FROM admin WHERE pending = FALSE ORDER BY id DESC'
+      'SELECT id, username, name, address, role, created_at FROM admin WHERE pending = FALSE ORDER BY id DESC'
     );
 
     return NextResponse.json(admins);
@@ -21,7 +21,7 @@ export async function GET(request: NextRequest) {
 // POST new admin
 export async function POST(request: NextRequest) {
   try {
-    const { username, password, name, role } = await request.json();
+    const { username, password, name, address, role } = await request.json();
     
     // Validate input
     if (!username || !password || !name || !role) {
@@ -54,8 +54,8 @@ export async function POST(request: NextRequest) {
 
     // Insert new admin
     await query(
-      'INSERT INTO admin (username, password, name, role) VALUES (?, ?, ?, ?)',
-      [username, password, name, role]
+      'INSERT INTO admin (username, password, name, address, role) VALUES (?, ?, ?, ?, ?)',
+      [username, password, name, address || null, role]
     );
 
     return NextResponse.json({ message: 'Admin created successfully' });

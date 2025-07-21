@@ -37,6 +37,7 @@ import {
   CastConnected as DevicesIcon,
   SupportAgent as SupportIcon,
   Help as HelpIcon,
+  Category as CategoryIcon,
 } from '@mui/icons-material';
 import { useAuth } from '../../contexts/AuthContext';
 
@@ -303,6 +304,11 @@ const Sidebar: React.FC<SidebarProps> = ({ open, onClose, variant = 'permanent' 
       title: 'Manajemen Admin',
       icon: <AdminIcon />,
       path: '/admin/manage-admins',
+    },
+    {
+      title: 'Jenis Laporan',
+      icon: <CategoryIcon />,
+      path: '/admin/jenis-laporan',
     },
     {
       title: 'Pengaturan',
