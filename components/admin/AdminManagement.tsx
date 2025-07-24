@@ -50,7 +50,7 @@ interface Admin {
   name: string | null;
   address: string | null;
   created_at: string;
-  role: 'superadmin' | 'admin1' | 'admin2' | 'petugas' | null; // Updated roles
+  role: 'superadmin' | 'admin1' | 'admin2' | 'petugas' | 'user' | null; // Updated roles
   pending: boolean; // Add pending status
 }
 
@@ -89,7 +89,7 @@ export default function AdminManagement() {
     rw: '',
     rt: '',
     password: '',
-    role: 'admin1' as 'admin1' | 'admin2' | 'superadmin' | 'petugas',
+    role: 'admin1' as 'admin1' | 'admin2' | 'superadmin' | 'petugas' | 'user',
   });
   const [snackbar, setSnackbar] = useState({
     open: false,
@@ -105,17 +105,18 @@ export default function AdminManagement() {
   // Function to get available roles based on current user's role
   const getAvailableRoles = () => {
     if (user?.role === 'superadmin') {
-      // Superadmin can create all admin roles
+      // Superadmin can create all admin roles and user warga
       return [
         { value: 'superadmin', label: 'Super Admin' },
         { value: 'admin1', label: 'Admin 1' },
         { value: 'admin2', label: 'Admin 2' },
-        { value: 'petugas', label: 'Petugas' }
+        { value: 'petugas', label: 'Petugas' },
       ];
     } else if (user?.role === 'admin1') {
-      // Admin1 can only create petugas
+      // Admin1 can create petugas, admin2, and user warga
       return [
-        { value: 'petugas', label: 'Petugas' }
+        { value: 'admin2', label: 'Admin 2' },
+        { value: 'petugas', label: 'Petugas' },
       ];
     }
     return [];
@@ -123,17 +124,20 @@ export default function AdminManagement() {
 
   const getAvailableApprovalRoles = () => {
     if (user?.role === 'superadmin') {
-      // Superadmin can approve all admin roles
+      // Superadmin can approve all admin roles and user warga
       return [
         { value: 'superadmin', label: 'Super Admin' },
         { value: 'admin1', label: 'Admin 1' },
         { value: 'admin2', label: 'Admin 2' },
-        { value: 'petugas', label: 'Petugas' }
+        { value: 'petugas', label: 'Petugas' },
+        { value: 'user', label: 'User Warga' }
       ];
     } else if (user?.role === 'admin1') {
-      // Admin1 can approve as petugas only
+      // Admin1 can approve as admin2, petugas, and user warga
       return [
-        { value: 'petugas', label: 'Petugas' }
+        { value: 'admin2', label: 'Admin 2' },
+        { value: 'petugas', label: 'Petugas' },
+        { value: 'user', label: 'User Warga' }
       ];
     }
     return [];
@@ -174,7 +178,7 @@ export default function AdminManagement() {
       rw: '',
       rt: '',
       password: '',
-      role: defaultRole as 'admin1' | 'admin2' | 'superadmin' | 'petugas',
+      role: defaultRole as 'admin1' | 'admin2' | 'superadmin' | 'petugas' | 'user',
     });
   };
 
@@ -208,12 +212,12 @@ export default function AdminManagement() {
   // Filter admins based on current user's role permissions
   const filterAdminsByRole = (adminsList: any[]) => {
     if (user?.role === 'superadmin') {
-      // Superadmin can see all admins
+      // Superadmin can see all admins and users
       return adminsList;
     } else if (user?.role === 'admin1') {
-      // Admin1 can only see petugas (they can manage petugas and add citizen data)
+      // Admin1 can see admin2, petugas, and user warga
       return adminsList.filter(admin =>
-        admin.role === 'petugas'
+        admin.role === 'admin2' || admin.role === 'petugas' || admin.role === 'user'
       );
     }
     // Other roles (admin2, petugas) can't see any admins
@@ -326,6 +330,18 @@ export default function AdminManagement() {
   };
 
   const submitAdminForm = async () => {
+    // Validation
+    const { username, name, address, rw, rt, password, role } = formData;
+    if (!username || !name || !password && adminDialog.mode === 'add') {
+      setSnackbar({ open: true, message: 'Username, Nama, dan Password wajib diisi.', severity: 'error' });
+      return;
+    }
+
+    if (role === 'user' && (!address || !rw || !rt)) {
+      setSnackbar({ open: true, message: 'Untuk warga, alamat, RW, dan RT wajib diisi.', severity: 'error' });
+      return;
+    }
+
     // Set loading state
     setLoadingStates(prev => ({
       ...prev,
@@ -334,13 +350,16 @@ export default function AdminManagement() {
     
     try {
       // Combine address with RW and RT
-      const fullAddress = formData.rw && formData.rt 
+      const fullAddress = formData.rw && formData.rt
         ? `${formData.address},${formData.rw},${formData.rt}`
         : formData.address;
       
       const submitData = {
         ...formData,
-        address: fullAddress
+        address: fullAddress,
+        userId: user?.id,
+        userRole: user?.role,
+        userName: user?.name || user?.username
       };
       
       // Remove rw and rt from submit data since they're now part of address
@@ -400,7 +419,13 @@ export default function AdminManagement() {
     
     try {
       const response = await fetch(`/api/admin/admins/${adminId}`, {
-        method: 'DELETE'
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userId: user?.id,
+          userRole: user?.role,
+          userName: user?.name || user?.username
+        })
       });
 
       if (!response.ok) {
@@ -1122,10 +1147,10 @@ export default function AdminManagement() {
         open={snackbar.open}
         autoHideDuration={6000}
         onClose={() => setSnackbar({ ...snackbar, open: false })}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
       >
-        <Alert 
-          onClose={() => setSnackbar({ ...snackbar, open: false })} 
+        <Alert
+          onClose={() => setSnackbar({ ...snackbar, open: false })}
           severity={snackbar.severity}
           sx={{ width: '100%' }}
         >

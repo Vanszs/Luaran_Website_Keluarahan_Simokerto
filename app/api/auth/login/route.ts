@@ -1,6 +1,7 @@
 import { query, checkDatabaseConnection } from '../../../../utils/db';
 import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
+import { ActivityLogger, getClientIP, getUserAgent } from '../../../../utils/activityLogger';
 
 export const dynamic = 'force-dynamic';
 
@@ -45,6 +46,15 @@ export async function POST(req: NextRequest) {
         { status: 401 }
       );
     }
+
+    // Log successful login
+    await ActivityLogger.logLogin(
+      userData.id,
+      userData.role,
+      userData.name || userData.username,
+      getClientIP(req),
+      getUserAgent(req)
+    );
     
     // Generate a simple session ID
     const sessionId = Buffer.from(JSON.stringify({ 

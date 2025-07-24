@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { query } from '../../../../utils/db';
+import { ActivityLogger, getClientIP, getUserAgent } from '../../../../utils/activityLogger';
 
 // GET all approved admins
 export async function GET(request: NextRequest) {
@@ -21,7 +22,7 @@ export async function GET(request: NextRequest) {
 // POST new admin
 export async function POST(request: NextRequest) {
   try {
-    const { username, password, name, address, role } = await request.json();
+    const { username, password, name, address, role, userId, userRole, userName } = await request.json();
     
     // Validate input
     if (!username || !password || !name || !role) {
@@ -32,7 +33,7 @@ export async function POST(request: NextRequest) {
     }
     
     // Validate role
-    if (!['admin1', 'admin2', 'petugas', 'superadmin'].includes(role)) {
+    if (!['admin1', 'admin2', 'petugas', 'superadmin', 'user'].includes(role)) {
       return NextResponse.json(
         { message: 'Invalid role' },
         { status: 400 }
@@ -53,10 +54,25 @@ export async function POST(request: NextRequest) {
     }
 
     // Insert new admin
-    await query(
+    const result = await query(
       'INSERT INTO admin (username, password, name, address, role) VALUES (?, ?, ?, ?, ?)',
       [username, password, name, address || null, role]
-    );
+    ) as any;
+
+    // Log the activity
+    if (userId && userRole && userName) {
+      await ActivityLogger.logCreate(
+        userId,
+        userRole,
+        userName,
+        role === 'user' ? 'users' : 'admin',
+        result.insertId,
+        { username, name, address, role },
+        `Created new ${role}: ${name} (${username})`,
+        getClientIP(request),
+        getUserAgent(request)
+      );
+    }
 
     return NextResponse.json({ message: 'Admin created successfully' });
   } catch (error) {

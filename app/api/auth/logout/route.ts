@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
+import { ActivityLogger, getClientIP, getUserAgent } from '../../../../utils/activityLogger';
 
 export async function POST(request: NextRequest) {
   try {
@@ -7,8 +8,21 @@ export async function POST(request: NextRequest) {
     const sessionCookie = cookies().get('admin_session');
     
     if (sessionCookie?.value) {
-      // Delete the session from database (implement this in a real app)
-      // await deleteSession(sessionCookie.value);
+      try {
+        // Decode session to get user info for logging
+        const sessionData = JSON.parse(Buffer.from(sessionCookie.value, 'base64').toString());
+        
+        // Log logout activity
+        await ActivityLogger.logLogout(
+          sessionData.id,
+          sessionData.role,
+          sessionData.name || sessionData.username,
+          getClientIP(request),
+          getUserAgent(request)
+        );
+      } catch (decodeError) {
+        console.error('Error decoding session for logout logging:', decodeError);
+      }
       
       // Clear the session cookie with same parameters as when setting it
       cookies().set({

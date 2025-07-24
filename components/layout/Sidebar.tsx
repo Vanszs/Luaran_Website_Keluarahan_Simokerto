@@ -38,6 +38,7 @@ import {
   SupportAgent as SupportIcon,
   Help as HelpIcon,
   Category as CategoryIcon,
+  History as HistoryIcon,
 } from '@mui/icons-material';
 import { useAuth } from '../../contexts/AuthContext';
 
@@ -311,6 +312,12 @@ const Sidebar: React.FC<SidebarProps> = ({ open, onClose, variant = 'permanent' 
       path: '/admin/jenis-laporan',
     },
     {
+      title: 'Log Aktivitas',
+      icon: <HistoryIcon />,
+      path: '/admin/logs',
+      disabled: true,
+    },
+    {
       title: 'Pengaturan',
       icon: <SettingsIcon />,
       path: '/admin/settings',
@@ -443,6 +450,7 @@ const Sidebar: React.FC<SidebarProps> = ({ open, onClose, variant = 'permanent' 
               <ListItem disablePadding sx={{ mb: 0.5 }}>
                 <ListItemButton
                   onMouseEnter={() => handleComingSoonHover('Statistik')}
+                  disabled={true}
                   sx={{
                     borderRadius: 2,
                     py: 1.25,
@@ -479,6 +487,7 @@ const Sidebar: React.FC<SidebarProps> = ({ open, onClose, variant = 'permanent' 
               <ListItem disablePadding sx={{ mb: 0.5 }}>
                 <ListItemButton
                   onMouseEnter={() => handleComingSoonHover('Perangkat')}
+                  disabled={true}
                   sx={{
                     borderRadius: 2,
                     py: 1.25,
@@ -519,14 +528,28 @@ const Sidebar: React.FC<SidebarProps> = ({ open, onClose, variant = 'permanent' 
             <NavLabel>Admin</NavLabel>
             <List disablePadding>
               {adminNavItems.map((item) => (
-                <NavItem
-                  key={item.path}
-                  icon={item.icon}
-                  title={item.title}
-                  path={item.path}
-                  active={isActive(item.path)}
-                  onClick={() => handleNavigation(item.path)}
-                />
+                item.disabled ? (
+                  <Tooltip title="Coming Soon" placement="right" arrow key={item.path}>
+                    <div>
+                      <NavItem
+                        icon={item.icon}
+                        title={item.title}
+                        path={item.path}
+                        active={false}
+                        disabled
+                      />
+                    </div>
+                  </Tooltip>
+                ) : (
+                  <NavItem
+                    key={item.path}
+                    icon={item.icon}
+                    title={item.title}
+                    path={item.path}
+                    active={isActive(item.path)}
+                    onClick={() => handleNavigation(item.path)}
+                  />
+                )
               ))}
             </List>
           </NavSection>

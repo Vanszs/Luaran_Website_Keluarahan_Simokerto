@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { query } from '../../../../../utils/db';
+import { ActivityLogger, getClientIP, getUserAgent } from '../../../../../utils/activityLogger';
 
 // PUT (update) admin
 export async function PUT(
@@ -15,7 +16,7 @@ export async function PUT(
       );
     }
     
-    const { name, role, password, username, phone, address } = await request.json();
+    const { name, role, password, username, phone, address, userId, userRole, userName } = await request.json();
     
     console.log('Update admin request:', { adminId, name, role, password: password ? '[provided]' : '[empty]', username, phone, address });
     
@@ -28,40 +29,72 @@ export async function PUT(
     }
     
     // Validate role
-    if (!['admin1', 'admin2', 'petugas', 'superadmin'].includes(role)) {
+    if (!['admin1', 'admin2', 'petugas', 'superadmin', 'user'].includes(role)) {
       return NextResponse.json(
         { message: 'Invalid role' },
         { status: 400 }
       );
     }
     
-    // Check if admin exists
-    const admins = await query(
-      'SELECT id FROM admin WHERE id = ?',
+    // Get old data for logging
+    const oldAdminData = await query(
+      'SELECT * FROM admin WHERE id = ?',
       [adminId]
-    );
+    ) as any[];
 
-    if ((admins as any[]).length === 0) {
+    if (oldAdminData.length === 0) {
       return NextResponse.json(
         { message: 'Admin not found' },
         { status: 404 }
       );
     }
-      
+
+    const oldData = oldAdminData[0];
+    
     // Update admin with or without password, including phone and address
     if (password) {
       await query(
         'UPDATE admin SET name = ?, role = ?, password = ?, phone = ?, address = ? WHERE id = ?',
         [name, role, password, phone || null, address || null, adminId]
       );
+      
+      // Log password change
+      if (userId && userRole && userName) {
+        await ActivityLogger.logPasswordChange(
+          userId,
+          userRole,
+          userName,
+          adminId,
+          name,
+          getClientIP(request),
+          getUserAgent(request)
+        );
+      }
     } else {
       await query(
         'UPDATE admin SET name = ?, role = ?, phone = ?, address = ? WHERE id = ?',
         [name, role, phone || null, address || null, adminId]
       );
     }
+
+    // Log the update activity
+    if (userId && userRole && userName) {
+      const newData = { name, role, phone, address };
+      await ActivityLogger.logUpdate(
+        userId,
+        userRole,
+        userName,
+        'admin',
+        adminId,
+        { name: oldData.name, role: oldData.role, phone: oldData.phone, address: oldData.address },
+        newData,
+        `Updated admin: ${name} (${username || oldData.username})`,
+        getClientIP(request),
+        getUserAgent(request)
+      );
+    }
       
-      return NextResponse.json({ message: 'Admin updated successfully' });
+    return NextResponse.json({ message: 'Admin updated successfully' });
   } catch (error) {
     console.error('Error updating admin:', error);
     return NextResponse.json(
@@ -84,27 +117,48 @@ export async function DELETE(
         { status: 400 }
       );
     }
+
+    // Get request body for user info
+    const body = await request.json().catch(() => ({}));
+    const { userId, userRole, userName } = body;
     
-    // Check if admin exists
-    const admins = await query(
-      'SELECT id FROM admin WHERE id = ?',
+    // Get admin data before deletion for logging
+    const adminData = await query(
+      'SELECT * FROM admin WHERE id = ?',
       [adminId]
-    );
+    ) as any[];
       
-    if ((admins as any[]).length === 0) {
+    if (adminData.length === 0) {
       return NextResponse.json(
         { message: 'Admin not found' },
         { status: 404 }
       );
     }
+
+    const deletedAdmin = adminData[0];
       
-      // Delete admin
+    // Delete admin
     await query(
       'DELETE FROM admin WHERE id = ?',
       [adminId]
     );
+
+    // Log the deletion
+    if (userId && userRole && userName) {
+      await ActivityLogger.logDelete(
+        userId,
+        userRole,
+        userName,
+        'admin',
+        adminId,
+        { name: deletedAdmin.name, username: deletedAdmin.username, role: deletedAdmin.role },
+        `Deleted admin: ${deletedAdmin.name} (${deletedAdmin.username})`,
+        getClientIP(request),
+        getUserAgent(request)
+      );
+    }
       
-      return NextResponse.json({ message: 'Admin deleted successfully' });
+    return NextResponse.json({ message: 'Admin deleted successfully' });
   } catch (error) {
     console.error('Error deleting admin:', error);
     return NextResponse.json(
