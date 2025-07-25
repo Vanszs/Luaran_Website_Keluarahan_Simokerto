@@ -1,26 +1,83 @@
-# 🏛️ Dashboard Pintar Kelurahan Simokerto
+# 🏛️ Ekosistem Simokerto PINTAR
 
 <div align="center">
-  <img src="./public/logo.png" alt="Dashboard Pintar Logo" width="120" height="120">
+  <img src="./public/logo.png" alt="Simokerto PINTAR Logo" width="120" height="120">
   
-  **Sistem Manajemen Digital Modern untuk Kelurahan Simokerto**
+  **Pelayanan Informasi Terpadu dan Responsif Kelurahan Simokerto**
   
-  *Mendigitalkan pelayanan masyarakat dengan teknologi terdepan*
+  *Mendigitalkan pelayanan masyarakat dengan teknologi terdepan - Ekosistem 3 Aplikasi Terintegrasi*
 
   [![Next.js](https://img.shields.io/badge/Next.js-15.0-black?style=for-the-badge&logo=next.js)](https://nextjs.org/)
+  [![Flutter](https://img.shields.io/badge/Flutter-3.0+-02569B?style=for-the-badge&logo=flutter&logoColor=white)](https://flutter.dev/)
   [![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue?style=for-the-badge&logo=typescript)](https://www.typescriptlang.org/)
-  [![Material-UI](https://img.shields.io/badge/Material--UI-5.0-0081CB?style=for-the-badge&logo=material-ui)](https://mui.com/)
-  [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15.0-316192?style=for-the-badge&logo=postgresql)](https://www.postgresql.org/)
+  [![MySQL](https://img.shields.io/badge/MySQL-8.0-4479A1?style=for-the-badge&logo=mysql&logoColor=white)](https://www.mysql.com/)
+  [![Version](https://img.shields.io/badge/Version-2.0.0-success?style=for-the-badge)](https://github.com)
+  [![Commits](https://img.shields.io/badge/Commits-56+-brightgreen?style=for-the-badge)](https://github.com)
 
 </div>
 
 ---
 
-## 🚀 Tentang Proyek
+## 🌟 Tentang Ekosistem
 
-**Dashboard Pintar Kelurahan Simokerto** adalah sistem manajemen digital yang revolusioner, dirancang khusus untuk modernisasi pelayanan publik di tingkat kelurahan. Sistem ini menggabungkan antarmuka yang intuitif dengan fungsionalitas yang powerful untuk memberikan pengalaman terbaik bagi administrator dan warga.
+**Simokerto PINTAR** adalah ekosistem digital komprehensif yang terdiri dari **3 aplikasi terintegrasi** untuk memenuhi kebutuhan digitalisasi pelayanan kelurahan yang modern, efisien, dan user-friendly.
 
-### ✨ Fitur Unggulan
+### 🏗️ Arsitektur Ekosistem
+
+```mermaid
+graph TB
+    A[📱 Aplikasi Warga<br/>Flutter Mobile App] --> D[🌐 Dashboard Web Admin<br/>Next.js Web App]
+    B[📱 Aplikasi Petugas<br/>Flutter Mobile App] --> D
+    C[👥 Masyarakat] --> A
+    E[👮 Petugas Lapangan] --> B
+    F[🏛️ Admin Kelurahan] --> D
+    
+    D --> G[(🗄️ MySQL Database)]
+    D --> H[🔔 Real-time Notifications]
+    D --> I[📊 Analytics & Reports]
+```
+
+---
+
+## 📱 Aplikasi dalam Ekosistem
+
+### 1. � **Dashboard Web Admin** (Repository Ini)
+> **Platform**: Next.js Web Application  
+> **Target User**: Admin Kelurahan, Superadmin, Petugas  
+> **Status**: ✅ **Aktif & Stabil** (56+ commits)
+
+**Fitur Utama**:
+- **Real-time Analytics Dashboard** dengan grafik interaktif
+- **Multi-role Management** (superadmin, admin1, admin2, petugas)  
+- **Comprehensive Reporting System** dengan status tracking
+- **Advanced Security** (bcrypt, rate limiting, CSRF protection)
+- **Activity Audit Logging** untuk compliance
+- **Responsive Design** untuk semua perangkat
+
+### 2. � **Aplikasi Warga** - [Lapor Maling App V2](https://github.com/Vanszs/Flutter_Aplikasi_Pintar_Kelurahan)
+> **Platform**: Flutter Mobile Application  
+> **Target User**: Masyarakat/Warga Kelurahan  
+> **Status**: ✅ **Aktif** (v2.0.0)
+
+**Fitur Unggulan**:
+- **🔄 Offline/Online State Management** - Sistem robust untuk mode offline
+- **📊 Smart Reporting** - Form pelaporan intelligent dengan validasi
+- **🔐 Secure Authentication** - Token-based dengan auto-refresh  
+- **🎨 Modern UI/UX** - Material Design 3 dengan smooth animations
+- **🌐 Real-time Sync** - Sinkronisasi otomatis saat online kembali
+- **📱 Cross-platform** - Support Android, iOS, dan Web
+
+### 3. � **Aplikasi Petugas** - [Simokerto PINTAR Petugas](https://github.com/Vanszs/Aplikasi_Pintar_Petugas) 
+> **Platform**: Flutter Mobile Application  
+> **Target User**: Petugas Lapangan, RT/RW  
+> **Status**: ✅ **Aktif** (v2.1.0+3 - 53+ commits)
+
+**Fitur Spesialis**:
+- **🔔 Real-time Push Notifications** via Firebase FCM
+- **📊 Field Dashboard** dengan monitoring laporan
+- **📱 Report Management** - Update status, tambah komentar
+- **👥 User Management** - Informasi pelapor dan statistik
+## ✨ Fitur Unggulan Dashboard Web
 
 #### 🎯 **Dashboard Interaktif**
 - **Real-time Analytics** - Statistik laporan dan aktivitas secara langsung
@@ -28,86 +85,126 @@
 - **Dark/Light Mode** - Tema yang dapat disesuaikan dengan preferensi pengguna
 - **Mobile-First** - Optimized untuk semua perangkat
 
-#### 👥 **Manajemen Pengguna**
-- **Multi-Role System** - Admin, Super Admin, dan Warga dengan hak akses berbeda
-- **Profile Management** - Kelola data pribadi dan foto profil
-- **Activity Tracking** - Riwayat aktivitas pengguna
-- **Bulk Operations** - Operasi massal untuk efisiensi
+#### 👥 **Manajemen Pengguna Multi-Role**
+- **4 Level Akses**: Superadmin, Admin1, Admin2, Petugas
+- **Profile Management** - Kelola data pribadi dan informasi petugas
+- **Activity Tracking** - Comprehensive audit trail semua aktivitas
+- **Bulk Operations** - Operasi massal untuk efisiensi administratif
 
-#### 📋 **Sistem Pelaporan**
-- **Smart Reporting** - Form pelaporan yang intelligent dan user-friendly
+#### 📋 **Sistem Pelaporan Terintegrasi**
+- **Central Report Management** - Kelola laporan dari 2 aplikasi mobile
 - **Status Tracking** - Pelacakan status laporan secara real-time
-- **Document Upload** - Upload bukti dan dokumen pendukung
-- **Notification System** - Notifikasi otomatis untuk update status
+- **Document Management** - Organisasi bukti dan dokumen pendukung  
+- **Analytics & Insights** - Laporan statistik dan trend analysis
 
-#### 🔐 **Keamanan Terdepan**
+#### 🔐 **Keamanan Enterprise-Grade**
 - **Bcrypt Password Hashing** - Password di-hash dengan bcrypt salt 12 rounds
 - **Secure Session Management** - Session dengan expiry dan signature validation
 - **SQL Injection Protection** - Parameterized queries untuk semua database operations
-- **Rate Limiting** - Perlindungan terhadap brute force attacks
+- **Rate Limiting** - Perlindungan terhadap brute force attacks (5 attempts/15min)
 - **CSRF Protection** - Token-based CSRF protection untuk form sensitif
-- **Role-Based Access Control** - Kontrol akses berdasarkan peran (superadmin, admin1, admin2, petugas)
+- **Role-Based Access Control** - Kontrol akses berdasarkan peran yang ketat
 - **Input Validation** - Validasi dan sanitasi semua input pengguna
 - **Secure Headers** - HTTP security headers untuk mencegah XSS dan clickjacking
 - **Activity Logging** - Comprehensive audit trail untuk semua aktivitas pengguna
 
 ---
 
-## 🏗️ Teknologi Stack
+## 🔗 Integrasi Antar Aplikasi
 
-### Frontend
+### 📊 **Data Flow & Communication**
+```mermaid
+sequenceDiagram
+    participant W as Warga (Mobile)
+    participant P as Petugas (Mobile) 
+    participant D as Dashboard (Web)
+    participant DB as Database
+    participant N as Notification Service
+    
+    W->>+D: Submit Laporan
+    D->>+DB: Store Report Data
+    D->>+N: Trigger Notification
+    N->>P: Push Notification
+    P->>+D: Update Report Status
+    D->>+N: Status Update Notification
+    N->>W: Status Change Alert
+```
+
+### 🔄 **Real-time Features**
+- **WebSocket Integration** - Live updates across all platforms
+- **Push Notifications** - Firebase FCM untuk mobile apps
+- **Auto-refresh** - Data sinkronisasi otomatis setiap 30 detik
+- **Offline Support** - Mode offline dengan sinkronisasi saat online kembali
+
+---
+
+## 🏗️ Teknologi Stack Ekosistem
+
+### 🌐 **Web Dashboard (Repository Ini)**
 ```typescript
-Next.js 15.0      // React Framework dengan App Router
-TypeScript 5.0    // Type-safe JavaScript
-Material-UI 5.0   // Component Library
-Emotion           // CSS-in-JS styling
-React Hook Form   // Form handling
+Next.js 15.0           // React Framework dengan App Router  
+TypeScript 5.0         // Type-safe JavaScript
+Material-UI 5.0        // Component Library dengan theming
+MySQL 8.0              // Relational Database
+bcryptjs               // Password hashing (12 rounds)
+Rate Limiting          // Brute force protection
+WebSocket/Socket.IO    // Real-time communication
 ```
 
-### Backend
-```javascript
-Next.js API Routes  // Serverless API
-MySQL              // Primary Database
-bcryptjs           // Password hashing (12 rounds)
-crypto             // Session signature validation
-Rate Limiting      // Brute force protection
+### 📱 **Mobile Applications**
+```dart
+Flutter 3.0+           // Cross-platform mobile framework
+Dart 3.0+              // Programming language
+Riverpod               // State management untuk React-like patterns
+Firebase FCM           // Push notifications & analytics  
+Socket.IO              // Real-time bidirectional communication
+Shared Preferences     // Local data persistence
+Connectivity Plus      // Network state monitoring
 ```
 
-### Security & DevOps
+### 🔧 **Infrastructure & DevOps**
 ```bash
-ESLint            # Code linting
-Prettier          # Code formatting
-bcryptjs          # Password hashing
-mysql2            # Database driver
-Rate Limiting     # Attack prevention
-CSRF Protection   # Cross-site request forgery protection
+MySQL 8.0              # Primary database dengan replication
+Node.js 18+            # Runtime environment untuk backend
+Firebase               # Push notifications & analytics
+WebSocket              # Real-time communication protocol
+SSL/TLS                # End-to-end encryption
+Rate Limiting          # DDoS & brute force protection
 ```
 
 ---
 
-## 🚀 Quick Start
+## 🚀 Quick Start - Setup Ekosistem
 
-### Prasyarat
+### 📋 Prasyarat Sistem
 ```bash
+# Web Dashboard
 Node.js >= 18.0.0
-PostgreSQL >= 13.0
+MySQL >= 8.0
 npm atau yarn
+
+# Mobile Apps  
+Flutter SDK >= 3.0.0
+Dart SDK >= 3.0.0
+Android Studio / VS Code
+Firebase Project (untuk notifications)
 ```
 
-### 1️⃣ Clone Repository
+### 🌐 **Setup Web Dashboard** (Repository Ini)
+
+#### 1️⃣ Clone Repository
 ```bash
-git clone https://github.com/your-username/dashboard-pintar-simokerto.git
-cd dashboard-pintar-simokerto
+git clone https://github.com/Vanszs/Luaran_Website_Keluarahan_Simokerto.git
+cd Luaran_Website_Keluarahan_Simokerto
 ```
 
-### 2️⃣ Install Dependencies
+#### 2️⃣ Install Dependencies
 ```bash
 npm install
-# atau
-yarn install
+# Dependencies: bcryptjs, mysql2, rate-limiter-flexible, dll
 ```
 
-### 3️⃣ Setup Environment
+#### 3️⃣ Setup Environment & Database
 ```bash
 cp .env.example .env.local
 ```
@@ -130,26 +227,73 @@ NEXT_PUBLIC_APP_NAME="Dashboard Pintar Simokerto"
 NEXT_PUBLIC_APP_VERSION="2.0.0"
 ```
 
-### 4️⃣ Setup Database
+#### 4️⃣ Setup Database & Migration
 ```bash
 # Import database structure
 mysql -u your_username -p lapor_maling < sql/lapor_maling.sql
 
-# Create activity logs table
+# Create activity logs table untuk audit trail
 mysql -u your_username -p lapor_maling < sql/create-activity-logs-table.sql
 
-# Migrate existing passwords to bcrypt hash
+# Migrate existing passwords ke bcrypt hash (PENTING!)
 npm run migrate:passwords
 ```
 
-### 5️⃣ Run Development Server
+#### 5️⃣ Run Development Server
 ```bash
 npm run dev
-# atau
-yarn dev
+# Server akan berjalan di http://localhost:3000
 ```
 
-🎉 **Buka [http://localhost:3000](http://localhost:3000) di browser Anda!**
+### 📱 **Setup Mobile Applications**
+
+#### 🏠 **Aplikasi Warga** - [Repository Flutter](https://github.com/Vanszs/Flutter_Aplikasi_Pintar_Kelurahan)
+```bash
+# Clone repository
+git clone https://github.com/Vanszs/Flutter_Aplikasi_Pintar_Kelurahan.git
+cd Flutter_Aplikasi_Pintar_Kelurahan
+
+# Install dependencies
+flutter pub get
+
+# Setup Firebase (opsional, untuk analytics)
+# Download google-services.json ke android/app/
+
+# Run aplikasi
+flutter run
+```
+
+#### 👮 **Aplikasi Petugas** - [Repository Flutter](https://github.com/Vanszs/Aplikasi_Pintar_Petugas)
+```bash
+# Clone repository  
+git clone https://github.com/Vanszs/Aplikasi_Pintar_Petugas.git
+cd Aplikasi_Pintar_Petugas
+
+# Install dependencies
+flutter pub get
+
+# Setup Firebase untuk push notifications
+# Download google-services.json (Android) dan GoogleService-Info.plist (iOS)
+
+# Generate launcher icons
+flutter pub run flutter_launcher_icons:main
+
+# Run aplikasi
+flutter run
+```
+
+### 🔗 **Koneksi Antar Aplikasi**
+Pastikan semua aplikasi terhubung ke server yang sama:
+
+```dart
+// Konfigurasi di aplikasi mobile
+const String serverUrl = 'http://your-server-ip:3000';
+const String webDashboardUrl = 'http://your-server-ip:3000';
+```
+
+🎉 **Ekosistem Simokerto PINTAR siap digunakan!**
+
+---
 
 ---
 
@@ -433,27 +577,109 @@ git commit -m "feat: add amazing feature"
 
 ### 4️⃣ Push & Create PR
 ```bash
-git push origin feature/amazing-feature
+## 📈 Development History & Statistik
+
+### 📊 **Project Statistics**
+- **📅 Development Timeline**: 6+ Bulan aktif development
+- **💻 Total Commits**: 56+ commits (Web Dashboard) + 53+ commits (Apps)
+- **🏗️ Arsitektur**: 3 aplikasi terintegrasi (Web + 2 Mobile)
+- **👨‍💻 Solo Development**: Dikembangkan secara mandiri oleh 1 developer
+- **🌟 Current Version**: Web v2.0.0, Mobile v2.1.0+3
+- **🛡️ Security Updates**: Major security overhaul dengan bcrypt & rate limiting
+
+### 🔄 **Recent Major Updates** (Latest 10 Commits)
+- 🔐 **Security Overhaul**: Bcrypt password hashing & session security
+- 🚨 **Rate Limiting**: Protection terhadap brute force attacks  
+- 🌐 **Multi-platform Integration**: WebSocket real-time communication
+- 📱 **Mobile App Enhancements**: Offline mode & push notifications
+- 🎨 **UI/UX Improvements**: Material Design 3 implementation
+- 📊 **Analytics Dashboard**: Real-time statistics & reporting
+- 🔄 **Database Migration**: Password security migration script
+- 🛠️ **Infrastructure**: Docker containerization support
+- 📝 **Documentation**: Comprehensive API & user documentation
+- 🧪 **Testing**: Unit & integration testing implementation
+
+---
+
+## 🤝 Contributing & Development
+
+### 👨‍💻 **Solo Development Journey**
+Proyek ini merupakan hasil kerja solo development selama 6+ bulan dengan fokus pada:
+- **Clean Architecture**: Pemisahan concerns yang jelas antar layer
+- **Security First**: Implementation security best practices dari awal
+- **Scalable Design**: Arsitektur yang mendukung pertumbuhan user
+- **User-Centric**: Design yang mengutamakan experience pengguna
+
+### 🔄 **Development Workflow**
+```bash
+# Feature development
+git checkout -b feature/new-feature
+git commit -m "feat: add new feature description"
+git push origin feature/new-feature
+
+# Security updates  
+git checkout -b security/vulnerability-fix
+git commit -m "security: fix authentication vulnerability"
+git push origin security/vulnerability-fix
+
+# Bug fixes
+git checkout -b hotfix/critical-bug
+git commit -m "fix: resolve critical issue in report system"
+git push origin hotfix/critical-bug
 ```
 
-### 📋 Commit Convention
+### 📋 **Commit Convention**
 ```bash
-feat:     # New feature
-fix:      # Bug fix
-docs:     # Documentation
-style:    # Formatting
-refactor: # Code refactoring
-test:     # Testing
-chore:    # Maintenance
+🔐 security:  # Security improvements & fixes
+✨ feat:      # New features & enhancements  
+🐛 fix:       # Bug fixes & patches
+📚 docs:      # Documentation updates
+🎨 style:     # UI/UX improvements
+♻️  refactor: # Code refactoring & optimization
+🧪 test:      # Testing improvements
+🔧 chore:     # Maintenance & tooling
+```
+
+### 🛠️ **Development Setup untuk Contributors**
+```bash
+# Clone all repositories
+git clone https://github.com/Vanszs/Luaran_Website_Keluarahan_Simokerto.git
+git clone https://github.com/Vanszs/Flutter_Aplikasi_Pintar_Kelurahan.git  
+git clone https://github.com/Vanszs/Aplikasi_Pintar_Petugas.git
+
+# Install development tools
+npm install -g @typescript-eslint/eslint-plugin
+flutter doctor # Verify Flutter installation
 ```
 
 ---
 
-## 📋 TODO Roadmap
+## � Roadmap & Future Development
 
-### 🎯 Version 1.1
-- [ ] 📊 Advanced Analytics Dashboard
-- [ ] 📱 Mobile App (React Native)
+### 🎯 **Version 3.0.0** (Q2 2025)
+- [ ] 🤖 **AI-Powered Analytics** - Machine learning untuk prediksi laporan
+- [ ] 🌐 **API Gateway** - Centralized API management untuk scalability
+- [ ] 📊 **Advanced Dashboard** - Interactive charts dengan drill-down capability
+- [ ] 🔔 **Smart Notifications** - Intelligent notification routing
+- [ ] 📱 **Progressive Web App** - Web app dengan offline capability
+- [ ] 🗺️ **GIS Integration** - Mapping dan geolocation features
+
+### 🌟 **Version 2.5.0** (Q1 2025)
+- [ ] 🎨 **UI/UX Overhaul** - Complete design system update
+- [ ] 📈 **Performance Optimization** - Database query optimization
+- [ ] 🔐 **SSO Integration** - Single Sign-On dengan sistem pemerintah
+- [ ] 📊 **Export Features** - PDF/Excel report generation  
+- [ ] 🌐 **Multi-language** - Bahasa Indonesia & English support
+- [ ] 📱 **Widget Dashboard** - Mobile widget untuk quick actions
+
+### 🛡️ **Ongoing Security Improvements**
+- [ ] 🔒 **Two-Factor Authentication** - 2FA untuk admin accounts
+- [ ] 🛡️ **Advanced Threat Detection** - AI-based security monitoring
+- [ ] 📊 **Security Dashboard** - Real-time security metrics
+- [ ] 🔐 **API Rate Limiting** - Advanced rate limiting strategies
+- [ ] 🚨 **Incident Response** - Automated security incident handling
+
+---
 - [ ] 🔔 Push Notifications
 - [ ] 📁 File Management System
 
@@ -561,6 +787,6 @@ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
 
 ---
 
-*Made with ❤️ by Dashboard Pintar Team*
+*Made with ❤️ by VAnszs*
 
 </div>
