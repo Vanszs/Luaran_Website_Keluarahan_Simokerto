@@ -41,10 +41,15 @@
 - **Notification System** - Notifikasi otomatis untuk update status
 
 #### 🔐 **Keamanan Terdepan**
-- **JWT Authentication** - Sistem autentikasi yang aman
-- **Role-Based Access Control** - Kontrol akses berdasarkan peran
-- **Data Encryption** - Enkripsi data sensitif
-- **Audit Trail** - Log aktivitas untuk keperluan audit
+- **Bcrypt Password Hashing** - Password di-hash dengan bcrypt salt 12 rounds
+- **Secure Session Management** - Session dengan expiry dan signature validation
+- **SQL Injection Protection** - Parameterized queries untuk semua database operations
+- **Rate Limiting** - Perlindungan terhadap brute force attacks
+- **CSRF Protection** - Token-based CSRF protection untuk form sensitif
+- **Role-Based Access Control** - Kontrol akses berdasarkan peran (superadmin, admin1, admin2, petugas)
+- **Input Validation** - Validasi dan sanitasi semua input pengguna
+- **Secure Headers** - HTTP security headers untuk mencegah XSS dan clickjacking
+- **Activity Logging** - Comprehensive audit trail untuk semua aktivitas pengguna
 
 ---
 
@@ -62,19 +67,20 @@ React Hook Form   // Form handling
 ### Backend
 ```javascript
 Next.js API Routes  // Serverless API
-PostgreSQL         // Primary Database
-Prisma ORM         // Database ORM
-bcryptjs           // Password hashing
-jsonwebtoken       // JWT authentication
+MySQL              // Primary Database
+bcryptjs           // Password hashing (12 rounds)
+crypto             // Session signature validation
+Rate Limiting      // Brute force protection
 ```
 
-### DevOps & Tools
+### Security & DevOps
 ```bash
 ESLint            # Code linting
 Prettier          # Code formatting
-Husky             # Git hooks
-Docker            # Containerization
-Vercel            # Deployment platform
+bcryptjs          # Password hashing
+mysql2            # Database driver
+Rate Limiting     # Attack prevention
+CSRF Protection   # Cross-site request forgery protection
 ```
 
 ---
@@ -108,28 +114,32 @@ cp .env.example .env.local
 
 Edit `.env.local`:
 ```env
-# Database
-DATABASE_URL="postgresql://username:password@localhost:5432/dashboard_pintar"
+# Database Configuration
+MYSQL_HOST=localhost
+MYSQL_PORT=3306
+MYSQL_DATABASE=lapor_maling
+MYSQL_USER=your_username
+MYSQL_PASSWORD=your_password
 
-# Authentication
-NEXTAUTH_SECRET="your-super-secret-jwt-key"
-NEXTAUTH_URL="http://localhost:3000"
+# Security
+SESSION_SECRET=your-super-secret-session-key-minimum-32-characters
+NODE_ENV=development
 
 # Application
 NEXT_PUBLIC_APP_NAME="Dashboard Pintar Simokerto"
-NEXT_PUBLIC_APP_VERSION="1.0.0"
+NEXT_PUBLIC_APP_VERSION="2.0.0"
 ```
 
 ### 4️⃣ Setup Database
 ```bash
-# Generate Prisma client
-npx prisma generate
+# Import database structure
+mysql -u your_username -p lapor_maling < sql/lapor_maling.sql
 
-# Run migrations
-npx prisma migrate dev
+# Create activity logs table
+mysql -u your_username -p lapor_maling < sql/create-activity-logs-table.sql
 
-# Seed database (optional)
-npm run db:seed
+# Migrate existing passwords to bcrypt hash
+npm run migrate:passwords
 ```
 
 ### 5️⃣ Run Development Server
@@ -140,6 +150,35 @@ yarn dev
 ```
 
 🎉 **Buka [http://localhost:3000](http://localhost:3000) di browser Anda!**
+
+---
+
+## 🔐 Security Features
+
+### Password Security
+- **Bcrypt Hashing**: Semua password di-hash dengan bcrypt salt 12 rounds
+- **Password Strength**: Validasi minimum 8 karakter dengan kombinasi huruf, angka, dan simbol
+- **Migration Script**: Script otomatis untuk migrasi password lama ke format hash
+
+### Session Management
+- **Secure Sessions**: Session dengan timestamp dan signature validation
+- **Auto Expiry**: Session otomatis expired setelah 7 hari
+- **Edge Runtime Compatible**: Session management yang kompatibel dengan Next.js Edge Runtime
+
+### Input Security
+- **SQL Injection Protection**: Semua query menggunakan parameterized statements
+- **XSS Prevention**: Input sanitization dan output encoding
+- **CSRF Protection**: Token-based protection untuk form sensitif
+
+### Access Control
+- **Role-Based Authorization**: 4 level akses (superadmin, admin1, admin2, petugas)
+- **Route Protection**: Middleware yang memvalidasi akses berdasarkan role
+- **API Security**: Endpoint protection dengan session validation
+
+### Rate Limiting
+- **Login Protection**: Rate limiting untuk mencegah brute force attack
+- **IP-based Limiting**: Pembatasan request per IP address
+- **Configurable Limits**: Rate limits yang dapat dikonfigurasi
 
 ---
 
@@ -165,21 +204,55 @@ yarn dev
 ```
 📦 dashboard-pintar-simokerto/
 ├── 📁 app/                    # Next.js App Router
-│   ├── 📁 admin/             # Admin pages
-│   ├── 📁 dashboard/         # User dashboard
+│   ├── 📁 admin/             # Admin pages (superadmin)
+│   ├── 📁 admin2/            # Admin2 pages (secondary admin)
+│   ├── 📁 dashboard/         # Admin1 dashboard
+│   ├── 📁 petugas/           # Petugas dashboard
 │   ├── 📁 api/              # API routes
+│   │   ├── 📁 auth/         # Authentication endpoints
+│   │   └── 📁 admin/        # Admin API endpoints
 │   └── 📄 layout.tsx        # Root layout
 ├── 📁 components/            # Reusable components
 │   ├── 📁 admin/            # Admin-specific components
 │   ├── 📁 layout/           # Layout components
-│   └── 📁 ui/               # UI components
+│   └── � ProtectedRoute.tsx # Route protection component
 ├── 📁 contexts/             # React contexts
+│   └── 📄 AuthContext.tsx   # Authentication context
 ├── 📁 hooks/                # Custom hooks
 ├── 📁 utils/                # Utility functions
+│   ├── � db.ts            # Database utilities
+│   ├── 📄 sessionUtils.ts   # Session management
+│   ├── 📄 rateLimiter.ts    # Rate limiting
+│   └── 📄 activityLogger.ts # Activity logging
+├── �📁 scripts/              # Utility scripts
+│   └── 📄 migrate-existing-passwords.js # Password migration
+├── 📁 sql/                  # Database schemas
 ├── 📁 styles/               # Global styles
 ├── 📁 public/               # Static assets
-├── 📁 prisma/               # Database schema & migrations
-└── 📁 docs/                 # Documentation
+├── � middleware.ts         # Next.js middleware for auth
+└── 📄 next.config.js        # Next.js configuration
+```
+
+---
+
+## 🔧 Scripts & Commands
+
+```bash
+# Development
+npm run dev              # Start development server
+npm run build           # Build for production
+npm run start           # Start production server
+
+# Database
+npm run migrate:passwords # Migrate existing passwords to bcrypt
+
+# Security
+npm audit               # Check for security vulnerabilities
+npm audit fix           # Fix security issues automatically
+
+# Code Quality
+npm run lint            # Run ESLint
+npm run format          # Format code with Prettier
 ```
 
 ---
@@ -224,56 +297,87 @@ font-weight: 700;  // Bold
 |----------|-------------|---------|
 | `DATABASE_URL` | PostgreSQL connection string | - |
 | `NEXTAUTH_SECRET` | JWT secret key | - |
-| `NEXTAUTH_URL` | Application URL | `http://localhost:3000` |
+## 🔧 Environment Variables
+
+| Variable | Description | Default Value |
+|----------|-------------|---------------|
+| `MYSQL_HOST` | Database host | `localhost` |
+| `MYSQL_PORT` | Database port | `3306` |
+| `MYSQL_DATABASE` | Database name | `lapor_maling` |
+| `MYSQL_USER` | Database username | `root` |
+| `MYSQL_PASSWORD` | Database password | `` |
+| `SESSION_SECRET` | Session encryption key | **Required** (min 32 chars) |
+| `NODE_ENV` | Environment mode | `development` |
 | `NEXT_PUBLIC_APP_NAME` | Application name | Dashboard Pintar |
 
 ### Database Schema
 ```sql
--- Users table
-CREATE TABLE users (
-  id SERIAL PRIMARY KEY,
+-- Admin table with bcrypt password hashing
+CREATE TABLE admin (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  username VARCHAR(255) UNIQUE NOT NULL,
+  password VARCHAR(255) NOT NULL,  -- bcrypt hashed
   name VARCHAR(255) NOT NULL,
-  email VARCHAR(255) UNIQUE NOT NULL,
-  phone VARCHAR(20),
-  role VARCHAR(50) DEFAULT 'user',
-  created_at TIMESTAMP DEFAULT NOW()
+  address TEXT,
+  role ENUM('superadmin', 'admin1', 'admin2', 'petugas') DEFAULT 'admin1',
+  pending BOOLEAN DEFAULT TRUE,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 -- Reports table
 CREATE TABLE reports (
-  id SERIAL PRIMARY KEY,
-  user_id INTEGER REFERENCES users(id),
-  title VARCHAR(255) NOT NULL,
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  user_id INT,
+  address TEXT NOT NULL,
   description TEXT,
-  status VARCHAR(50) DEFAULT 'pending',
-  created_at TIMESTAMP DEFAULT NOW()
+  jenis_laporan VARCHAR(255),
+  status ENUM('pending', 'processing', 'completed', 'rejected') DEFAULT 'pending',
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Activity logs for security audit
+CREATE TABLE activity_logs (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  user_id INT,
+  user_role VARCHAR(50),
+  user_name VARCHAR(255),
+  action VARCHAR(100),
+  table_name VARCHAR(100),
+  record_id INT,
+  old_data JSON,
+  new_data JSON,
+  description TEXT,
+  ip_address VARCHAR(45),
+  user_agent TEXT,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 ```
 
 ---
 
-## 🧪 Testing
+## 🛡️ Security Checklist
 
-### Unit Tests
-```bash
-npm run test
-# atau
-yarn test
-```
+### ✅ Authentication & Authorization
+- [x] Bcrypt password hashing (12 rounds)
+- [x] Secure session management with expiry
+- [x] Role-based access control (4 levels)
+- [x] Protected routes with middleware
+- [x] Rate limiting on login attempts
 
-### E2E Tests
-```bash
-npm run test:e2e
-# atau
-yarn test:e2e
-```
+### ✅ Data Protection
+- [x] SQL injection prevention (parameterized queries)
+- [x] XSS prevention (input sanitization)
+- [x] CSRF protection for forms
+- [x] Secure HTTP headers
+- [x] Environment variables for sensitive data
 
-### Coverage Report
-```bash
-npm run test:coverage
-# atau
-yarn test:coverage
-```
+### ✅ Monitoring & Logging
+- [x] Activity logging for all user actions
+- [x] Failed login attempt tracking
+- [x] Database query error handling
+- [x] Session validation logging
+
+---
 
 ---
 
