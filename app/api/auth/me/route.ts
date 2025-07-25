@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
+import { verifySession } from '../../../../utils/sessionUtils.edge';
 
 export const dynamic = 'force-dynamic';
 
@@ -15,35 +16,33 @@ export async function GET(req: NextRequest) {
       );
     }
     
-    let sessionData;
-    try {
-      const decoded = Buffer.from(sessionCookie.value, 'base64').toString('utf8');
-      sessionData = JSON.parse(decoded);
-    } catch (error) {
-      console.error('Error decoding session cookie in /api/auth/me:', error);
-      // If decoding fails, clear the cookie and return unauthenticated
-      cookies().set({
+    // Verify session using secure utility
+    const sessionData = verifySession(sessionCookie.value);
+    
+    if (!sessionData) {
+      console.error('Session verification failed in /api/auth/me');
+      // Clear invalid cookie
+      const response = NextResponse.json(
+        { authenticated: false, message: 'Invalid or expired session' },
+        { status: 401 }
+      );
+      response.cookies.set({
         name: 'admin_session',
         value: '',
         expires: new Date(0),
         path: '/',
         httpOnly: true,
-        secure: false, // Setting to false to work in all environments including HTTP
-        sameSite: 'lax',
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'strict',
       });
-      return NextResponse.json({ authenticated: false, message: 'Invalid session data' }, { status: 401 });
+      return response;
     }
-
-    // In a real application, you would want to verify the sessionData.id against a database
-    // to ensure the user still exists and the session is valid and not revoked.
-    // For this example, we'll assume the decoded data is sufficient for basic user info.
-    // You might want to fetch full user details (like name) from DB if not stored in session.
     
-    // For now, we'll construct the user object from the sessionData
+    // Construct user object from verified session data
     const user = {
       id: sessionData.id,
-      username: sessionData.username || 'unknown', // Assuming username is in sessionData
-      name: sessionData.name || 'Unknown User', // Assuming name is in sessionData
+      username: sessionData.username,
+      name: sessionData.name,
       role: sessionData.role,
     };
     

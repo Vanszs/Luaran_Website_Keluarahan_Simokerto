@@ -38,8 +38,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         });
 
         if (response.ok) {
-          const data = await response.json();
-          setUser(data.user);
+          const contentType = response.headers.get('content-type');
+          if (contentType && contentType.includes('application/json')) {
+            const data = await response.json();
+            setUser(data.user);
+          }
         }
       } catch (error) {
         console.error('Auth check failed:', error);
@@ -61,12 +64,23 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         body: JSON.stringify({ username, password }),
       });
 
-      const data = await response.json();
-      
+      // Check if response is ok first
       if (!response.ok) {
-        throw new Error(data.message || 'Login failed');
+        // Try to get error message from response
+        const contentType = response.headers.get('content-type');
+        if (contentType && contentType.includes('application/json')) {
+          const errorData = await response.json();
+          throw new Error(errorData.message || 'Login gagal');
+        } else {
+          // If not JSON, probably an HTML error page
+          const errorText = await response.text();
+          console.error('Non-JSON response from login API:', errorText);
+          throw new Error('Terjadi kesalahan server. Silakan coba lagi.');
+        }
       }
 
+      const data = await response.json();
+      
       setUser(data.user);
       console.log('User data set in context:', data.user);
       
@@ -123,8 +137,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       });
 
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Registration failed');
+        const contentType = response.headers.get('content-type');
+        if (contentType && contentType.includes('application/json')) {
+          const errorData = await response.json();
+          throw new Error(errorData.message || 'Registrasi gagal');
+        } else {
+          const errorText = await response.text();
+          console.error('Non-JSON response from register API:', errorText);
+          throw new Error('Terjadi kesalahan server. Silakan coba lagi.');
+        }
       }
 
       return await response.json();

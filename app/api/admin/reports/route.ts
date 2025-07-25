@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { query, checkDatabaseConnection } from '../../../../utils/db';
+import { verifySession } from '../../../../utils/sessionUtils';
 
 export const dynamic = 'force-dynamic';
 
@@ -94,9 +95,15 @@ export async function POST(req: NextRequest) {
       );
     }
     
-    // Decode admin session
-    const decoded = Buffer.from(sessionValue, 'base64').toString('utf8');
-    const sessionData = JSON.parse(decoded);
+    // Verify session securely
+    const sessionData = verifySession(sessionValue);
+    if (!sessionData) {
+      return NextResponse.json(
+        { message: 'Unauthorized: Invalid or expired session' },
+        { status: 401 }
+      );
+    }
+    
     const adminName = sessionData.name;
     
     // Validate input

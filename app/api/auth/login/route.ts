@@ -2,6 +2,8 @@ import { query, checkDatabaseConnection } from '../../../../utils/db';
 import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { ActivityLogger, getClientIP, getUserAgent } from '../../../../utils/activityLogger';
+import bcrypt from 'bcryptjs';
+import { loginRateLimiter } from '../../../../utils/rateLimiter';
 
 export const dynamic = 'force-dynamic';
 
@@ -12,8 +14,24 @@ export async function POST(req: NextRequest) {
     
     if (!username || !password) {
       return NextResponse.json(
-        { success: false, message: 'Username and password are required' },
+        { success: false, message: 'Username dan password wajib diisi' },
         { status: 400 }
+      );
+    }
+
+    // Get client IP for rate limiting
+    const clientIP = getClientIP(req);
+    const rateLimitIdentifier = `${clientIP}:${username}`;
+    
+    // Check rate limiting
+    if (loginRateLimiter.isBlocked(rateLimitIdentifier)) {
+      const remainingTime = Math.ceil(loginRateLimiter.getBlockTimeRemaining(rateLimitIdentifier) / 1000 / 60);
+      return NextResponse.json(
+        { 
+          success: false, 
+          message: `Terlalu banyak percobaan login yang gagal. Silakan coba lagi dalam ${remainingTime} menit.` 
+        },
+        { status: 429 }
       );
     }
     
@@ -24,25 +42,44 @@ export async function POST(req: NextRequest) {
     // Clear any existing session cookies first
     cookies().delete('admin_session');
     
-    // Query the database, including the pending status
+    // Query the database for user with username (we'll verify password separately)
     const results = await query(
-      'SELECT id, username, name, role, pending FROM admin WHERE username = ? AND password = ?',
-      [username, password]
+      'SELECT id, username, name, role, pending, password FROM admin WHERE username = ?',
+      [username]
     );
     
     if (!results || (results as any[]).length === 0) {
       return NextResponse.json(
-        { success: false, message: 'Invalid username or password' },
+        { success: false, message: 'Username atau password salah' },
         { status: 401 }
       );
     }
     
     const userData = (results as any[])[0];
     
+    // Verify password with bcrypt
+    const isPasswordValid = await bcrypt.compare(password, userData.password);
+    if (!isPasswordValid) {
+      // Record failed attempt
+      loginRateLimiter.recordAttempt(rateLimitIdentifier, false);
+      const remainingAttempts = loginRateLimiter.getRemainingAttempts(rateLimitIdentifier);
+      
+      return NextResponse.json(
+        { 
+          success: false, 
+          message: `Username atau password salah. ${remainingAttempts} percobaan tersisa.` 
+        },
+        { status: 401 }
+      );
+    }
+    
+    // Record successful attempt (resets rate limiting)
+    loginRateLimiter.recordAttempt(rateLimitIdentifier, true);
+    
     // Check if the account is pending approval
     if (userData.pending) {
       return NextResponse.json(
-        { success: false, message: 'Your account is pending approval by an administrator.' },
+        { success: false, message: 'Akun Anda sedang menunggu persetujuan administrator.' },
         { status: 401 }
       );
     }
@@ -56,14 +93,16 @@ export async function POST(req: NextRequest) {
       getUserAgent(req)
     );
     
-    // Generate a simple session ID
-    const sessionId = Buffer.from(JSON.stringify({ 
+    // Generate a simple session (compatible with edge runtime)
+    const sessionData = {
       id: userData.id, 
       role: userData.role, 
       username: userData.username, 
       name: userData.name,
       timestamp: new Date().getTime()
-    })).toString('base64');
+    };
+    
+    const sessionId = Buffer.from(JSON.stringify(sessionData)).toString('base64');
     
     // Create response with JSON data first
     const response = NextResponse.json({
@@ -78,14 +117,14 @@ export async function POST(req: NextRequest) {
       sessionToken: sessionId
     });
     
-    // Set secure HTTP-only cookie with more compatible settings
+    // Set secure HTTP-only cookie
     response.cookies.set({
       name: 'admin_session',
       value: sessionId,
       httpOnly: true,
       path: '/',
-      secure: false, // Setting to false to work in all environments including HTTP
-      sameSite: 'lax', // Using lax as a safer option that still works in most environments
+      secure: process.env.NODE_ENV === 'production', // Secure in production
+      sameSite: 'strict', // More secure than lax
       // 7 day expiration
       maxAge: 7 * 24 * 60 * 60
     });
@@ -97,7 +136,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json(
       { 
         success: false, 
-        message: 'An error occurred during login. Please try again later.',
+        message: 'Terjadi kesalahan saat login. Silakan coba lagi nanti.',
         details: error instanceof Error ? error.message : String(error)
       },
       { status: 500 }

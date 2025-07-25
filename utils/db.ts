@@ -83,12 +83,43 @@ function mockQueryResults(q: string, values: any[] = []) {
         id: 2,
         username: 'admin1',
         name: 'admintest',
-        role: 'admin',
+        role: 'admin1',
         created_at: '2025-07-03 05:24:11'
       }];
     }
     
     // Return empty array for invalid credentials
+    return [];
+  }
+  
+  // For login queries - check username only first, then verify password in the API
+  if (table === 'admin' && q.includes('WHERE username = ?') && !q.includes('password')) {
+    // Return user data with hashed password for verification
+    if (values[0] === 'admin_kelurahan1') {
+      return [{
+        id: 1,
+        username: 'admin_kelurahan1',
+        name: 'Admin Simokerto',
+        role: 'superadmin',
+        password: '$2b$12$wP71o9pxLPBbS2R6pIhMWey91iz9eFTN/lHowAVUYH85ijNs9St46', // admin123 (changed from simokerto123)
+        pending: false,
+        created_at: '2025-07-02 14:21:23'
+      }];
+    }
+    
+    if (values[0] === 'admin1') {
+      return [{
+        id: 2,
+        username: 'admin1',
+        name: 'admintest',
+        role: 'admin1',
+        password: '$2b$12$JvxPQhOEqeqsjW4tMLAHqeswqoAqIKBt37tUFvx7/r4TscnoF.3i.', // 12345678
+        pending: false,
+        created_at: '2025-07-03 05:24:11'
+      }];
+    }
+    
+    // Return empty array for non-existent users
     return [];
   }
   

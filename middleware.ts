@@ -1,16 +1,17 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
+import { verifySession } from './utils/sessionUtils.edge';
 
 export function middleware(request: NextRequest) {
-  // Debug info - helpful for troubleshooting
+  // Debug info - helpful for troubleshooting (removed sensitive data logging)
   console.log(`Middleware processing: ${request.nextUrl.pathname}`);
 
   // Paths that don't require authentication
-  const publicPaths = ['/login', '/', '/register', '/api/public', '/assets', '/favicon.ico']; // Added more public paths
+  const publicPaths = ['/login', '/', '/register', '/api/public', '/assets', '/favicon.ico'];
   const isPublicPath = publicPaths.some(path => request.nextUrl.pathname === path || request.nextUrl.pathname.startsWith(path + '/'));
   
   // Paths specifically for API authentication
-  const authApiPaths = ['/api/auth/login', '/api/auth/register', '/api/auth/me', '/api/auth/logout', '/api/auth/session']; // Added session endpoint
+  const authApiPaths = ['/api/auth/login', '/api/auth/register', '/api/auth/me', '/api/auth/logout', '/api/auth/session', '/api/auth/csrf'];
   const isAuthApiPath = authApiPaths.some(path => request.nextUrl.pathname === path);
   
   // Check if path is an API route that needs protection
@@ -42,40 +43,23 @@ export function middleware(request: NextRequest) {
 
   // Decode the session value to get user role
   let userRole: string | null = null;
-  try {
-    const decoded = Buffer.from(sessionValue, 'base64').toString('utf8');
-    const sessionData = JSON.parse(decoded);
-    userRole = sessionData.role;
-    console.log(`Decoded user role: ${userRole} for path: ${request.nextUrl.pathname}`);
-    
-    // Check for session expiration (optional - 7 days)
-    // Only apply this check if timestamp exists in the session
-    if (sessionData.timestamp) {
-      const timestamp = sessionData.timestamp;
-      const now = new Date().getTime();
-      const sevenDaysMs = 7 * 24 * 60 * 60 * 1000;
-      
-      // More lenient check - add an extra day to account for clock differences
-      if (now - timestamp > (sevenDaysMs + 86400000)) {
-        console.warn('Session expired');
-        // For API requests, return 401 instead of redirecting
-        if (request.nextUrl.pathname.startsWith('/api/')) {
-          return NextResponse.json({ message: 'Session expired' }, { status: 401 });
-        }
-        const response = NextResponse.redirect(new URL('/', request.url));
-        response.cookies.delete('admin_session'); // Clear the expired cookie
-        return response;
+  let sessionData = null;
+  
+  if (sessionValue) {
+    sessionData = verifySession(sessionValue);
+    if (sessionData) {
+      userRole = sessionData.role;
+      console.log(`Verified user role: ${userRole} for path: ${request.nextUrl.pathname}`);
+    } else {
+      // Invalid or expired session
+      console.warn('Invalid or expired session detected');
+      if (request.nextUrl.pathname.startsWith('/api/')) {
+        return NextResponse.json({ message: 'Invalid or expired session' }, { status: 401 });
       }
+      const response = NextResponse.redirect(new URL('/', request.url));
+      response.cookies.delete('admin_session');
+      return response;
     }
-  } catch (error) {
-    console.error('Error decoding session in root middleware:', error);
-    // If decoding fails, treat as unauthenticated and clear the invalid cookie
-    if (request.nextUrl.pathname.startsWith('/api/')) {
-      return NextResponse.json({ message: 'Invalid session' }, { status: 401 });
-    }
-    const response = NextResponse.redirect(new URL('/', request.url));
-    response.cookies.delete('admin_session'); // Clear the invalid cookie
-    return response;
   }
 
   // Protect API routes based on role

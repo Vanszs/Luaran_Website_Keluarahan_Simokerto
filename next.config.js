@@ -4,6 +4,12 @@ const path = require('path');
 const nextConfig = {
   reactStrictMode: true,
   swcMinify: true,
+  // Add allowed dev origins to prevent CORS warnings
+  allowedDevOrigins: [
+    'www.simokerto.my.id',
+    'localhost',
+    '127.0.0.1'
+  ],
   // Hapus experimental.serverActions dan serverComponents
   webpack: (config, { isServer }) => {
     if (!isServer) {

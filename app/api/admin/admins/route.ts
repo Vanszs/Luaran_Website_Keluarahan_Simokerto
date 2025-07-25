@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { query } from '../../../../utils/db';
 import { ActivityLogger, getClientIP, getUserAgent } from '../../../../utils/activityLogger';
+import bcrypt from 'bcryptjs';
 
 // GET all approved admins
 export async function GET(request: NextRequest) {
@@ -32,6 +33,14 @@ export async function POST(request: NextRequest) {
       );
     }
     
+    // Validate password strength
+    if (password.length < 8) {
+      return NextResponse.json(
+        { message: 'Password must be at least 8 characters long' },
+        { status: 400 }
+      );
+    }
+    
     // Validate role
     if (!['admin1', 'admin2', 'petugas', 'superadmin', 'user'].includes(role)) {
       return NextResponse.json(
@@ -53,10 +62,14 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Insert new admin
+    // Hash password before storing
+    const saltRounds = 12;
+    const hashedPassword = await bcrypt.hash(password, saltRounds);
+
+    // Insert new admin with hashed password
     const result = await query(
       'INSERT INTO admin (username, password, name, address, role) VALUES (?, ?, ?, ?, ?)',
-      [username, password, name, address || null, role]
+      [username, hashedPassword, name, address || null, role]
     ) as any;
 
     // Log the activity
