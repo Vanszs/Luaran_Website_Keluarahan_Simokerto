@@ -14,6 +14,7 @@ interface User {
 
 interface AuthContextType {
   user: User | null;
+  setUser: (user: User | null) => void;
   login: (username: string, password: string) => Promise<any>;
   logout: () => Promise<void>;
   registerAdmin: (data: { username: string; password: string; name: string }) => Promise<any>;
@@ -41,7 +42,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           const contentType = response.headers.get('content-type');
           if (contentType && contentType.includes('application/json')) {
             const data = await response.json();
-            setUser(data.user);
+            if (data.authenticated && data.user) {
+              setUser(data.user);
+            }
           }
         }
       } catch (error) {
@@ -159,6 +162,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const value = {
     user,
+    setUser,
     login,
     logout,
     registerAdmin,
