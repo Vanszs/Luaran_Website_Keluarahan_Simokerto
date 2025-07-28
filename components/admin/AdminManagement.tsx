@@ -144,6 +144,12 @@ export default function AdminManagement() {
     severity: 'success' as 'success' | 'error' | 'info'
   });
 
+  const filterAdminsByRole = (adminsList: any[]) => {
+    if (user?.role === 'superadmin') return adminsList;
+    if (user?.role === 'admin1') return adminsList.filter(admin => ['admin2', 'petugas', 'user'].includes(admin.role));
+    return [];
+  };
+
   const fetchAdmins = useCallback(async () => {
     setLoading(true);
     try {
@@ -165,7 +171,7 @@ export default function AdminManagement() {
     } finally {
       setLoading(false);
     }
-  }, [user?.role]);
+  }, [user?.role, filterAdminsByRole]);
 
   useEffect(() => {
     fetchAdmins();
@@ -226,35 +232,6 @@ export default function AdminManagement() {
       rt = addressParts[addressParts.length - 1].trim();
     }
     setFormData({ username: admin.username, name: admin.name || '', address: baseAddress, rw, rt, password: '', role: admin.role || 'admin1' });
-  };
-
-  const filterAdminsByRole = (adminsList: any[]) => {
-    if (user?.role === 'superadmin') return adminsList;
-    if (user?.role === 'admin1') return adminsList.filter(admin => ['admin2', 'petugas', 'user'].includes(admin.role));
-    return [];
-  };
-
-  const fetchAdmins = async () => {
-    setLoading(true);
-    try {
-      const [adminsResponse, pendingResponse] = await Promise.all([
-        fetch('/api/admin/admins'),
-        fetch('/api/admin/admins/pending')
-      ]);
-      if (adminsResponse.ok && pendingResponse.ok) {
-        const adminsData = await adminsResponse.json();
-        const pendingData = await pendingResponse.json();
-        setAdmins(filterAdminsByRole(adminsData));
-        setPendingAdmins(filterAdminsByRole(pendingData));
-      } else {
-        throw new Error('Failed to fetch admin data');
-      }
-    } catch (error) {
-      console.error('Error fetching admins:', error);
-      setSnackbar({ open: true, message: 'Gagal memuat data admin', severity: 'error' });
-    } finally {
-      setLoading(false);
-    }
   };
 
   const handleAddAdmin = () => {

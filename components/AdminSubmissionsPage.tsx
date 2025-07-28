@@ -895,7 +895,7 @@ export default function AdminDashboardPage() {
               Dashboard Admin
             </Typography>
             <Typography variant="body1" color="text.secondary">
-              Sistem Informasi "Sirine Maling" Kelurahan Simokerto
+              Sistem Informasi &quot;Sirine Maling&quot; Kelurahan Simokerto
             </Typography>
           </Box>
         </Box>

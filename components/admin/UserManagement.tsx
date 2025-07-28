@@ -217,28 +217,6 @@ export default function UserManagement() {
     return options;
   };
 
-  const fetchUsers = async () => {
-    setLoading(true);
-    try {
-      const response = await fetch('/api/admin/users');
-      if (response.ok) {
-        const data = await response.json();
-        setUsers(data);
-      } else {
-        throw new Error('Failed to fetch users');
-      }
-    } catch (error) {
-      console.error('Error fetching users:', error);
-      setSnackbar({
-        open: true,
-        message: 'Failed to load users',
-        severity: 'error'
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const handleAddUser = () => {
     setFormData({
       username: '',
