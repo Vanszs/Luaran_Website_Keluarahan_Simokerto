@@ -144,11 +144,11 @@ export default function AdminManagement() {
     severity: 'success' as 'success' | 'error' | 'info'
   });
 
-  const filterAdminsByRole = (adminsList: any[]) => {
+  const filterAdminsByRole = useCallback((adminsList: any[]) => {
     if (user?.role === 'superadmin') return adminsList;
     if (user?.role === 'admin1') return adminsList.filter(admin => ['admin2', 'petugas', 'user'].includes(admin.role));
     return [];
-  };
+  }, [user?.role]);
 
   const fetchAdmins = useCallback(async () => {
     setLoading(true);
@@ -171,7 +171,7 @@ export default function AdminManagement() {
     } finally {
       setLoading(false);
     }
-  }, [user?.role, filterAdminsByRole]);
+  }, [filterAdminsByRole]);
 
   useEffect(() => {
     fetchAdmins();
