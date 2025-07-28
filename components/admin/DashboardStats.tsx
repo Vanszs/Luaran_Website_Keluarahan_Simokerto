@@ -22,6 +22,8 @@ import {
 } from '@mui/icons-material';
 import { useApiData } from '../../hooks/useMockApi';
 import { getStatusChipStyle, getStatusInIndonesian, standardChipStyles } from '../../utils/statusStyles';
+import useMediaQuery from '@mui/material/useMediaQuery';
+import responsiveUtils from '../../shared-theme/responsive';
 
 // Define proper types for our data
 interface Report {
@@ -43,6 +45,7 @@ interface DashboardStatsProps {
 
 export default function DashboardStats({ useMockData = false }: DashboardStatsProps) {
   const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
 
@@ -81,6 +84,36 @@ export default function DashboardStats({ useMockData = false }: DashboardStatsPr
     page * rowsPerPage + rowsPerPage
   );
 
+  // Responsive card layout for mobile
+  if (isMobile) {
+    return (
+      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+        {paginatedReports.length > 0 ? (
+          paginatedReports.map((report) => (
+            <Paper key={report.id} sx={{ ...responsiveUtils.card(theme), mb: 1, border: `1px solid ${theme.palette.divider}` }}>
+              <Box sx={{ p: 2 }}>
+                <Typography variant="subtitle2" color="text.secondary">ID</Typography>
+                <Typography variant="body1" fontWeight={600}>#{report.id}</Typography>
+                <Typography variant="subtitle2" color="text.secondary" sx={{ mt: 1 }}>Pelapor</Typography>
+                <Typography variant="body1">{report.reporter_type === 'admin' ? (report.pelapor || report.submittedBy || 'Admin') : (report.user?.name || 'Warga')}</Typography>
+                <Typography variant="subtitle2" color="text.secondary" sx={{ mt: 1 }}>Lokasi</Typography>
+                <Typography variant="body1">{report.address}</Typography>
+                <Typography variant="subtitle2" color="text.secondary" sx={{ mt: 1 }}>Waktu Kejadian</Typography>
+                <Typography variant="body1">{new Date(report.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}</Typography>
+                <Typography variant="subtitle2" color="text.secondary" sx={{ mt: 1 }}>Status</Typography>
+                <Chip label={getStatusInIndonesian(report.status)} size="small" sx={{ ...standardChipStyles, ...getStatusChipStyle(report.status, theme), fontSize: '0.8rem', height: 28, mt: 0.5 }} />
+              </Box>
+            </Paper>
+          ))
+        ) : (
+          <Paper sx={{ ...responsiveUtils.card(theme), textAlign: 'center', p: 3 }}>
+            <Typography variant="body1" color="text.secondary">Tidak ada data laporan</Typography>
+          </Paper>
+        )}
+      </Box>
+    );
+  }
+
   return (
     <Paper 
       elevation={0}
@@ -114,16 +147,16 @@ export default function DashboardStats({ useMockData = false }: DashboardStatsPr
 
       <TableContainer component={Paper} elevation={0} sx={{
         borderRadius: 3,
-        overflow: 'hidden',
+        overflow: 'auto', // Enable horizontal scroll
         boxShadow: theme.palette.mode === 'dark'
           ? '0 4px 12px rgba(0,0,0,0.2)'
           : '0 4px 12px rgba(0,0,0,0.1)',
-        padding: 0.5, // Add a small padding to separate container border from table
+        padding: 0.5,
         background: theme.palette.mode === 'dark'
           ? alpha(theme.palette.background.paper, 0.8)
           : alpha(theme.palette.background.paper, 0.8),
-        // Make table horizontally scrollable on small screens
         [theme.breakpoints.down('md')]: {
+          minWidth: 600,
           overflowX: 'auto',
         },
       }}>

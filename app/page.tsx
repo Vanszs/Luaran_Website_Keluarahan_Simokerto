@@ -114,7 +114,7 @@ function LoginContent() {
   const [error, setError] = React.useState('');
   const [successMessage, setSuccessMessage] = React.useState('');
   const [isLoading, setIsLoading] = React.useState(false);
-  const { login, setUser } = useAuth();
+  const { login } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -146,26 +146,23 @@ function LoginContent() {
       if (result?.success) {
         console.log('Login successful, redirecting based on role...');
         
-        // Set user in context first
-        setUser(result.user);
-        
-        // Use window.location instead of router to ensure fresh page load
+        // Set a short timeout to ensure state updates and cookie is set properly before redirect
         setTimeout(() => {
           // Redirect based on user role
           if (result.user.role === 'superadmin') {
             console.log('Redirecting superadmin to /admin');
-            window.location.href = '/admin';
+            window.location.href = '/admin'; // Use direct navigation instead of router
           } else if (result.user.role === 'admin1') {
             console.log('Redirecting admin1 to /dashboard');
-            window.location.href = '/dashboard';
+            window.location.href = '/dashboard'; // Use direct navigation instead of router
           } else if (result.user.role === 'admin2') {
             console.log('Redirecting admin2 to /admin2');
-            window.location.href = '/admin2';
+            window.location.href = '/admin2'; // Use direct navigation instead of router
           } else if (result.user.role === 'petugas') {
             console.log('Redirecting petugas to /petugas');
-            window.location.href = '/petugas';
+            window.location.href = '/petugas'; // Use direct navigation instead of router
           }
-        }, 100);
+        }, 500);
       } else {
         console.error('Login failed with result:', result);
         setError(result?.message || 'Login failed. Please try again.');

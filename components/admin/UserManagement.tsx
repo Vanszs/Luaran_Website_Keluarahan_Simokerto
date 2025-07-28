@@ -41,6 +41,9 @@ import {
   ExpandMore as ExpandMoreIcon,
 } from '@mui/icons-material';
 import { useAuth } from '../../contexts/AuthContext';
+import useMediaQuery from '@mui/material/useMediaQuery';
+import responsiveUtils from '../../shared-theme/responsive';
+import { Lock as LockIcon } from '@mui/icons-material';
 
 interface User {
   id: number;
@@ -54,6 +57,7 @@ interface User {
 export default function UserManagement() {
   const theme = useTheme();
   const { user } = useAuth();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   
   // Check if current user can add users
   const canAddUsers = user?.role !== 'admin2'; // Admin2 cannot add users
@@ -294,42 +298,140 @@ export default function UserManagement() {
     );
   }
 
+  // Mobile card layout for responsive design
+  if (isMobile) {
+    return (
+      <>
+        {/* Header and Add Button */}
+        <Box sx={{ mb: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <Typography variant="h5" fontWeight={700}>
+            Manajemen Warga
+          </Typography>
+          {canAddUsers && (
+            <Button 
+              variant="contained" 
+              onClick={handleAddUser}
+              startIcon={<AddIcon />}
+              size="small"
+            >
+              Tambah
+            </Button>
+          )}
+        </Box>
+
+        {/* Search Field */}
+        <Paper
+          elevation={0}
+          sx={{
+            ...responsiveUtils.card(theme),
+            mb: 3,
+            border: `1px solid ${theme.palette.divider}`,
+          }}
+        >
+          <TextField
+            fullWidth
+            placeholder="Cari berdasarkan nama, username, atau alamat..."
+            variant="outlined"
+            size="small"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            sx={{
+              ...responsiveUtils.formField(theme),
+              marginBottom: 0,
+            }}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <SearchIcon fontSize="small" color="action" />
+                </InputAdornment>
+              ),
+            }}
+          />
+        </Paper>
+
+        {/* Mobile Card List */}
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+          {filteredUsers.length > 0 ? (
+            filteredUsers.map((user) => (
+              <Paper key={user.id} sx={{ ...responsiveUtils.card(theme), mb: 1, border: `1px solid ${theme.palette.divider}` }}>
+                <Box sx={{ p: 2 }}>
+                  <Typography variant="subtitle2" color="text.secondary">ID</Typography>
+                  <Typography variant="body1" fontWeight={600}>{user.id}</Typography>
+                  <Typography variant="subtitle2" color="text.secondary" sx={{ mt: 1 }}>Username</Typography>
+                  <Typography variant="body1">{user.username}</Typography>
+                  <Typography variant="subtitle2" color="text.secondary" sx={{ mt: 1 }}>Nama</Typography>
+                  <Typography variant="body1">{user.name}</Typography>
+                  <Typography variant="subtitle2" color="text.secondary" sx={{ mt: 1 }}>Alamat</Typography>
+                  <Typography variant="body1">{user.address}</Typography>
+                  <Typography variant="subtitle2" color="text.secondary" sx={{ mt: 1 }}>No. Telepon</Typography>
+                  <Typography variant="body1">{user.phone || '-'}</Typography>
+                  <Typography variant="subtitle2" color="text.secondary" sx={{ mt: 1 }}>Terdaftar</Typography>
+                  <Typography variant="body1">{new Date(user.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}</Typography>
+                  {canAddUsers && (
+                    <Box sx={{ display: 'flex', gap: 1, mt: 2 }}>
+                      <IconButton size="small" onClick={() => handleEditUser(user)} color="primary">
+                        <EditIcon fontSize="small" />
+                      </IconButton>
+                      <IconButton size="small" onClick={() => handleDeleteUser(user)} color="error" sx={{ ml: 1 }}>
+                        <DeleteIcon fontSize="small" />
+                      </IconButton>
+                    </Box>
+                  )}
+                </Box>
+              </Paper>
+            ))
+          ) : (
+            <Paper sx={{ ...responsiveUtils.card(theme), textAlign: 'center', p: 3 }}>
+              <Typography variant="body1" color="text.secondary">Tidak ada data warga</Typography>
+            </Paper>
+          )}
+        </Box>
+
+        {/* Dialogs and Snackbar */}
+        {renderDialogs()}
+      </>
+    );
+  }
+
+  // Desktop table layout
   return (
     <>
+      {/* Header and Controls */}
       <Box sx={{ mb: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <Typography variant="h5" fontWeight={700}>
           Manajemen Warga
         </Typography>
         {canAddUsers && (
-          <Button
-            variant="contained"
-            color="primary"
-            startIcon={<AddIcon />}
+          <Button 
+            variant="contained" 
             onClick={handleAddUser}
-            sx={{ borderRadius: 2 }}
+            startIcon={<AddIcon />}
           >
             Tambah Warga
           </Button>
         )}
       </Box>
 
-      {/* Enhanced Search Bar */}
-      <Paper 
-        elevation={0} 
-        sx={{ 
-          p: 2, 
-          mb: 3, 
-          borderRadius: 2,
+      {/* Search Field */}
+      <Paper
+        elevation={0}
+        sx={{
+          ...responsiveUtils.card(theme),
+          mb: 3,
           border: `1px solid ${theme.palette.divider}`,
         }}
       >
         <TextField
           fullWidth
-          placeholder="Cari warga berdasarkan nama atau username..."
+          placeholder="Cari berdasarkan nama, username, atau alamat..."
           variant="outlined"
           size="small"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
+          sx={{
+            ...responsiveUtils.formField(theme),
+            marginBottom: 0,
+          }}
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">
@@ -337,40 +439,25 @@ export default function UserManagement() {
               </InputAdornment>
             ),
           }}
-          sx={{
-            '& .MuiOutlinedInput-root': {
-              borderRadius: 2,
-              bgcolor: theme.palette.mode === 'dark'
-                ? alpha(theme.palette.common.white, 0.05)
-                : alpha(theme.palette.common.black, 0.03),
-              transition: 'all 0.3s ease',
-              '&:hover': {
-                bgcolor: theme.palette.mode === 'dark'
-                  ? alpha(theme.palette.common.white, 0.08)
-                  : alpha(theme.palette.common.black, 0.05),
-              },
-              '&.Mui-focused': {
-                boxShadow: `0 0 0 2px ${alpha(theme.palette.primary.main, 0.25)}`,
-                bgcolor: theme.palette.mode === 'dark'
-                  ? alpha(theme.palette.common.white, 0.1)
-                  : alpha(theme.palette.common.black, 0.06),
-              }
-            }
-          }}
         />
       </Paper>
 
-      <TableContainer component={Paper} elevation={0} sx={{ 
-        borderRadius: 3,
-        overflow: 'hidden',
-        boxShadow: theme.palette.mode === 'dark'
-          ? '0 4px 12px rgba(0,0,0,0.2)'
-          : '0 4px 12px rgba(0,0,0,0.1)',
-        padding: 0.5, // Add padding to separate container border from table
-        background: theme.palette.mode === 'dark'
-          ? alpha(theme.palette.background.paper, 0.8)
-          : alpha(theme.palette.background.paper, 0.8),
-      }}>
+      {/* Desktop Table */}
+      <TableContainer 
+        component={Paper} 
+        elevation={0} 
+        sx={{ 
+          borderRadius: 3,
+          overflow: 'hidden',
+          ...responsiveUtils.table(theme),
+          boxShadow: theme.palette.mode === 'dark'
+            ? '0 4px 12px rgba(0,0,0,0.2)'
+            : '0 4px 12px rgba(0,0,0,0.1)',
+          background: theme.palette.mode === 'dark'
+            ? alpha(theme.palette.background.paper, 0.8)
+            : alpha(theme.palette.background.paper, 0.8),
+        }}
+      >
         <Table>
           <TableHead sx={{ 
             backgroundColor: theme.palette.mode === 'dark'
@@ -394,7 +481,16 @@ export default function UserManagement() {
                   <TableCell>{user.id}</TableCell>
                   <TableCell>{user.username}</TableCell>
                   <TableCell>{user.name}</TableCell>
-                  <TableCell>{user.address}</TableCell>
+                  <TableCell>
+                    <Typography variant="body2" sx={{ 
+                      maxWidth: 250,
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      whiteSpace: 'nowrap'
+                    }}>
+                      {user.address}
+                    </Typography>
+                  </TableCell>
                   <TableCell>{user.phone || '-'}</TableCell>
                   <TableCell>
                     {new Date(user.created_at).toLocaleDateString('id-ID', {
@@ -404,8 +500,8 @@ export default function UserManagement() {
                     })}
                   </TableCell>
                   <TableCell align="right">
-                    {canAddUsers ? (
-                      <>
+                    {canAddUsers && (
+                      <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
                         <IconButton 
                           size="small" 
                           onClick={() => handleEditUser(user)}
@@ -417,38 +513,20 @@ export default function UserManagement() {
                           size="small" 
                           onClick={() => handleDeleteUser(user)}
                           color="error"
-                          sx={{ ml: 1 }}
                         >
                           <DeleteIcon fontSize="small" />
                         </IconButton>
-                      </>
-                    ) : (
-                      <Typography variant="body2" color="text.secondary">
-                        Read Only
-                      </Typography>
+                      </Box>
                     )}
                   </TableCell>
                 </TableRow>
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={6} align="center" sx={{ py: 3 }}>
-                  <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', py: 2 }}>
-                    <PersonAddIcon sx={{ fontSize: 40, color: 'text.secondary', mb: 1 }} />
-                    <Typography variant="body1" color="text.secondary">
-                      Tidak ada data warga
-                    </Typography>
-                    {canAddUsers && (
-                      <Button 
-                        variant="contained" 
-                        startIcon={<AddIcon />}
-                        onClick={handleAddUser}
-                        sx={{ mt: 2, borderRadius: 2 }}
-                      >
-                        Tambah Warga
-                      </Button>
-                    )}
-                  </Box>
+                <TableCell colSpan={7} align="center" sx={{ py: 3 }}>
+                  <Typography variant="body1" color="text.secondary">
+                    Tidak ada data warga yang ditemukan
+                  </Typography>
                 </TableCell>
               </TableRow>
             )}
@@ -456,222 +534,245 @@ export default function UserManagement() {
         </Table>
       </TableContainer>
 
-      {/* User Form Dialog */}
-      <Dialog 
-        open={userDialog.open} 
-        onClose={() => setUserDialog({ ...userDialog, open: false })}
-        fullWidth
-        maxWidth="sm"
-      >
-        <DialogTitle>
-          {userDialog.mode === 'add' ? 'Tambah Warga Baru' : 'Edit Data Warga'}
-        </DialogTitle>
-        <DialogContent>
-          <Grid container spacing={2} sx={{ mt: 1 }}>
-            <Grid item xs={12}>
-              <TextField
-                fullWidth
-                label="Username"
-                name="username"
-                value={formData.username}
-                onChange={handleInputChange}
-                disabled={userDialog.mode === 'edit'} // Username cannot be changed when editing
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <TextField
-                fullWidth
-                label="Nama Lengkap"
-                name="name"
-                value={formData.name}
-                onChange={handleInputChange}
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <TextField
-                fullWidth
-                label="Alamat"
-                name="address"
-                value={formData.address}
-                onChange={handleInputChange}
-                multiline
-                rows={2}
-                placeholder="Masukkan alamat lengkap (tanpa RW/RT)"
-                helperText="RW dan RT akan dipilih di form terpisah di bawah"
-              />
-            </Grid>
-            <Grid item xs={6}>
-              <FormControl fullWidth>
-                <InputLabel id="rw-select-label">RW</InputLabel>
-                <Select
-                  labelId="rw-select-label"
-                  id="rw-select"
-                  value={formData.rw}
-                  label="RW"
-                  onChange={(e) => setFormData(prev => ({ ...prev, rw: e.target.value }))}
-                  MenuProps={{
-                    PaperProps: {
-                      style: {
-                        maxHeight: 200,
-                        width: 200,
-                      },
-                    },
-                  }}
-                  sx={{
-                    '& .MuiSelect-select': {
-                      borderRadius: 2,
-                    },
-                    '& .MuiOutlinedInput-root': {
-                      borderRadius: 2,
-                    }
-                  }}
-                >
-                  <MenuItem value="">
-                    <em>Pilih RW</em>
-                  </MenuItem>
-                  {generateRWOptions().map((option) => (
-                    <MenuItem 
-                      key={option.value} 
-                      value={option.value}
-                      sx={{
-                        '&:hover': {
-                          backgroundColor: alpha(theme.palette.primary.main, 0.08),
-                        },
-                        '&.Mui-selected': {
-                          backgroundColor: alpha(theme.palette.primary.main, 0.12),
-                          '&:hover': {
-                            backgroundColor: alpha(theme.palette.primary.main, 0.16),
-                          }
-                        }
-                      }}
-                    >
-                      {option.label}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            </Grid>
-            <Grid item xs={6}>
-              <FormControl fullWidth>
-                <InputLabel id="rt-select-label">RT</InputLabel>
-                <Select
-                  labelId="rt-select-label"
-                  id="rt-select"
-                  value={formData.rt}
-                  label="RT"
-                  onChange={(e) => setFormData(prev => ({ ...prev, rt: e.target.value }))}
-                  MenuProps={{
-                    PaperProps: {
-                      style: {
-                        maxHeight: 200,
-                        width: 200,
-                      },
-                    },
-                  }}
-                  sx={{
-                    '& .MuiSelect-select': {
-                      borderRadius: 2,
-                    },
-                    '& .MuiOutlinedInput-root': {
-                      borderRadius: 2,
-                    }
-                  }}
-                >
-                  <MenuItem value="">
-                    <em>Pilih RT</em>
-                  </MenuItem>
-                  {generateRTOptions().map((option) => (
-                    <MenuItem 
-                      key={option.value} 
-                      value={option.value}
-                      sx={{
-                        '&:hover': {
-                          backgroundColor: alpha(theme.palette.primary.main, 0.08),
-                        },
-                        '&.Mui-selected': {
-                          backgroundColor: alpha(theme.palette.primary.main, 0.12),
-                          '&:hover': {
-                            backgroundColor: alpha(theme.palette.primary.main, 0.16),
-                          }
-                        }
-                      }}
-                    >
-                      {option.label}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            </Grid>
-            <Grid item xs={12}>
-              <TextField
-                fullWidth
-                label="Nomor Telepon"
-                name="phone"
-                value={formData.phone}
-                onChange={handleInputChange}
-                placeholder="Contoh: 081234567890"
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <TextField
-                fullWidth
-                label="Password"
-                name="password"
-                type="password"
-                value={formData.password}
-                onChange={handleInputChange}
-                helperText={userDialog.mode === 'edit' ? 'Biarkan kosong jika tidak ingin mengubah password' : ''}
-              />
-            </Grid>
-          </Grid>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setUserDialog({ ...userDialog, open: false })}>
-            Batal
-          </Button>
-          <Button onClick={submitUserForm} variant="contained">
-            Simpan
-          </Button>
-        </DialogActions>
-      </Dialog>
-
-      {/* Delete Confirmation Dialog */}
-      <Dialog
-        open={confirmDialog.open}
-        onClose={() => setConfirmDialog({ ...confirmDialog, open: false })}
-      >
-        <DialogTitle>Konfirmasi Hapus</DialogTitle>
-        <DialogContent>
-          <Typography>
-            Apakah Anda yakin ingin menghapus warga "{confirmDialog.userName}"? 
-            Tindakan ini tidak dapat dibatalkan.
-          </Typography>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setConfirmDialog({ ...confirmDialog, open: false })}>
-            Batal
-          </Button>
-          <Button onClick={confirmDeleteUser} color="error" variant="contained">
-            Hapus
-          </Button>
-        </DialogActions>
-      </Dialog>
-
-      {/* Snackbar for notifications */}
-      <Snackbar
-        open={snackbar.open}
-        autoHideDuration={6000}
-        onClose={() => setSnackbar({ ...snackbar, open: false })}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-      >
-        <Alert 
-          onClose={() => setSnackbar({ ...snackbar, open: false })} 
-          severity={snackbar.severity}
-          sx={{ width: '100%' }}
-        >
-          {snackbar.message}
-        </Alert>
-      </Snackbar>
+      {/* Dialogs and Snackbar */}
+      {renderDialogs()}
     </>
   );
+
+  // Function to render all dialogs and snackbar
+  function renderDialogs() {
+    return (
+      <>
+        {/* User Form Dialog */}
+        <Dialog 
+          open={userDialog.open} 
+          onClose={() => setUserDialog({ ...userDialog, open: false })}
+          fullWidth
+          maxWidth="sm"
+        >
+          <DialogTitle>
+            {userDialog.mode === 'add' ? 'Tambah Warga Baru' : 'Edit Data Warga'}
+          </DialogTitle>
+          <DialogContent>
+            <Grid container spacing={2} sx={{ mt: 1 }}>
+              <Grid item xs={12}>
+                <TextField
+                  fullWidth
+                  label="Username"
+                  name="username"
+                  value={formData.username}
+                  onChange={handleInputChange}
+                  disabled={userDialog.mode === 'edit'} // Username cannot be changed when editing
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <TextField
+                  fullWidth
+                  label="Nama Lengkap"
+                  name="name"
+                  value={formData.name}
+                  onChange={handleInputChange}
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <TextField
+                  fullWidth
+                  label="Alamat"
+                  name="address"
+                  value={formData.address}
+                  onChange={handleInputChange}
+                  multiline
+                  rows={2}
+                  placeholder="Masukkan alamat lengkap (tanpa RW/RT)"
+                  helperText="RW dan RT akan dipilih di form terpisah di bawah"
+                />
+              </Grid>
+              <Grid item xs={6}>
+                <FormControl fullWidth>
+                  <InputLabel id="rw-select-label">RW</InputLabel>
+                  <Select
+                    labelId="rw-select-label"
+                    id="rw-select"
+                    value={formData.rw}
+                    label="RW"
+                    onChange={(e) => setFormData(prev => ({ ...prev, rw: e.target.value }))}
+                    MenuProps={{
+                      PaperProps: {
+                        style: {
+                          maxHeight: 200,
+                          width: 200,
+                        },
+                      },
+                    }}
+                    sx={{
+                      '& .MuiSelect-select': {
+                        borderRadius: 2,
+                      },
+                      '& .MuiOutlinedInput-root': {
+                        borderRadius: 2,
+                      }
+                    }}
+                  >
+                    <MenuItem value="">
+                      <em>Pilih RW</em>
+                    </MenuItem>
+                    {generateRWOptions().map((option) => (
+                      <MenuItem 
+                        key={option.value}
+                        value={option.value}
+                        sx={{ 
+                          display: 'flex',
+                          justifyContent: 'space-between',
+                          py: 0.5,
+                          px: 1,
+                          '&:hover': {
+                            backgroundColor: alpha(theme.palette.primary.main, 0.1),
+                          }
+                        }}
+                      >
+                        <span>{option.label}</span>
+                        {option.value === formData.rw && (
+                          <Chip size="small" label="Dipilih" color="primary" sx={{ borderRadius: 1 }} />
+                        )}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Grid>
+              <Grid item xs={6}>
+                <FormControl fullWidth>
+                  <InputLabel id="rt-select-label">RT</InputLabel>
+                  <Select
+                    labelId="rt-select-label"
+                    id="rt-select"
+                    value={formData.rt}
+                    label="RT"
+                    onChange={(e) => setFormData(prev => ({ ...prev, rt: e.target.value }))}
+                    MenuProps={{
+                      PaperProps: {
+                        style: {
+                          maxHeight: 200,
+                          width: 200,
+                        },
+                      },
+                    }}
+                    sx={{
+                      '& .MuiSelect-select': {
+                        borderRadius: 2,
+                      },
+                      '& .MuiOutlinedInput-root': {
+                        borderRadius: 2,
+                      }
+                    }}
+                  >
+                    <MenuItem value="">
+                      <em>Pilih RT</em>
+                    </MenuItem>
+                    {generateRTOptions().map((option) => (
+                      <MenuItem 
+                        key={option.value}
+                        value={option.value}
+                        sx={{ 
+                          display: 'flex',
+                          justifyContent: 'space-between',
+                          py: 0.5,
+                          px: 1,
+                          '&:hover': {
+                            backgroundColor: alpha(theme.palette.primary.main, 0.1),
+                          }
+                        }}
+                      >
+                        <span>{option.label}</span>
+                        {option.value === formData.rt && (
+                          <Chip size="small" label="Dipilih" color="primary" sx={{ borderRadius: 1 }} />
+                        )}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Grid>
+              <Grid item xs={12}>
+                <TextField
+                  fullWidth
+                  label="No. Telepon"
+                  name="phone"
+                  value={formData.phone}
+                  onChange={handleInputChange}
+                  placeholder="Masukkan nomor telepon (opsional)"
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <PersonAddIcon fontSize="small" />
+                      </InputAdornment>
+                    ),
+                  }}
+                />
+              </Grid>
+              {userDialog.mode === 'add' && (
+                <Grid item xs={12}>
+                  <TextField
+                    fullWidth
+                    label="Password"
+                    name="password"
+                    value={formData.password}
+                    onChange={handleInputChange}
+                    type="password"
+                    placeholder="Masukkan password untuk akun ini"
+                    InputProps={{
+                      startAdornment: (
+                        <InputAdornment position="start">
+                          <LockIcon fontSize="small" />
+                        </InputAdornment>
+                      ),
+                    }}
+                  />
+                </Grid>
+              )}
+            </Grid>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={() => setUserDialog({ ...userDialog, open: false })} color="inherit">
+              Batal
+            </Button>
+            <Button onClick={submitUserForm} variant="contained" color="primary">
+              Simpan
+            </Button>
+          </DialogActions>
+        </Dialog>
+        {/* Confirm Delete Dialog */}
+        <Dialog
+          open={confirmDialog.open}
+          onClose={() => setConfirmDialog({ ...confirmDialog, open: false })}
+          aria-labelledby="confirm-delete-dialog-title"
+          aria-describedby="confirm-delete-dialog-description"
+        >
+          <DialogTitle id="confirm-delete-dialog-title">Konfirmasi Hapus Pengguna</DialogTitle>
+          <DialogContent>
+            <Typography variant="body1" color="text.secondary">
+              Apakah Anda yakin ingin menghapus pengguna <strong>{confirmDialog.userName}</strong>? Tindakan ini tidak dapat dibatalkan.
+            </Typography>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={() => setConfirmDialog({ ...confirmDialog, open: false })} color="inherit">
+              Batal
+            </Button>
+            <Button onClick={confirmDeleteUser} variant="contained" color="error">
+              Hapus
+            </Button>
+          </DialogActions>
+        </Dialog>
+        {/* Snackbar for notifications */}
+        <Snackbar 
+          open={snackbar.open} 
+          autoHideDuration={6000} 
+          onClose={() => setSnackbar({ ...snackbar, open: false })}
+          anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+        >
+          <Alert onClose={() => setSnackbar({ ...snackbar, open: false })} severity={snackbar.severity} sx={{ width: '100%' }}>
+            {snackbar.message}
+          </Alert>
+        </Snackbar>
+      </>
+    );
+  }
 }

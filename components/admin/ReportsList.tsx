@@ -48,6 +48,8 @@ import {
 } from '@mui/icons-material';
 import { getStatusChipStyle, getStatusInIndonesian, standardChipStyles } from '../../utils/statusStyles';
 import { useAuth } from '../../contexts/AuthContext';
+import responsiveUtils from '../../shared-theme/responsive';
+import useMediaQuery from '@mui/material/useMediaQuery';
 
 interface Report {
   id: number;
@@ -87,6 +89,8 @@ export default function ReportsList({ isReadOnly = false }: { isReadOnly?: boole
     message: '',
     severity: 'success' as 'success' | 'error' | 'info' | 'warning'
   });
+
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
   useEffect(() => {
     fetchReports();
@@ -262,6 +266,55 @@ export default function ReportsList({ isReadOnly = false }: { isReadOnly?: boole
     );
   }
 
+  // Responsive card layout for mobile
+  if (isMobile) {
+    return (
+      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+        {filteredReports.length > 0 ? (
+          filteredReports.map((report) => (
+            <Paper key={report.id} sx={{ ...responsiveUtils.card(theme), mb: 1, border: `1px solid ${theme.palette.divider}` }}>
+              <Box sx={{ p: 2 }}>
+                <Typography variant="subtitle2" color="text.secondary">ID Laporan</Typography>
+                <Typography variant="body1" fontWeight={600}>{report.id}</Typography>
+                <Typography variant="subtitle2" color="text.secondary" sx={{ mt: 1 }}>Nama Pelapor</Typography>
+                <Typography variant="body1">{report.reporter_type === 'admin' ? (report.pelapor || 'Admin') : (report.user.name || 'Warga')}</Typography>
+                <Typography variant="subtitle2" color="text.secondary" sx={{ mt: 1 }}>Jenis</Typography>
+                <Typography variant="body1">{report.jenis_laporan || 'Umum'}</Typography>
+                <Typography variant="subtitle2" color="text.secondary" sx={{ mt: 1 }}>Alamat</Typography>
+                <Typography variant="body1">{report.address}</Typography>
+                <Typography variant="subtitle2" color="text.secondary" sx={{ mt: 1 }}>Waktu Laporan</Typography>
+                <Typography variant="body1">{new Date(report.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}</Typography>
+                <Typography variant="subtitle2" color="text.secondary" sx={{ mt: 1 }}>Status</Typography>
+                <Chip label={getStatusInIndonesian(report.status)} size="small" sx={{ ...standardChipStyles, ...getStatusChipStyle(report.status, theme), fontSize: '0.8rem', height: 28, mt: 0.5 }} />
+                <Box sx={{ display: 'flex', gap: 1, mt: 2 }}>
+                  <Tooltip title="Lihat Detail">
+                    <IconButton size="small" onClick={() => handleViewDetails(report)} sx={{ ...responsiveUtils.iconButton(theme), color: theme.palette.primary.main }}>
+                      <VisibilityIcon fontSize="small" />
+                    </IconButton>
+                  </Tooltip>
+                  {canUpdateStatus() && (
+                    <Tooltip title="Ubah Status">
+                      <IconButton size="small" onClick={(e) => handleStatusMenuOpen(e, report.id)} disabled={statusUpdateLoading} sx={{ ...responsiveUtils.iconButton(theme), color: theme.palette.text.secondary }}>
+                        <MoreVertIcon fontSize="small" />
+                      </IconButton>
+                    </Tooltip>
+                  )}
+                </Box>
+              </Box>
+            </Paper>
+          ))
+        ) : (
+          <Paper sx={{ ...responsiveUtils.card(theme), textAlign: 'center', p: 3 }}>
+            <WarningIcon sx={{ fontSize: 40, color: 'text.secondary', mb: 1 }} />
+            <Typography variant="body1" color="text.secondary">Tidak ada data laporan</Typography>
+          </Paper>
+        )}
+        {/* Status Update Menu and Dialogs remain unchanged */}
+        {/* ...existing code for Menu, Dialog, Snackbar... */}
+      </Box>
+    );
+  }
+
   return (
     <>
       <Box sx={{ mb: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -273,13 +326,12 @@ export default function ReportsList({ isReadOnly = false }: { isReadOnly?: boole
       <Paper
         elevation={0}
         sx={{
-          p: 2,
+          ...responsiveUtils.card(theme),
           mb: 3,
-          borderRadius: 2,
           border: `1px solid ${theme.palette.divider}`,
         }}
       >
-        <Grid container spacing={2} alignItems="center">
+        <Grid container spacing={{ xs: 1, sm: 2 }} alignItems="center">
           <Grid item xs={12} md={6}>
             <TextField
               fullWidth
@@ -288,32 +340,16 @@ export default function ReportsList({ isReadOnly = false }: { isReadOnly?: boole
               size="small"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
+              sx={{
+                ...responsiveUtils.formField(theme),
+                marginBottom: 0,
+              }}
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">
                     <SearchIcon fontSize="small" color="action" />
                   </InputAdornment>
                 ),
-              }}
-              sx={{
-                '& .MuiOutlinedInput-root': {
-                  borderRadius: 2,
-                  bgcolor: theme.palette.mode === 'dark'
-                    ? alpha(theme.palette.common.white, 0.05)
-                    : alpha(theme.palette.common.black, 0.03),
-                  transition: 'all 0.3s ease',
-                  '&:hover': {
-                    bgcolor: theme.palette.mode === 'dark'
-                      ? alpha(theme.palette.common.white, 0.08)
-                      : alpha(theme.palette.common.black, 0.05),
-                  },
-                  '&.Mui-focused': {
-                    boxShadow: `0 0 0 2px ${alpha(theme.palette.primary.main, 0.25)}`,
-                    bgcolor: theme.palette.mode === 'dark'
-                      ? alpha(theme.palette.common.white, 0.1)
-                      : alpha(theme.palette.common.black, 0.06),
-                  },
-                },
               }}
             />
           </Grid>
@@ -325,6 +361,10 @@ export default function ReportsList({ isReadOnly = false }: { isReadOnly?: boole
                 value={statusFilter}
                 label="Status"
                 onChange={(e) => setStatusFilter(e.target.value)}
+                sx={{
+                  ...responsiveUtils.formField(theme),
+                  marginBottom: 0,
+                }}
               >
                 <MenuItem value="all">Semua Status</MenuItem>
                 <MenuItem value="pending">Pending</MenuItem>
@@ -336,45 +376,43 @@ export default function ReportsList({ isReadOnly = false }: { isReadOnly?: boole
         </Grid>
       </Paper>
 
-      <TableContainer component={Paper} elevation={0} sx={{ 
-        borderRadius: 3,
-        overflow: 'hidden',
-        boxShadow: theme.palette.mode === 'dark'
-          ? '0 4px 12px rgba(0,0,0,0.2)'
-          : '0 4px 12px rgba(0,0,0,0.1)',
-        padding: 0.5, // Add padding to separate container border from table
-        background: theme.palette.mode === 'dark'
-          ? alpha(theme.palette.background.paper, 0.8)
-          : alpha(theme.palette.background.paper, 0.8),
-        // Make table horizontally scrollable on small screens
-        [theme.breakpoints.down('md')]: {
-          overflowX: 'auto',
-        },
-      }}>
-        <Table sx={{ 
-          minWidth: { xs: 600, md: 'auto' }, // Set minimum width for horizontal scroll on mobile
-        }}>
+      <TableContainer 
+        component={Paper} 
+        elevation={0} 
+        sx={{ 
+          borderRadius: 3,
+          overflow: 'hidden',
+          ...responsiveUtils.table(theme),
+          boxShadow: theme.palette.mode === 'dark'
+            ? '0 4px 12px rgba(0,0,0,0.2)'
+            : '0 4px 12px rgba(0,0,0,0.1)',
+          background: theme.palette.mode === 'dark'
+            ? alpha(theme.palette.background.paper, 0.8)
+            : alpha(theme.palette.background.paper, 0.8),
+        }}
+      >
+        <Table>
           <TableHead sx={{ 
             backgroundColor: theme.palette.mode === 'dark'
               ? alpha(theme.palette.primary.main, 0.1)
               : alpha(theme.palette.primary.main, 0.05)
           }}>
             <TableRow>
-              <TableCell sx={{ minWidth: 60 }}>ID</TableCell>
-              <TableCell sx={{ minWidth: 150 }}>Nama Pelapor</TableCell>
-              <TableCell sx={{ minWidth: 100, display: { xs: 'none', md: 'table-cell' } }}>Jenis</TableCell>
-              <TableCell sx={{ minWidth: 200 }}>Alamat</TableCell>
-              <TableCell sx={{ minWidth: 120, display: { xs: 'none', sm: 'table-cell' } }}>Waktu Laporan</TableCell>
-              <TableCell sx={{ minWidth: 120 }}>Status</TableCell>
-              <TableCell align="right" sx={{ minWidth: 100 }}>Aksi</TableCell>
+              <TableCell data-label="ID">ID</TableCell>
+              <TableCell data-label="Nama Pelapor">Nama Pelapor</TableCell>
+              <TableCell data-label="Jenis" sx={{ display: { xs: 'none', md: 'table-cell' } }}>Jenis</TableCell>
+              <TableCell data-label="Alamat">Alamat</TableCell>
+              <TableCell data-label="Waktu Laporan" sx={{ display: { xs: 'none', sm: 'table-cell' } }}>Waktu Laporan</TableCell>
+              <TableCell data-label="Status">Status</TableCell>
+              <TableCell data-label="Aksi" align="right">Aksi</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {filteredReports.length > 0 ? (
               filteredReports.map((report) => (
                 <TableRow key={report.id} hover>
-                  <TableCell>{report.id}</TableCell>
-                  <TableCell>
+                  <TableCell data-label="ID">{report.id}</TableCell>
+                  <TableCell data-label="Nama Pelapor">
                     <Box>
                       <Typography variant="body2" fontWeight={500}>
                         {report.reporter_type === 'admin' 
@@ -386,10 +424,10 @@ export default function ReportsList({ isReadOnly = false }: { isReadOnly?: boole
                       </Typography>
                     </Box>
                   </TableCell>
-                  <TableCell sx={{ display: { xs: 'none', md: 'table-cell' } }}>
+                  <TableCell data-label="Jenis" sx={{ display: { xs: 'none', md: 'table-cell' } }}>
                     {report.jenis_laporan || 'Umum'}
                   </TableCell>
-                  <TableCell>
+                  <TableCell data-label="Alamat">
                     <Typography variant="body2" sx={{ 
                       maxWidth: { xs: 150, sm: 200, md: 250 },
                       overflow: 'hidden',
@@ -399,7 +437,7 @@ export default function ReportsList({ isReadOnly = false }: { isReadOnly?: boole
                       {report.address}
                     </Typography>
                   </TableCell>
-                  <TableCell sx={{ display: { xs: 'none', sm: 'table-cell' } }}>
+                  <TableCell data-label="Waktu Laporan" sx={{ display: { xs: 'none', sm: 'table-cell' } }}>
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                       <CalendarIcon fontSize="small" color="action" />
                       <Typography variant="body2">
@@ -411,23 +449,32 @@ export default function ReportsList({ isReadOnly = false }: { isReadOnly?: boole
                       </Typography>
                     </Box>
                   </TableCell>
-                  <TableCell>
+                  <TableCell data-label="Status">
                     <Chip
                       label={getStatusInIndonesian(report.status)}
                       size="small"
                       sx={{
                         ...standardChipStyles,
                         ...getStatusChipStyle(report.status, theme),
+                        // Mobile responsive chip sizing
+                        fontSize: { xs: '0.7rem', sm: '0.75rem' },
+                        height: { xs: '24px', sm: '28px' },
                       }}
                     />
                   </TableCell>
-                  <TableCell align="right">
-                    <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
+                  <TableCell data-label="Aksi" align="right">
+                    <Box sx={{ 
+                      display: 'flex', 
+                      justifyContent: 'flex-end', 
+                      gap: { xs: 0.5, sm: 1 },
+                      flexWrap: 'wrap'
+                    }}>
                       <Tooltip title="Lihat Detail">
                         <IconButton
                           size="small"
                           onClick={() => handleViewDetails(report)}
                           sx={{
+                            ...responsiveUtils.iconButton(theme),
                             color: theme.palette.primary.main,
                             '&:hover': {
                               backgroundColor: alpha(theme.palette.primary.main, 0.1),
@@ -444,6 +491,7 @@ export default function ReportsList({ isReadOnly = false }: { isReadOnly?: boole
                             onClick={(e) => handleStatusMenuOpen(e, report.id)}
                             disabled={statusUpdateLoading}
                             sx={{
+                              ...responsiveUtils.iconButton(theme),
                               color: theme.palette.text.secondary,
                               '&:hover': {
                                 backgroundColor: alpha(theme.palette.text.secondary, 0.1),

@@ -34,13 +34,13 @@ export function verifySession(sessionValue: string): SessionData | null {
     const now = new Date().getTime();
     const sevenDaysMs = 7 * 24 * 60 * 60 * 1000;
     
-    if (sessionData.timestamp && now - sessionData.timestamp > sevenDaysMs) {
+    if (now - sessionData.timestamp > sevenDaysMs) {
       console.warn('Session expired');
       return null;
     }
     
     // Basic validation
-    if (!sessionData.id || !sessionData.role || !sessionData.username) {
+    if (!sessionData.id || !sessionData.role) {
       console.warn('Invalid session data structure');
       return null;
     }

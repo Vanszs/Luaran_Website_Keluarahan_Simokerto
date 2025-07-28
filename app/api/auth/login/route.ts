@@ -95,7 +95,7 @@ export async function POST(req: NextRequest) {
     
     // Generate a simple session (compatible with edge runtime)
     const sessionData = {
-      id: userData.id.toString(), 
+      id: userData.id, 
       role: userData.role, 
       username: userData.username, 
       name: userData.name,
@@ -123,8 +123,8 @@ export async function POST(req: NextRequest) {
       value: sessionId,
       httpOnly: true,
       path: '/',
-      secure: false, // Set to false for development
-      sameSite: 'lax', // Changed from strict to lax for better compatibility
+      secure: process.env.NODE_ENV === 'production', // Secure in production
+      sameSite: 'strict', // More secure than lax
       // 7 day expiration
       maxAge: 7 * 24 * 60 * 60
     });

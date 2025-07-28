@@ -32,8 +32,8 @@ export async function GET(req: NextRequest) {
         expires: new Date(0),
         path: '/',
         httpOnly: true,
-        secure: false, // Match login route settings
-        sameSite: 'lax', // Match login route settings
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'strict',
       });
       return response;
     }
