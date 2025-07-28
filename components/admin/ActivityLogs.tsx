@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   Box,
   Paper,
@@ -101,14 +101,40 @@ export default function ActivityLogs() {
     log: null as ActivityLog | null
   });
 
+  const fetchLogs = useCallback(async () => {
+    setLoading(true);
+    try {
+      const searchParams = new URLSearchParams({
+        page: pagination.page.toString(),
+        limit: pagination.limit.toString(),
+        ...(filters.action !== 'all' && { action: filters.action }),
+        ...(filters.table !== 'all' && { table: filters.table }),
+        ...(filters.userId && { userId: filters.userId }),
+        ...(filters.dateFrom && { dateFrom: filters.dateFrom }),
+        ...(filters.dateTo && { dateTo: filters.dateTo }),
+      });
+
+      const response = await fetch(`/api/admin/logs?${searchParams}`);
+      if (response.ok) {
+        const data = await response.json();
+        setLogs(data.logs);
+        setPagination(prev => ({
+          ...prev,
+          total: data.pagination.total,
+          totalPages: data.pagination.totalPages
+        }));
+      }
+    } catch (error) {
+      console.error('Error fetching logs:', error);
+    } finally {
+      setLoading(false);
+    }
+  }, [pagination.page, pagination.limit, filters]);
+
   useEffect(() => {
     fetchFilterOptions();
     fetchLogs();
-  }, []);
-
-  useEffect(() => {
-    fetchLogs();
-  }, [filters, pagination.page]);
+  }, [fetchLogs]);
 
   const fetchFilterOptions = async () => {
     try {

@@ -405,7 +405,7 @@ export default function JenisLaporanManagement() {
         <DialogTitle>Konfirmasi Hapus</DialogTitle>
         <DialogContent>
           <Typography>
-            Apakah Anda yakin ingin menghapus jenis laporan "{confirmDialog.jenisLaporanNama}"? 
+            Apakah Anda yakin ingin menghapus jenis laporan &quot;{confirmDialog.jenisLaporanNama}&quot;? 
             Tindakan ini tidak dapat dibatalkan.
           </Typography>
         </DialogContent>

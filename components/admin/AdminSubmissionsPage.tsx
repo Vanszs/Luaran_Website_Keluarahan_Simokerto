@@ -44,7 +44,7 @@ export default function AdminSubmissionsPage() {
     switch (activeTab) {
       case 0: return <DashboardStats useMockData={false} />;
       case 1: return <UserManagement />;
-      case 2: return user?.role === 'superadmin' ? <AdminManagement /> : <Box p={3}>You don't have permission to access this feature.</Box>;
+      case 2: return user?.role === 'superadmin' ? <AdminManagement /> : <Box p={3}>You don&apos;t have permission to access this feature.</Box>;
       case 3: return <ReportsList />;
       default: return <DashboardStats useMockData={false} />;
     }

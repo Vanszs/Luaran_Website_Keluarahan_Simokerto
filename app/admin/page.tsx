@@ -1,36 +1,34 @@
 'use client';
 
-export const dynamic = 'force-dynamic';
-
 import React, { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { useTheme, alpha } from '@mui/material/styles';
 import {
   Box,
+  Card,
   Grid,
-  Paper,
   Typography,
   Button,
-  useTheme,
   IconButton,
   Tooltip,
+  Paper,
   Chip,
   Stack,
-  alpha,
-  Card,
 } from '@mui/material';
 import {
-  NotificationsActive as AlertIcon,
+  Warning as WarningIcon,
+  NotificationImportant as AlertIcon,
   People as PeopleIcon,
   Dashboard as DashboardIcon,
-  Warning as WarningIcon,
   Refresh as RefreshIcon,
   ArrowUpward as ArrowUpwardIcon,
   ArrowDownward as ArrowDownwardIcon,
 } from '@mui/icons-material';
+
 import { useAuth } from '../../contexts/AuthContext';
-import DashboardStats from '../../components/admin/DashboardStats';
-import { useRouter } from 'next/navigation';
 import { useRealStats } from '../../hooks/useRealStats';
 import Layout from '../../components/layout/Layout';
+import ReportsList from '../../components/admin/ReportsList';
 
 export default function AdminDashboard() {
   const theme = useTheme();
@@ -248,7 +246,12 @@ export default function AdminDashboard() {
         </Grid>
 
         {/* Recent Reports */}
-        <DashboardStats useMockData={false} />
+        <Box>
+          <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
+            Laporan Terbaru
+          </Typography>
+          <ReportsList isReadOnly={true} limit={5} />
+        </Box>
       </Box>
     </Layout>
   );

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   Box,
   Button,
@@ -31,6 +31,7 @@ import {
   FormControl,
   InputLabel,
   ListSubheader,
+  Pagination,
 } from '@mui/material';
 import {
   Add as AddIcon,
@@ -163,9 +164,34 @@ export default function UserManagement() {
     severity: 'success' as 'success' | 'error' | 'info'
   });
 
+  const [mobilePage, setMobilePage] = useState(1);
+  const ITEMS_PER_PAGE = 10;
+
+  const fetchUsers = useCallback(async () => {
+    setLoading(true);
+    try {
+      const response = await fetch('/api/admin/users');
+      if (response.ok) {
+        const data = await response.json();
+        setUsers(data);
+      } else {
+        throw new Error('Failed to fetch users');
+      }
+    } catch (error) {
+      console.error('Error fetching users:', error);
+      setSnackbar({
+        open: true,
+        message: 'Failed to load users',
+        severity: 'error'
+      });
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
   useEffect(() => {
     fetchUsers();
-  }, []);
+  }, [fetchUsers]);
 
   // Generate RW options (1-14)
   const generateRWOptions = () => {
@@ -369,6 +395,12 @@ export default function UserManagement() {
 
   // Mobile card layout for responsive design
   if (isMobile) {
+    const pageCount = Math.ceil(filteredUsers.length / ITEMS_PER_PAGE);
+    const paginatedUsers = filteredUsers.slice(
+      (mobilePage - 1) * ITEMS_PER_PAGE,
+      mobilePage * ITEMS_PER_PAGE
+    );
+
     return (
       <>
         {/* Header and Add Button */}
@@ -420,8 +452,8 @@ export default function UserManagement() {
 
         {/* Mobile Card List */}
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
-          {filteredUsers.length > 0 ? (
-            filteredUsers.map((user, index) => (
+          {paginatedUsers.length > 0 ? (
+            paginatedUsers.map((user, index) => (
               <Paper 
                 key={user.id} 
                 elevation={0}
@@ -668,6 +700,17 @@ export default function UserManagement() {
             </Paper>
           )}
         </Box>
+
+        {pageCount > 1 && (
+          <Box sx={{ display: 'flex', justifyContent: 'center', mt: 3 }}>
+            <Pagination
+              count={pageCount}
+              page={mobilePage}
+              onChange={(e, page) => setMobilePage(page)}
+              color="primary"
+            />
+          </Box>
+        )}
 
         {/* Dialogs and Snackbar */}
         {renderDialogs()}

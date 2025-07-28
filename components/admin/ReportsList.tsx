@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   Box,
   Paper,
@@ -34,6 +34,7 @@ import {
   ListItemIcon,
   ListItemText,
   Tooltip,
+  Pagination,
 } from '@mui/material';
 import {
   Search as SearchIcon,
@@ -137,7 +138,12 @@ const ReportListSkeleton = ({ isMobile }: { isMobile: boolean }) => {
 };
 
 
-export default function ReportsList({ isReadOnly = false }: { isReadOnly?: boolean }) {
+interface ReportsListProps {
+  isReadOnly?: boolean;
+  limit?: number;
+}
+
+export default function ReportsList({ isReadOnly = false, limit }: ReportsListProps) {
   const theme = useTheme();
   const { user } = useAuth();
   const [reports, setReports] = useState<Report[]>([]);
@@ -160,16 +166,16 @@ export default function ReportsList({ isReadOnly = false }: { isReadOnly?: boole
     severity: 'success' as 'success' | 'error' | 'info' | 'warning'
   });
 
+  const [mobilePage, setMobilePage] = useState(1);
+  const ITEMS_PER_PAGE = 10;
+
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
-  useEffect(() => {
-    fetchReports();
-  }, []);
-
-  const fetchReports = async () => {
+  const fetchReports = useCallback(async () => {
     setLoading(true);
     try {
-      const response = await fetch('/api/admin/reports');
+      const url = limit ? `/api/admin/reports?limit=${limit}` : '/api/admin/reports';
+      const response = await fetch(url);
       if (!response.ok) {
         throw new Error('Failed to fetch reports');
       }
@@ -181,7 +187,11 @@ export default function ReportsList({ isReadOnly = false }: { isReadOnly?: boole
     } finally {
       setLoading(false);
     }
-  };
+  }, [limit]);
+
+  useEffect(() => {
+    fetchReports();
+  }, [fetchReports]);
 
   // Check if user can update status
   const canUpdateStatus = () => {
@@ -334,78 +344,88 @@ export default function ReportsList({ isReadOnly = false }: { isReadOnly?: boole
 
   // Responsive card layout for mobile
   if (isMobile) {
+    const pageCount = Math.ceil(filteredReports.length / ITEMS_PER_PAGE);
+    const paginatedReports = filteredReports.slice(
+      (mobilePage - 1) * ITEMS_PER_PAGE,
+      mobilePage * ITEMS_PER_PAGE
+    );
+
     return (
       <>
         {/* Header */}
-        <Box sx={{ mb: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <Typography variant="h5" fontWeight={700}>
-            Daftar Laporan
-          </Typography>
-        </Box>
+        {!limit && (
+          <Box sx={{ mb: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <Typography variant="h5" fontWeight={700}>
+              Daftar Laporan
+            </Typography>
+          </Box>
+        )}
 
         {/* Search and Filter */}
-        <Paper
-          elevation={0}
-          sx={{
-            p: 2,
-            mb: 3,
-            borderRadius: 3,
-            border: `1px solid ${alpha(theme.palette.divider, 0.8)}`,
-            background: theme.palette.mode === 'dark'
-              ? alpha(theme.palette.background.paper, 0.9)
-              : alpha(theme.palette.background.paper, 0.9),
-          }}
-        >
-          <Grid container spacing={2} alignItems="center">
-            <Grid item xs={12}>
-              <TextField
-                fullWidth
-                placeholder="Cari berdasarkan nama warga atau alamat..."
-                variant="outlined"
-                size="small"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                sx={{
-                  '& .MuiOutlinedInput-root': {
-                    borderRadius: 2,
-                    fontSize: '16px', // Prevents zoom on iOS
-                  },
-                }}
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <SearchIcon fontSize="small" color="action" />
-                    </InputAdornment>
-                  ),
-                }}
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <FormControl fullWidth size="small">
-                <InputLabel id="status-filter-label">Status</InputLabel>
-                <Select
-                  labelId="status-filter-label"
-                  value={statusFilter}
-                  label="Status"
-                  onChange={(e) => setStatusFilter(e.target.value)}
+        {!limit && (
+          <Paper
+            elevation={0}
+            sx={{
+              p: 2,
+              mb: 3,
+              borderRadius: 3,
+              border: `1px solid ${alpha(theme.palette.divider, 0.8)}`,
+              background: theme.palette.mode === 'dark'
+                ? alpha(theme.palette.background.paper, 0.9)
+                : alpha(theme.palette.background.paper, 0.9),
+            }}
+          >
+            <Grid container spacing={2} alignItems="center">
+              <Grid item xs={12}>
+                <TextField
+                  fullWidth
+                  placeholder="Cari berdasarkan nama warga atau alamat..."
+                  variant="outlined"
+                  size="small"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
                   sx={{
-                    borderRadius: 2,
+                    '& .MuiOutlinedInput-root': {
+                      borderRadius: 2,
+                      fontSize: '16px', // Prevents zoom on iOS
+                    },
                   }}
-                >
-                  <MenuItem value="all">Semua Status</MenuItem>
-                  <MenuItem value="pending">Pending</MenuItem>
-                  <MenuItem value="processing">Sedang Diproses</MenuItem>
-                  <MenuItem value="completed">Selesai</MenuItem>
-                </Select>
-              </FormControl>
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <SearchIcon fontSize="small" color="action" />
+                      </InputAdornment>
+                    ),
+                  }}
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <FormControl fullWidth size="small">
+                  <InputLabel id="status-filter-label">Status</InputLabel>
+                  <Select
+                    labelId="status-filter-label"
+                    value={statusFilter}
+                    label="Status"
+                    onChange={(e) => setStatusFilter(e.target.value)}
+                    sx={{
+                      borderRadius: 2,
+                    }}
+                  >
+                    <MenuItem value="all">Semua Status</MenuItem>
+                    <MenuItem value="pending">Pending</MenuItem>
+                    <MenuItem value="processing">Sedang Diproses</MenuItem>
+                    <MenuItem value="completed">Selesai</MenuItem>
+                  </Select>
+                </FormControl>
+              </Grid>
             </Grid>
-          </Grid>
-        </Paper>
+          </Paper>
+        )}
 
         {/* Mobile Cards */}
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
-          {filteredReports.length > 0 ? (
-            filteredReports.map((report, index) => (
+          {paginatedReports.length > 0 ? (
+            paginatedReports.map((report, index) => (
               <Paper 
                 key={report.id} 
                 elevation={0}
@@ -675,6 +695,17 @@ export default function ReportsList({ isReadOnly = false }: { isReadOnly?: boole
             </Paper>
           )}
         </Box>
+
+        {pageCount > 1 && (
+          <Box sx={{ display: 'flex', justifyContent: 'center', mt: 3 }}>
+            <Pagination
+              count={pageCount}
+              page={mobilePage}
+              onChange={(e, page) => setMobilePage(page)}
+              color="primary"
+            />
+          </Box>
+        )}
 
         {/* Status Update Menu */}
         <Menu
