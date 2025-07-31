@@ -122,16 +122,16 @@ export async function POST(req: NextRequest) {
       value: sessionToken,
       httpOnly: true,
       path: '/',
-      secure: process.env.NODE_ENV === 'production', // Secure in production
+      secure: false, // Set to false for HTTP server
       sameSite: 'lax' as const, // Changed from strict to lax for better cross-origin support
       // 7 day expiration
       maxAge: 7 * 24 * 60 * 60
     };
     
-    // Add domain configuration if in production
+    // Add domain configuration for production HTTP server
     if (process.env.NODE_ENV === 'production') {
-      // You can set domain if needed for cross-subdomain support
-      // cookieOptions.domain = '.simokerto.my.id';
+      // For HTTP server, we don't set domain to avoid cross-domain issues
+      // cookieOptions.domain = 'simokerto.my.id'; // Commented out for HTTP
     }
     
     response.cookies.set(cookieOptions);

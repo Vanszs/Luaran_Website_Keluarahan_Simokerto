@@ -33,13 +33,13 @@ export async function GET(req: NextRequest) {
         expires: new Date(0),
         path: '/',
         httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
+        secure: false, // Set to false for HTTP server
         sameSite: 'lax' as const,
       };
       
-      // Add domain if in production
+      // For HTTP server, don't set domain to avoid issues
       if (process.env.NODE_ENV === 'production') {
-        // clearCookieOptions.domain = '.simokerto.my.id';
+        // clearCookieOptions.domain = 'simokerto.my.id'; // Commented out for HTTP
       }
       
       response.cookies.set(clearCookieOptions);
