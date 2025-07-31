@@ -28,7 +28,24 @@ function simpleHash(data: string, secret: string): string {
 export function verifySession(sessionValue: string): SessionData | null {
   try {
     const decoded = Buffer.from(sessionValue, 'base64').toString('utf8');
-    const sessionData: SessionData = JSON.parse(decoded);
+    const sessionPayload: SessionPayload = JSON.parse(decoded);
+    
+    // Validate payload structure
+    if (!sessionPayload.data || !sessionPayload.signature) {
+      console.warn('Invalid session payload structure');
+      return null;
+    }
+    
+    const sessionData = sessionPayload.data;
+    
+    // Verify signature
+    const secret = process.env.SESSION_SECRET || 'default-secret-change-in-production';
+    const expectedSignature = simpleHash(JSON.stringify(sessionData), secret);
+    
+    if (sessionPayload.signature !== expectedSignature) {
+      console.warn('Session signature verification failed');
+      return null;
+    }
     
     // Check session expiration (7 days)
     const now = new Date().getTime();

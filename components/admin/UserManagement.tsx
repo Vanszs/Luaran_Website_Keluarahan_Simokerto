@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Box,
   Button,
@@ -22,7 +22,7 @@ import {
   Alert,
   alpha,
   useTheme,
-  Skeleton,
+  CircularProgress,
   Chip,
   Grid,
   InputAdornment,
@@ -31,7 +31,6 @@ import {
   FormControl,
   InputLabel,
   ListSubheader,
-  Pagination,
 } from '@mui/material';
 import {
   Add as AddIcon,
@@ -54,79 +53,6 @@ interface User {
   phone: string | null;
   created_at: string;
 }
-
-// --- Skeleton Component ---
-const UserManagementSkeleton = ({ isMobile }: { isMobile: boolean }) => {
-  const theme = useTheme();
-  
-  if (isMobile) {
-    return (
-      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
-        {[...Array(3)].map((_, index) => (
-          <Paper 
-            key={index} 
-            elevation={0}
-            sx={{ 
-              p: 3,
-              borderRadius: 3,
-              border: `1px solid ${alpha(theme.palette.divider, 0.8)}`,
-            }}
-          >
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
-              <Box>
-                <Skeleton variant="text" width={80} height={20} sx={{ mb: 0.5 }} />
-                <Skeleton variant="text" width={50} height={30} />
-              </Box>
-              <Box sx={{ display: 'flex', gap: 0.5 }}>
-                <Skeleton variant="circular" width={36} height={36} />
-                <Skeleton variant="circular" width={36} height={36} />
-              </Box>
-            </Box>
-            <Skeleton variant="text" width="40%" sx={{ mb: 1 }} />
-            <Skeleton variant="text" width="70%" sx={{ mb: 2 }} />
-            <Skeleton variant="rectangular" width="100%" height={40} />
-          </Paper>
-        ))}
-      </Box>
-    );
-  }
-
-  return (
-    <TableContainer 
-      component={Paper} 
-      elevation={0}
-      sx={{ 
-        borderRadius: 3,
-        border: `1px solid ${theme.palette.divider}`,
-        overflow: 'hidden',
-      }}
-    >
-      <Table>
-        <TableHead>
-          <TableRow>
-            {[...Array(7)].map((_, i) => (
-              <TableCell key={i}>
-                <Skeleton variant="text" />
-              </TableCell>
-            ))}
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {[...Array(5)].map((_, rowIndex) => (
-            <TableRow key={rowIndex}>
-              {[...Array(7)].map((_, cellIndex) => (
-                <TableCell key={cellIndex}>
-                  <Skeleton variant="text" />
-                </TableCell>
-              ))}
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-    </TableContainer>
-  );
-};
-
 
 export default function UserManagement() {
   const theme = useTheme();
@@ -164,34 +90,9 @@ export default function UserManagement() {
     severity: 'success' as 'success' | 'error' | 'info'
   });
 
-  const [mobilePage, setMobilePage] = useState(1);
-  const ITEMS_PER_PAGE = 10;
-
-  const fetchUsers = useCallback(async () => {
-    setLoading(true);
-    try {
-      const response = await fetch('/api/admin/users');
-      if (response.ok) {
-        const data = await response.json();
-        setUsers(data);
-      } else {
-        throw new Error('Failed to fetch users');
-      }
-    } catch (error) {
-      console.error('Error fetching users:', error);
-      setSnackbar({
-        open: true,
-        message: 'Failed to load users',
-        severity: 'error'
-      });
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
   useEffect(() => {
     fetchUsers();
-  }, [fetchUsers]);
+  }, []);
 
   // Generate RW options (1-14)
   const generateRWOptions = () => {
@@ -215,6 +116,28 @@ export default function UserManagement() {
       });
     }
     return options;
+  };
+
+  const fetchUsers = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch('/api/admin/users');
+      if (response.ok) {
+        const data = await response.json();
+        setUsers(data);
+      } else {
+        throw new Error('Failed to fetch users');
+      }
+    } catch (error) {
+      console.error('Error fetching users:', error);
+      setSnackbar({
+        open: true,
+        message: 'Failed to load users',
+        severity: 'error'
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleAddUser = () => {
@@ -368,17 +291,15 @@ export default function UserManagement() {
   );
 
   if (loading) {
-    return <UserManagementSkeleton isMobile={isMobile} />;
+    return (
+      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '50vh' }}>
+        <CircularProgress />
+      </Box>
+    );
   }
 
   // Mobile card layout for responsive design
   if (isMobile) {
-    const pageCount = Math.ceil(filteredUsers.length / ITEMS_PER_PAGE);
-    const paginatedUsers = filteredUsers.slice(
-      (mobilePage - 1) * ITEMS_PER_PAGE,
-      mobilePage * ITEMS_PER_PAGE
-    );
-
     return (
       <>
         {/* Header and Add Button */}
@@ -429,266 +350,42 @@ export default function UserManagement() {
         </Paper>
 
         {/* Mobile Card List */}
-        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
-          {paginatedUsers.length > 0 ? (
-            paginatedUsers.map((user, index) => (
-              <Paper 
-                key={user.id} 
-                elevation={0}
-                sx={{ 
-                  p: 3,
-                  borderRadius: 3,
-                  border: `1px solid ${alpha(theme.palette.divider, 0.8)}`,
-                  background: theme.palette.mode === 'dark'
-                    ? `linear-gradient(135deg, ${alpha(theme.palette.background.paper, 0.9)} 0%, ${alpha(theme.palette.background.paper, 0.95)} 100%)`
-                    : `linear-gradient(135deg, ${alpha(theme.palette.background.paper, 0.9)} 0%, ${alpha(theme.palette.background.paper, 0.95)} 100%)`,
-                  transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                  position: 'relative',
-                  overflow: 'hidden',
-                  '&::before': {
-                    content: '""',
-                    position: 'absolute',
-                    top: 0,
-                    left: 0,
-                    width: '100%',
-                    height: '3px',
-                    background: `linear-gradient(90deg, ${theme.palette.primary.main}, ${alpha(theme.palette.primary.main, 0.7)})`,
-                  },
-                  '&:hover': {
-                    transform: 'translateY(-2px)',
-                    boxShadow: theme.palette.mode === 'dark'
-                      ? '0 8px 32px rgba(0,0,0,0.3)'
-                      : '0 8px 32px rgba(0,0,0,0.12)',
-                    borderColor: alpha(theme.palette.primary.main, 0.3),
-                  },
-                  animation: `fadeInUp 0.4s ease-out ${index * 0.1}s both`,
-                }}
-              >
-                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                  {/* Header with ID and Actions */}
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1 }}>
-                    <Box>
-                      <Typography 
-                        variant="caption" 
-                        color="text.secondary"
-                        sx={{ 
-                          fontSize: '0.7rem',
-                          fontWeight: 600,
-                          textTransform: 'uppercase',
-                          letterSpacing: 0.5,
-                          mb: 0.5,
-                          display: 'block'
-                        }}
-                      >
-                        ID Warga
-                      </Typography>
-                      <Typography 
-                        variant="h6" 
-                        sx={{ 
-                          fontWeight: 700,
-                          fontSize: '1.1rem',
-                          color: theme.palette.primary.main 
-                        }}
-                      >
-                        #{user.id}
-                      </Typography>
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+          {filteredUsers.length > 0 ? (
+            filteredUsers.map((user) => (
+              <Paper key={user.id} sx={{ ...responsiveUtils.card(theme), mb: 1, border: `1px solid ${theme.palette.divider}` }}>
+                <Box sx={{ p: 2 }}>
+                  <Typography variant="subtitle2" color="text.secondary">ID</Typography>
+                  <Typography variant="body1" fontWeight={600}>{user.id}</Typography>
+                  <Typography variant="subtitle2" color="text.secondary" sx={{ mt: 1 }}>Username</Typography>
+                  <Typography variant="body1">{user.username}</Typography>
+                  <Typography variant="subtitle2" color="text.secondary" sx={{ mt: 1 }}>Nama</Typography>
+                  <Typography variant="body1">{user.name}</Typography>
+                  <Typography variant="subtitle2" color="text.secondary" sx={{ mt: 1 }}>Alamat</Typography>
+                  <Typography variant="body1">{user.address}</Typography>
+                  <Typography variant="subtitle2" color="text.secondary" sx={{ mt: 1 }}>No. Telepon</Typography>
+                  <Typography variant="body1">{user.phone || '-'}</Typography>
+                  <Typography variant="subtitle2" color="text.secondary" sx={{ mt: 1 }}>Terdaftar</Typography>
+                  <Typography variant="body1">{new Date(user.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}</Typography>
+                  {canAddUsers && (
+                    <Box sx={{ display: 'flex', gap: 1, mt: 2 }}>
+                      <IconButton size="small" onClick={() => handleEditUser(user)} color="primary">
+                        <EditIcon fontSize="small" />
+                      </IconButton>
+                      <IconButton size="small" onClick={() => handleDeleteUser(user)} color="error" sx={{ ml: 1 }}>
+                        <DeleteIcon fontSize="small" />
+                      </IconButton>
                     </Box>
-                    {canAddUsers && (
-                      <Box sx={{ display: 'flex', gap: 0.5 }}>
-                        <IconButton 
-                          size="small" 
-                          onClick={() => handleEditUser(user)} 
-                          sx={{
-                            color: theme.palette.primary.main,
-                            backgroundColor: alpha(theme.palette.primary.main, 0.1),
-                            '&:hover': {
-                              backgroundColor: alpha(theme.palette.primary.main, 0.2),
-                            },
-                            width: 36,
-                            height: 36,
-                          }}
-                        >
-                          <EditIcon fontSize="small" />
-                        </IconButton>
-                        <IconButton 
-                          size="small" 
-                          onClick={() => handleDeleteUser(user)} 
-                          sx={{
-                            color: theme.palette.error.main,
-                            backgroundColor: alpha(theme.palette.error.main, 0.1),
-                            '&:hover': {
-                              backgroundColor: alpha(theme.palette.error.main, 0.2),
-                            },
-                            width: 36,
-                            height: 36,
-                          }}
-                        >
-                          <DeleteIcon fontSize="small" />
-                        </IconButton>
-                      </Box>
-                    )}
-                  </Box>
-
-                  {/* Username and Name */}
-                  <Box>
-                    <Typography 
-                      variant="caption" 
-                      color="text.secondary"
-                      sx={{ 
-                        fontSize: '0.7rem',
-                        fontWeight: 600,
-                        textTransform: 'uppercase',
-                        letterSpacing: 0.5,
-                        mb: 0.5,
-                        display: 'block'
-                      }}
-                    >
-                      Username
-                    </Typography>
-                    <Typography variant="body1" sx={{ fontWeight: 600, fontSize: '0.95rem', mb: 1 }}>
-                      {user.username}
-                    </Typography>
-                    
-                    <Typography 
-                      variant="caption" 
-                      color="text.secondary"
-                      sx={{ 
-                        fontSize: '0.7rem',
-                        fontWeight: 600,
-                        textTransform: 'uppercase',
-                        letterSpacing: 0.5,
-                        mb: 0.5,
-                        display: 'block'
-                      }}
-                    >
-                      Nama Lengkap
-                    </Typography>
-                    <Typography variant="body1" sx={{ fontWeight: 500, fontSize: '0.95rem' }}>
-                      {user.name}
-                    </Typography>
-                  </Box>
-
-                  {/* Address */}
-                  <Box>
-                    <Typography 
-                      variant="caption" 
-                      color="text.secondary"
-                      sx={{ 
-                        fontSize: '0.7rem',
-                        fontWeight: 600,
-                        textTransform: 'uppercase',
-                        letterSpacing: 0.5,
-                        mb: 0.5,
-                        display: 'block'
-                      }}
-                    >
-                      Alamat
-                    </Typography>
-                    <Typography 
-                      variant="body2" 
-                      sx={{ 
-                        fontSize: '0.9rem',
-                        lineHeight: 1.4,
-                        color: theme.palette.text.primary
-                      }}
-                    >
-                      {user.address}
-                    </Typography>
-                  </Box>
-
-                  {/* Contact and Registration Info */}
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between', gap: 3 }}>
-                    <Box sx={{ flex: 1 }}>
-                      <Typography 
-                        variant="caption" 
-                        color="text.secondary"
-                        sx={{ 
-                          fontSize: '0.7rem',
-                          fontWeight: 600,
-                          textTransform: 'uppercase',
-                          letterSpacing: 0.5,
-                          mb: 0.5,
-                          display: 'block'
-                        }}
-                      >
-                        No. Telepon
-                      </Typography>
-                      <Typography variant="body2" sx={{ fontSize: '0.9rem', color: theme.palette.text.primary }}>
-                        {user.phone || '-'}
-                      </Typography>
-                    </Box>
-                    <Box sx={{ flex: 1 }}>
-                      <Typography 
-                        variant="caption" 
-                        color="text.secondary"
-                        sx={{ 
-                          fontSize: '0.7rem',
-                          fontWeight: 600,
-                          textTransform: 'uppercase',
-                          letterSpacing: 0.5,
-                          mb: 0.5,
-                          display: 'block'
-                        }}
-                      >
-                        Terdaftar
-                      </Typography>
-                      <Typography variant="body2" sx={{ fontSize: '0.9rem', color: theme.palette.text.primary }}>
-                        {new Date(user.created_at).toLocaleDateString('id-ID', { 
-                          day: 'numeric', 
-                          month: 'short', 
-                          year: 'numeric' 
-                        })}
-                      </Typography>
-                    </Box>
-                  </Box>
+                  )}
                 </Box>
               </Paper>
             ))
           ) : (
-            <Paper 
-              elevation={0}
-              sx={{ 
-                p: 4,
-                textAlign: 'center',
-                borderRadius: 3,
-                border: `1px solid ${alpha(theme.palette.divider, 0.5)}`,
-                background: theme.palette.mode === 'dark'
-                  ? alpha(theme.palette.background.paper, 0.6)
-                  : alpha(theme.palette.background.paper, 0.8),
-              }}
-            >
-              <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
-                <Box 
-                  sx={{ 
-                    width: 64,
-                    height: 64,
-                    borderRadius: '50%',
-                    background: `linear-gradient(135deg, ${alpha(theme.palette.text.secondary, 0.1)}, ${alpha(theme.palette.text.secondary, 0.05)})`,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                  }}
-                >
-                  <PersonAddIcon sx={{ fontSize: 32, color: 'text.secondary', opacity: 0.7 }} />
-                </Box>
-                <Typography variant="body1" color="text.secondary" sx={{ fontSize: '0.95rem', fontWeight: 500 }}>
-                  Tidak ada data warga
-                </Typography>
-              </Box>
+            <Paper sx={{ ...responsiveUtils.card(theme), textAlign: 'center', p: 3 }}>
+              <Typography variant="body1" color="text.secondary">Tidak ada data warga</Typography>
             </Paper>
           )}
         </Box>
-
-        {pageCount > 1 && (
-          <Box sx={{ display: 'flex', justifyContent: 'center', mt: 3 }}>
-            <Pagination
-              count={pageCount}
-              page={mobilePage}
-              onChange={(e, page) => setMobilePage(page)}
-              color="primary"
-            />
-          </Box>
-        )}
 
         {/* Dialogs and Snackbar */}
         {renderDialogs()}
@@ -746,242 +443,96 @@ export default function UserManagement() {
       </Paper>
 
       {/* Desktop Table */}
-      <Paper 
-        elevation={0}
+      <TableContainer 
+        component={Paper} 
+        elevation={0} 
         sx={{ 
           borderRadius: 3,
-          border: `1px solid ${theme.palette.divider}`,
           overflow: 'hidden',
+          ...responsiveUtils.table(theme),
+          boxShadow: theme.palette.mode === 'dark'
+            ? '0 4px 12px rgba(0,0,0,0.2)'
+            : '0 4px 12px rgba(0,0,0,0.1)',
           background: theme.palette.mode === 'dark'
-            ? alpha(theme.palette.background.paper, 0.9)
-            : alpha(theme.palette.background.paper, 0.9),
+            ? alpha(theme.palette.background.paper, 0.8)
+            : alpha(theme.palette.background.paper, 0.8),
         }}
       >
-        <TableContainer sx={{ 
-          overflow: 'auto',
-          [theme.breakpoints.down('lg')]: {
-            minWidth: 800,
-            overflowX: 'auto',
-          },
-        }}>
-          <Table sx={{
-            minWidth: { xs: 800, lg: 'auto' },
-            '& .MuiTableCell-root': {
-              borderBottom: `1px solid ${alpha(theme.palette.divider, 0.5)}`,
-              padding: '16px 12px',
-              fontSize: '0.875rem',
-              '&:first-of-type': {
-                paddingLeft: 20,
-              },
-              '&:last-of-type': {
-                paddingRight: 20,
-              },
-            },
+        <Table>
+          <TableHead sx={{ 
+            backgroundColor: theme.palette.mode === 'dark'
+              ? alpha(theme.palette.primary.main, 0.1)
+              : alpha(theme.palette.primary.main, 0.05)
           }}>
-            <TableHead>
-              <TableRow>
-                <TableCell sx={{ 
-                  fontWeight: 700,
-                  fontSize: '0.8rem',
-                  color: theme.palette.text.secondary,
-                  textTransform: 'uppercase',
-                  letterSpacing: 0.5,
-                  background: 'transparent',
-                }}>
-                  ID
-                </TableCell>
-                <TableCell sx={{ 
-                  fontWeight: 700,
-                  fontSize: '0.8rem',
-                  color: theme.palette.text.secondary,
-                  textTransform: 'uppercase',
-                  letterSpacing: 0.5,
-                  background: 'transparent',
-                }}>
-                  Username
-                </TableCell>
-                <TableCell sx={{ 
-                  fontWeight: 700,
-                  fontSize: '0.8rem',
-                  color: theme.palette.text.secondary,
-                  textTransform: 'uppercase',
-                  letterSpacing: 0.5,
-                  background: 'transparent',
-                }}>
-                  Nama
-                </TableCell>
-                <TableCell sx={{ 
-                  fontWeight: 700,
-                  fontSize: '0.8rem',
-                  color: theme.palette.text.secondary,
-                  textTransform: 'uppercase',
-                  letterSpacing: 0.5,
-                  background: 'transparent',
-                }}>
-                  Alamat
-                </TableCell>
-                <TableCell sx={{ 
-                  fontWeight: 700,
-                  fontSize: '0.8rem',
-                  color: theme.palette.text.secondary,
-                  textTransform: 'uppercase',
-                  letterSpacing: 0.5,
-                  background: 'transparent',
-                }}>
-                  No. Telepon
-                </TableCell>
-                <TableCell sx={{ 
-                  fontWeight: 700,
-                  fontSize: '0.8rem',
-                  color: theme.palette.text.secondary,
-                  textTransform: 'uppercase',
-                  letterSpacing: 0.5,
-                  background: 'transparent',
-                }}>
-                  Terdaftar
-                </TableCell>
-                <TableCell align="right" sx={{ 
-                  fontWeight: 700,
-                  fontSize: '0.8rem',
-                  color: theme.palette.text.secondary,
-                  textTransform: 'uppercase',
-                  letterSpacing: 0.5,
-                  background: 'transparent',
-                }}>
-                  Aksi
-                </TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {filteredUsers.length > 0 ? (
-                filteredUsers.map((user) => (
-                  <TableRow 
-                    key={user.id} 
-                    sx={{
-                      '&:hover': {
-                        backgroundColor: alpha(theme.palette.primary.main, 0.04),
-                      },
-                      transition: 'background-color 0.2s ease',
-                      cursor: 'pointer',
-                    }}
-                  >
-                    <TableCell>
-                      <Typography 
-                        variant="body2" 
-                        sx={{ 
-                          fontWeight: 700,
-                          color: theme.palette.primary.main,
-                          fontSize: '0.85rem'
-                        }}
-                      >
-                        #{user.id}
-                      </Typography>
-                    </TableCell>
-                    <TableCell>
-                      <Typography variant="body2" sx={{ fontWeight: 600, fontSize: '0.875rem' }}>
-                        {user.username}
-                      </Typography>
-                    </TableCell>
-                    <TableCell>
-                      <Typography variant="body2" sx={{ fontWeight: 500, fontSize: '0.875rem' }}>
-                        {user.name}
-                      </Typography>
-                    </TableCell>
-                    <TableCell>
-                      <Typography variant="body2" sx={{ 
-                        fontSize: '0.875rem',
-                        maxWidth: 200,
-                        overflow: 'hidden',
-                        textOverflow: 'ellipsis',
-                        whiteSpace: 'nowrap',
-                      }}>
-                        {user.address}
-                      </Typography>
-                    </TableCell>
-                    <TableCell>
-                      <Typography variant="body2" sx={{ fontSize: '0.875rem' }}>
-                        {user.phone || '-'}
-                      </Typography>
-                    </TableCell>
-                    <TableCell>
-                      <Typography variant="body2" sx={{ fontSize: '0.875rem' }}>
-                        {new Date(user.created_at).toLocaleDateString('id-ID', {
-                          day: 'numeric',
-                          month: 'short',
-                          year: 'numeric'
-                        })}
-                      </Typography>
-                    </TableCell>
-                    <TableCell align="right">
-                      {canAddUsers ? (
-                        <Box sx={{ display: 'flex', gap: 0.5, justifyContent: 'flex-end' }}>
-                          <IconButton 
-                            size="small" 
-                            onClick={() => handleEditUser(user)}
-                            sx={{
-                              color: theme.palette.primary.main,
-                              backgroundColor: alpha(theme.palette.primary.main, 0.1),
-                              '&:hover': {
-                                backgroundColor: alpha(theme.palette.primary.main, 0.2),
-                              },
-                              width: 32,
-                              height: 32,
-                            }}
-                          >
-                            <EditIcon fontSize="small" />
-                          </IconButton>
-                          <IconButton 
-                            size="small" 
-                            onClick={() => handleDeleteUser(user)}
-                            sx={{
-                              color: theme.palette.error.main,
-                              backgroundColor: alpha(theme.palette.error.main, 0.1),
-                              '&:hover': {
-                                backgroundColor: alpha(theme.palette.error.main, 0.2),
-                              },
-                              width: 32,
-                              height: 32,
-                            }}
-                          >
-                            <DeleteIcon fontSize="small" />
-                          </IconButton>
-                        </Box>
-                      ) : (
-                        <Typography variant="caption" color="text.secondary">
-                          Tidak ada aksi
-                        </Typography>
-                      )}
-                    </TableCell>
-                  </TableRow>
-                ))
-              ) : (
-                <TableRow>
-                  <TableCell colSpan={7} align="center" sx={{ py: 6 }}>
-                    <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
-                      <Box 
-                        sx={{ 
-                          width: 64,
-                          height: 64,
-                          borderRadius: '50%',
-                          background: `linear-gradient(135deg, ${alpha(theme.palette.text.secondary, 0.1)}, ${alpha(theme.palette.text.secondary, 0.05)})`,
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                        }}
-                      >
-                        <PersonAddIcon sx={{ fontSize: 32, color: 'text.secondary', opacity: 0.7 }} />
+            <TableRow>
+              <TableCell>ID</TableCell>
+              <TableCell>Username</TableCell>
+              <TableCell>Nama</TableCell>
+              <TableCell>Alamat</TableCell>
+              <TableCell>No. Telepon</TableCell>
+              <TableCell>Terdaftar</TableCell>
+              <TableCell align="right">Aksi</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {filteredUsers.length > 0 ? (
+              filteredUsers.map((user) => (
+                <TableRow key={user.id} hover>
+                  <TableCell>{user.id}</TableCell>
+                  <TableCell>{user.username}</TableCell>
+                  <TableCell>{user.name}</TableCell>
+                  <TableCell>
+                    <Typography variant="body2" sx={{ 
+                      maxWidth: 250,
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      whiteSpace: 'nowrap'
+                    }}>
+                      {user.address}
+                    </Typography>
+                  </TableCell>
+                  <TableCell>{user.phone || '-'}</TableCell>
+                  <TableCell>
+                    {new Date(user.created_at).toLocaleDateString('id-ID', {
+                      day: 'numeric',
+                      month: 'short',
+                      year: 'numeric'
+                    })}
+                  </TableCell>
+                  <TableCell align="right">
+                    {canAddUsers && (
+                      <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
+                        <IconButton 
+                          size="small" 
+                          onClick={() => handleEditUser(user)}
+                          color="primary"
+                        >
+                          <EditIcon fontSize="small" />
+                        </IconButton>
+                        <IconButton 
+                          size="small" 
+                          onClick={() => handleDeleteUser(user)}
+                          color="error"
+                        >
+                          <DeleteIcon fontSize="small" />
+                        </IconButton>
                       </Box>
-                      <Typography variant="body1" color="text.secondary" sx={{ fontSize: '0.95rem', fontWeight: 500 }}>
-                        Tidak ada data warga
-                      </Typography>
-                    </Box>
+                    )}
                   </TableCell>
                 </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        </TableContainer>
-      </Paper>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell colSpan={7} align="center" sx={{ py: 3 }}>
+                  <Typography variant="body1" color="text.secondary">
+                    Tidak ada data warga yang ditemukan
+                  </Typography>
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+      </TableContainer>
 
       {/* Dialogs and Snackbar */}
       {renderDialogs()}

@@ -93,16 +93,15 @@ export async function POST(req: NextRequest) {
       getUserAgent(req)
     );
     
-    // Generate a simple session (compatible with edge runtime)
-    const sessionData = {
+    // Generate a secure session using sessionUtils
+    const { createSession } = await import('../../../../utils/sessionUtils.edge');
+    
+    const sessionToken = createSession({
       id: userData.id, 
       role: userData.role, 
       username: userData.username, 
-      name: userData.name,
-      timestamp: new Date().getTime()
-    };
-    
-    const sessionId = Buffer.from(JSON.stringify(sessionData)).toString('base64');
+      name: userData.name
+    });
     
     // Create response with JSON data first
     const response = NextResponse.json({
@@ -114,20 +113,28 @@ export async function POST(req: NextRequest) {
         role: userData.role
       },
       // Also include session token in the response body for mobile clients
-      sessionToken: sessionId
+      sessionToken: sessionToken
     });
     
-    // Set secure HTTP-only cookie
-    response.cookies.set({
+    // Set secure HTTP-only cookie with proper domain configuration
+    const cookieOptions = {
       name: 'admin_session',
-      value: sessionId,
+      value: sessionToken,
       httpOnly: true,
       path: '/',
       secure: process.env.NODE_ENV === 'production', // Secure in production
-      sameSite: 'strict', // More secure than lax
+      sameSite: 'lax' as const, // Changed from strict to lax for better cross-origin support
       // 7 day expiration
       maxAge: 7 * 24 * 60 * 60
-    });
+    };
+    
+    // Add domain configuration if in production
+    if (process.env.NODE_ENV === 'production') {
+      // You can set domain if needed for cross-subdomain support
+      // cookieOptions.domain = '.simokerto.my.id';
+    }
+    
+    response.cookies.set(cookieOptions);
     
     return response;
     

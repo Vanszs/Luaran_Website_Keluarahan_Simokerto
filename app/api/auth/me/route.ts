@@ -21,20 +21,28 @@ export async function GET(req: NextRequest) {
     
     if (!sessionData) {
       console.error('Session verification failed in /api/auth/me');
-      // Clear invalid cookie
+      // Clear invalid cookie with proper options
       const response = NextResponse.json(
         { authenticated: false, message: 'Invalid or expired session' },
         { status: 401 }
       );
-      response.cookies.set({
+      
+      const clearCookieOptions = {
         name: 'admin_session',
         value: '',
         expires: new Date(0),
         path: '/',
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
-        sameSite: 'strict',
-      });
+        sameSite: 'lax' as const,
+      };
+      
+      // Add domain if in production
+      if (process.env.NODE_ENV === 'production') {
+        // clearCookieOptions.domain = '.simokerto.my.id';
+      }
+      
+      response.cookies.set(clearCookieOptions);
       return response;
     }
     

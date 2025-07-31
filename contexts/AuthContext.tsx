@@ -31,21 +31,44 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   useEffect(() => {
     const checkAuth = async () => {
       try {
+        console.log('[AuthContext] Initial auth check started...');
+        
         const response = await fetch('/api/auth/me', {
           method: 'GET',
-          headers: { 'Content-Type': 'application/json' },
+          headers: { 
+            'Content-Type': 'application/json',
+            'Cache-Control': 'no-cache',
+            'Pragma': 'no-cache',
+          },
           credentials: 'include',
         });
+
+        console.log('[AuthContext] Initial auth response status:', response.status);
 
         if (response.ok) {
           const contentType = response.headers.get('content-type');
           if (contentType && contentType.includes('application/json')) {
             const data = await response.json();
-            setUser(data.user);
+            console.log('[AuthContext] Initial auth data:', { 
+              authenticated: data.authenticated, 
+              hasUser: !!data.user,
+              userRole: data.user?.role 
+            });
+            
+            if (data.authenticated && data.user) {
+              setUser(data.user);
+            } else {
+              console.log('[AuthContext] No valid session on initial load');
+              setUser(null);
+            }
           }
+        } else {
+          console.log('[AuthContext] Initial auth check failed with status:', response.status);
+          setUser(null);
         }
       } catch (error) {
-        console.error('Auth check failed:', error);
+        console.error('[AuthContext] Initial auth check failed:', error);
+        setUser(null);
       } finally {
         setLoading(false);
       }
@@ -57,6 +80,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const login = async (username: string, password: string) => {
     setLoading(true);
     try {
+      console.log('[AuthContext] Login attempt for user:', username);
+      
       const response = await fetch('/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -64,28 +89,38 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         body: JSON.stringify({ username, password }),
       });
 
+      console.log('[AuthContext] Login response status:', response.status);
+
       // Check if response is ok first
       if (!response.ok) {
         // Try to get error message from response
         const contentType = response.headers.get('content-type');
         if (contentType && contentType.includes('application/json')) {
           const errorData = await response.json();
+          console.log('[AuthContext] Login error response:', errorData);
           throw new Error(errorData.message || 'Login gagal');
         } else {
           // If not JSON, probably an HTML error page
           const errorText = await response.text();
-          console.error('Non-JSON response from login API:', errorText);
+          console.error('[AuthContext] Non-JSON response from login API:', errorText);
           throw new Error('Terjadi kesalahan server. Silakan coba lagi.');
         }
       }
 
       const data = await response.json();
+      console.log('[AuthContext] Login success response:', { 
+        success: data.success, 
+        hasUser: !!data.user,
+        userRole: data.user?.role,
+        hasSessionToken: !!data.sessionToken 
+      });
       
       setUser(data.user);
-      console.log('User data set in context:', data.user);
+      console.log('[AuthContext] User data set in context:', data.user);
       
       // Manually navigate based on role after successful login
       if (data.user && data.user.role) {
+        console.log('[AuthContext] Navigating user to dashboard based on role:', data.user.role);
         // A slight delay to ensure cookie is properly set
         setTimeout(() => {
           if (data.user.role === 'superadmin') {
