@@ -127,10 +127,11 @@ const DateRangeFilter: React.FC<DateRangeFilterProps> = ({
         sx={{
           p: 2,
           borderRadius: 3,
-          border: `1px solid ${alpha(theme.palette.divider, 0.8)}`,
-          background: theme.palette.mode === 'dark'
-            ? alpha(theme.palette.background.paper, 0.9)
-            : alpha(theme.palette.background.paper, 0.9),
+          border: `1px solid ${theme.palette.divider}`,
+          background: theme.palette.background.paper,
+          transition: theme.transitions.create(['background-color', 'border-color'], {
+            duration: theme.transitions.duration.standard,
+          }),
         }}
       >
         <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
@@ -143,10 +144,20 @@ const DateRangeFilter: React.FC<DateRangeFilterProps> = ({
               onDelete={handleClearFilter}
               size="small"
               sx={{
-                backgroundColor: alpha(theme.palette.primary.main, 0.1),
+                backgroundColor: alpha(theme.palette.primary.main, 0.12),
                 color: theme.palette.primary.main,
+                border: `1px solid ${alpha(theme.palette.primary.main, 0.3)}`,
+                transition: theme.transitions.create(['background-color', 'color', 'border-color'], {
+                  duration: theme.transitions.duration.short,
+                }),
                 '& .MuiChip-deleteIcon': {
                   color: theme.palette.primary.main,
+                  '&:hover': {
+                    color: theme.palette.primary.dark,
+                  },
+                },
+                '&:hover': {
+                  backgroundColor: alpha(theme.palette.primary.main, 0.16),
                 },
               }}
             />
@@ -163,13 +174,32 @@ const DateRangeFilter: React.FC<DateRangeFilterProps> = ({
               value={startDate}
               onChange={(e) => setStartDate(e.target.value)}
               InputLabelProps={{ shrink: true }}
-              inputProps={{filter date
+              inputProps={{
                 max: getTodayDate(), // Can't select future dates
               }}
               sx={{
                 '& .MuiOutlinedInput-root': {
                   borderRadius: 2,
                   fontSize: '16px', // Prevents zoom on iOS
+                  transition: theme.transitions.create(['border-color', 'box-shadow'], {
+                    duration: theme.transitions.duration.short,
+                  }),
+                  '&:hover': {
+                    '& .MuiOutlinedInput-notchedOutline': {
+                      borderColor: theme.palette.primary.main,
+                    },
+                  },
+                  '&.Mui-focused': {
+                    '& .MuiOutlinedInput-notchedOutline': {
+                      borderColor: theme.palette.primary.main,
+                    },
+                  },
+                },
+                '& .MuiInputLabel-root': {
+                  color: theme.palette.text.secondary,
+                  '&.Mui-focused': {
+                    color: theme.palette.primary.main,
+                  },
                 },
               }}
             />
@@ -191,6 +221,25 @@ const DateRangeFilter: React.FC<DateRangeFilterProps> = ({
                 '& .MuiOutlinedInput-root': {
                   borderRadius: 2,
                   fontSize: '16px',
+                  transition: theme.transitions.create(['border-color', 'box-shadow'], {
+                    duration: theme.transitions.duration.short,
+                  }),
+                  '&:hover': {
+                    '& .MuiOutlinedInput-notchedOutline': {
+                      borderColor: theme.palette.primary.main,
+                    },
+                  },
+                  '&.Mui-focused': {
+                    '& .MuiOutlinedInput-notchedOutline': {
+                      borderColor: theme.palette.primary.main,
+                    },
+                  },
+                },
+                '& .MuiInputLabel-root': {
+                  color: theme.palette.text.secondary,
+                  '&.Mui-focused': {
+                    color: theme.palette.primary.main,
+                  },
                 },
               }}
             />
@@ -200,7 +249,16 @@ const DateRangeFilter: React.FC<DateRangeFilterProps> = ({
         {/* Error Message */}
         {error && (
           <Box sx={{ mt: 1 }}>
-            <Typography variant="caption" color="error" sx={{ fontSize: '0.75rem' }}>
+            <Typography 
+              variant="caption" 
+              color="error" 
+              sx={{ 
+                fontSize: '0.75rem',
+                transition: theme.transitions.create('color', {
+                  duration: theme.transitions.duration.short,
+                }),
+              }}
+            >
               {error}
             </Typography>
           </Box>
@@ -221,8 +279,19 @@ const DateRangeFilter: React.FC<DateRangeFilterProps> = ({
                 onClick={() => handleQuickFilter(filter.getValue)}
                 sx={{
                   borderRadius: 2,
+                  borderColor: theme.palette.divider,
+                  color: theme.palette.text.secondary,
+                  backgroundColor: 'transparent',
+                  transition: theme.transitions.create(['background-color', 'border-color', 'color'], {
+                    duration: theme.transitions.duration.short,
+                  }),
                   '&:hover': {
-                    backgroundColor: alpha(theme.palette.primary.main, 0.1),
+                    backgroundColor: alpha(theme.palette.primary.main, 0.08),
+                    borderColor: theme.palette.primary.main,
+                    color: theme.palette.primary.main,
+                  },
+                  '&:active': {
+                    backgroundColor: alpha(theme.palette.primary.main, 0.12),
                   },
                 }}
               />
@@ -246,6 +315,24 @@ const DateRangeFilter: React.FC<DateRangeFilterProps> = ({
           borderRadius: 2,
           textTransform: 'none',
           minWidth: hasActiveFilter ? 200 : 140,
+          transition: theme.transitions.create(['background-color', 'border-color', 'color', 'box-shadow'], {
+            duration: theme.transitions.duration.short,
+          }),
+          ...(hasActiveFilter ? {
+            backgroundColor: theme.palette.primary.main,
+            color: theme.palette.primary.contrastText,
+            '&:hover': {
+              backgroundColor: theme.palette.primary.dark,
+              boxShadow: theme.shadows[4],
+            },
+          } : {
+            borderColor: theme.palette.divider,
+            color: theme.palette.text.primary,
+            '&:hover': {
+              borderColor: theme.palette.primary.main,
+              backgroundColor: alpha(theme.palette.primary.main, 0.04),
+            },
+          }),
         }}
       >
         {hasActiveFilter 
@@ -272,10 +359,21 @@ const DateRangeFilter: React.FC<DateRangeFilterProps> = ({
             borderRadius: 3,
             minWidth: 400,
             boxShadow: theme.shadows[8],
+            backgroundColor: theme.palette.background.paper,
+            border: `1px solid ${theme.palette.divider}`,
+            transition: theme.transitions.create(['background-color', 'border-color'], {
+              duration: theme.transitions.duration.standard,
+            }),
           },
         }}
       >
-        <Typography variant="h6" fontWeight={600} sx={{ mb: 2 }}>
+        <Typography variant="h6" fontWeight={600} sx={{ 
+          mb: 2,
+          color: theme.palette.text.primary,
+          transition: theme.transitions.create('color', {
+            duration: theme.transitions.duration.short,
+          }),
+        }}>
           Pilih Rentang Tanggal
         </Typography>
 
@@ -295,6 +393,25 @@ const DateRangeFilter: React.FC<DateRangeFilterProps> = ({
               sx={{
                 '& .MuiOutlinedInput-root': {
                   borderRadius: 2,
+                  transition: theme.transitions.create(['border-color', 'box-shadow'], {
+                    duration: theme.transitions.duration.short,
+                  }),
+                  '&:hover': {
+                    '& .MuiOutlinedInput-notchedOutline': {
+                      borderColor: theme.palette.primary.main,
+                    },
+                  },
+                  '&.Mui-focused': {
+                    '& .MuiOutlinedInput-notchedOutline': {
+                      borderColor: theme.palette.primary.main,
+                    },
+                  },
+                },
+                '& .MuiInputLabel-root': {
+                  color: theme.palette.text.secondary,
+                  '&.Mui-focused': {
+                    color: theme.palette.primary.main,
+                  },
                 },
               }}
             />
@@ -315,6 +432,25 @@ const DateRangeFilter: React.FC<DateRangeFilterProps> = ({
               sx={{
                 '& .MuiOutlinedInput-root': {
                   borderRadius: 2,
+                  transition: theme.transitions.create(['border-color', 'box-shadow'], {
+                    duration: theme.transitions.duration.short,
+                  }),
+                  '&:hover': {
+                    '& .MuiOutlinedInput-notchedOutline': {
+                      borderColor: theme.palette.primary.main,
+                    },
+                  },
+                  '&.Mui-focused': {
+                    '& .MuiOutlinedInput-notchedOutline': {
+                      borderColor: theme.palette.primary.main,
+                    },
+                  },
+                },
+                '& .MuiInputLabel-root': {
+                  color: theme.palette.text.secondary,
+                  '&.Mui-focused': {
+                    color: theme.palette.primary.main,
+                  },
                 },
               }}
             />
@@ -324,15 +460,36 @@ const DateRangeFilter: React.FC<DateRangeFilterProps> = ({
         {/* Error Message for Desktop */}
         {error && (
           <Box sx={{ mb: 2 }}>
-            <Typography variant="caption" color="error" sx={{ fontSize: '0.75rem' }}>
+            <Typography 
+              variant="caption" 
+              color="error" 
+              sx={{ 
+                fontSize: '0.75rem',
+                transition: theme.transitions.create('color', {
+                  duration: theme.transitions.duration.short,
+                }),
+              }}
+            >
               {error}
             </Typography>
           </Box>
         )}
 
-        <Divider sx={{ mb: 2 }} />
+        <Divider sx={{ 
+          mb: 2,
+          borderColor: theme.palette.divider,
+          transition: theme.transitions.create('border-color', {
+            duration: theme.transitions.duration.short,
+          }),
+        }} />
 
-        <Typography variant="subtitle2" fontWeight={600} sx={{ mb: 1 }}>
+        <Typography variant="subtitle2" fontWeight={600} sx={{ 
+          mb: 1,
+          color: theme.palette.text.primary,
+          transition: theme.transitions.create('color', {
+            duration: theme.transitions.duration.short,
+          }),
+        }}>
           Filter Cepat
         </Typography>
         <Grid container spacing={1} sx={{ mb: 3 }}>
@@ -346,8 +503,18 @@ const DateRangeFilter: React.FC<DateRangeFilterProps> = ({
                 sx={{
                   textTransform: 'none',
                   borderRadius: 2,
+                  borderColor: theme.palette.divider,
+                  color: theme.palette.text.secondary,
+                  transition: theme.transitions.create(['background-color', 'border-color', 'color'], {
+                    duration: theme.transitions.duration.short,
+                  }),
                   '&:hover': {
-                    backgroundColor: alpha(theme.palette.primary.main, 0.1),
+                    backgroundColor: alpha(theme.palette.primary.main, 0.08),
+                    borderColor: theme.palette.primary.main,
+                    color: theme.palette.primary.main,
+                  },
+                  '&:active': {
+                    backgroundColor: alpha(theme.palette.primary.main, 0.12),
                   },
                 }}
               >
@@ -361,7 +528,19 @@ const DateRangeFilter: React.FC<DateRangeFilterProps> = ({
           <Button
             variant="outlined"
             onClick={handlePopoverClose}
-            sx={{ textTransform: 'none', borderRadius: 2 }}
+            sx={{ 
+              textTransform: 'none', 
+              borderRadius: 2,
+              borderColor: theme.palette.divider,
+              color: theme.palette.text.secondary,
+              transition: theme.transitions.create(['background-color', 'border-color', 'color'], {
+                duration: theme.transitions.duration.short,
+              }),
+              '&:hover': {
+                backgroundColor: alpha(theme.palette.action.hover, 0.08),
+                borderColor: theme.palette.text.secondary,
+              },
+            }}
           >
             Batal
           </Button>
@@ -372,7 +551,23 @@ const DateRangeFilter: React.FC<DateRangeFilterProps> = ({
               handlePopoverClose();
             }}
             disabled={!startDate || !endDate}
-            sx={{ textTransform: 'none', borderRadius: 2 }}
+            sx={{ 
+              textTransform: 'none', 
+              borderRadius: 2,
+              backgroundColor: theme.palette.primary.main,
+              color: theme.palette.primary.contrastText,
+              transition: theme.transitions.create(['background-color', 'box-shadow'], {
+                duration: theme.transitions.duration.short,
+              }),
+              '&:hover': {
+                backgroundColor: theme.palette.primary.dark,
+                boxShadow: theme.shadows[4],
+              },
+              '&:disabled': {
+                backgroundColor: theme.palette.action.disabledBackground,
+                color: theme.palette.action.disabled,
+              },
+            }}
           >
             Terapkan Filter
           </Button>
