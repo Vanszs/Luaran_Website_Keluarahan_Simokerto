@@ -31,6 +31,7 @@ import {
 } from '@mui/icons-material';
 import Layout from '../../../components/layout/Layout';
 import ProtectedRoute from '../../../components/ProtectedRoute';
+import DateRangeFilter, { DateRange } from '../../../components/DateRangeFilter';
 
 interface Report {
   id: number;
@@ -49,6 +50,7 @@ export default function ReportsPage() {
   const [reports, setReports] = useState<Report[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
+  const [dateRange, setDateRange] = useState<DateRange | null>(null);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [selectedReport, setSelectedReport] = useState<Report | null>(null);
@@ -89,12 +91,29 @@ export default function ReportsPage() {
     setPage(0);
   };
   
-  // Filter reports based on search term
-  const filteredReports = reports.filter(report => 
-    report.address.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    report.user?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    report.description?.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  // Filter reports based on search term and date range
+  const filteredReports = reports.filter(report => {
+    const matchesSearch = 
+      report.address.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      report.user?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      report.description?.toLowerCase().includes(searchTerm.toLowerCase());
+    
+    const matchesDateRange = (() => {
+      if (!dateRange) return true;
+      
+      const reportDate = new Date(report.created_at);
+      const startDate = new Date(dateRange.startDate);
+      const endDate = new Date(dateRange.endDate);
+      
+      // Set time to start and end of day for proper comparison
+      startDate.setHours(0, 0, 0, 0);
+      endDate.setHours(23, 59, 59, 999);
+      
+      return reportDate >= startDate && reportDate <= endDate;
+    })();
+
+    return matchesSearch && matchesDateRange;
+  });
   
   // Get reports for current page
   const paginatedReports = filteredReports.slice(
@@ -150,40 +169,52 @@ export default function ReportsPage() {
               Semua Laporan
             </Typography>
 
-            <TextField
-              placeholder="Cari berdasarkan nama, alamat, atau deskripsi..."
-              size="small"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <SearchIcon fontSize="small" color="action" />
-                  </InputAdornment>
-                ),
-              }}
-              sx={{
-                width: { xs: '100%', sm: 350 },
-                '& .MuiOutlinedInput-root': {
-                  borderRadius: 2,
-                  bgcolor: theme.palette.mode === 'dark'
-                    ? alpha(theme.palette.common.white, 0.05)
-                    : alpha(theme.palette.common.black, 0.03),
-                  transition: 'all 0.3s ease',
-                  '&:hover': {
+            <Box sx={{ 
+              display: 'flex', 
+              gap: 2, 
+              alignItems: 'center',
+              flexWrap: 'wrap',
+              flex: { xs: '1 1 100%', md: '0 1 auto' }
+            }}>
+              <TextField
+                placeholder="Cari berdasarkan nama, alamat, atau deskripsi..."
+                size="small"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <SearchIcon fontSize="small" color="action" />
+                    </InputAdornment>
+                  ),
+                }}
+                sx={{
+                  width: { xs: '100%', sm: 300 },
+                  '& .MuiOutlinedInput-root': {
+                    borderRadius: 2,
                     bgcolor: theme.palette.mode === 'dark'
-                      ? alpha(theme.palette.common.white, 0.08)
-                      : alpha(theme.palette.common.black, 0.05),
-                  },
-                  '&.Mui-focused': {
-                    boxShadow: `0 0 0 2px ${alpha(theme.palette.primary.main, 0.25)}`,
-                    bgcolor: theme.palette.mode === 'dark'
-                      ? alpha(theme.palette.common.white, 0.1)
+                      ? alpha(theme.palette.common.white, 0.05)
+                      : alpha(theme.palette.common.black, 0.03),
+                    transition: 'all 0.3s ease',
+                    '&:hover': {
+                      bgcolor: theme.palette.mode === 'dark'
+                        ? alpha(theme.palette.common.white, 0.08)
+                        : alpha(theme.palette.common.black, 0.05),
+                    },
+                    '&.Mui-focused': {
+                      boxShadow: `0 0 0 2px ${alpha(theme.palette.primary.main, 0.25)}`,
+                      bgcolor: theme.palette.mode === 'dark'
+                        ? alpha(theme.palette.common.white, 0.1)
                       : alpha(theme.palette.common.black, 0.06),
                   }
                 }
               }}
             />
+            
+            <DateRangeFilter 
+              onDateRangeChange={setDateRange}
+            />
+            </Box>
           </Box>
           
           <TableContainer>

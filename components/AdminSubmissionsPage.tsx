@@ -47,6 +47,7 @@ import {
   CheckCircle as CheckCircleIcon,
   Add as AddIcon,
 } from '@mui/icons-material';
+import DateRangeFilter, { DateRange } from './DateRangeFilter';
 
 // Tipe data berdasarkan struktur database
 interface User {
@@ -95,6 +96,7 @@ export default function AdminDashboardPage() {
   const [userSearch, setUserSearch] = useState('');
   const [adminSearch, setAdminSearch] = useState('');
   const [reportSearch, setReportSearch] = useState('');
+  const [reportDateRange, setReportDateRange] = useState<DateRange | null>(null);
   
   // Dialog states
   const [userDialog, setUserDialog] = useState<{open: boolean; user: User | null; mode: 'add' | 'edit'}>({
@@ -256,10 +258,27 @@ export default function AdminDashboardPage() {
     admin.username.toLowerCase().includes(adminSearch.toLowerCase())
   );
 
-  const filteredReports = reports.filter(report => 
-    report.address.toLowerCase().includes(reportSearch.toLowerCase()) ||
-    (report.user?.name || '').toLowerCase().includes(reportSearch.toLowerCase())
-  );
+  const filteredReports = reports.filter(report => {
+    const matchesSearch = report.address.toLowerCase().includes(reportSearch.toLowerCase()) ||
+      (report.user?.name || '').toLowerCase().includes(reportSearch.toLowerCase());
+    
+    // Date range filter
+    const matchesDateRange = (() => {
+      if (!reportDateRange) return true;
+      
+      const reportDate = new Date(report.created_at);
+      const startDate = new Date(reportDateRange.startDate);
+      const endDate = new Date(reportDateRange.endDate);
+      
+      // Set time to start and end of day for proper comparison
+      startDate.setHours(0, 0, 0, 0);
+      endDate.setHours(23, 59, 59, 999);
+      
+      return reportDate >= startDate && reportDate <= endDate;
+    })();
+
+    return matchesSearch && matchesDateRange;
+  });
 
   // Menghitung statistik
   const todayReports = reports.filter(report => {
@@ -622,7 +641,7 @@ export default function AdminDashboardPage() {
   // Render tab laporan
   const renderReportsTab = () => (
     <>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2, flexWrap: 'wrap', gap: 2 }}>
         <TextField
           placeholder="Cari laporan..."
           value={reportSearch}
@@ -631,7 +650,10 @@ export default function AdminDashboardPage() {
           InputProps={{
             startAdornment: <SearchIcon fontSize="small" sx={{ mr: 1, color: 'text.secondary' }} />
           }}
-          sx={{ width: 300 }}
+          sx={{ width: { xs: '100%', md: 300 } }}
+        />
+        <DateRangeFilter 
+          onDateRangeChange={setReportDateRange}
         />
       </Box>
 

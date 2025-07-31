@@ -16,6 +16,46 @@ export async function GET(req: NextRequest) {
         reports: generateMockReports()
       });
     }
+
+    // Get query parameters for filtering
+    const url = new URL(req.url);
+    const limit = url.searchParams.get('limit');
+    const startDate = url.searchParams.get('startDate');
+    const endDate = url.searchParams.get('endDate');
+    const status = url.searchParams.get('status');
+
+    // Build WHERE clause for date filtering
+    let whereClause = '';
+    const queryParams: any[] = [];
+    
+    if (startDate && endDate) {
+      whereClause += ' WHERE DATE(r.created_at) BETWEEN ? AND ?';
+      queryParams.push(startDate, endDate);
+    } else if (startDate) {
+      whereClause += ' WHERE DATE(r.created_at) >= ?';
+      queryParams.push(startDate);
+    } else if (endDate) {
+      whereClause += ' WHERE DATE(r.created_at) <= ?';
+      queryParams.push(endDate);
+    }
+
+    // Add status filter
+    if (status && status !== 'all') {
+      if (whereClause) {
+        whereClause += ' AND r.status = ?';
+      } else {
+        whereClause += ' WHERE r.status = ?';
+      }
+      queryParams.push(status);
+    }
+
+    // Add limit
+    let limitClause = '';
+    if (limit && !isNaN(parseInt(limit))) {
+      limitClause = ` LIMIT ${parseInt(limit)}`;
+    } else {
+      limitClause = ' LIMIT 50';
+    }
     
     // Query reports with user information using JOIN, also get admin info if reporter_type is admin
     const reportsResult = await query(`
@@ -26,9 +66,10 @@ export async function GET(req: NextRequest) {
       FROM reports r
       JOIN users u ON r.user_id = u.id
       LEFT JOIN admin a ON r.reporter_type = 'admin' AND a.name = r.pelapor
+      ${whereClause}
       ORDER BY r.created_at DESC
-      LIMIT 50
-    `);
+      ${limitClause}
+    `, queryParams);
 
     const processed = (reportsResult as any[]).map((r) => {
       // Determine the correct name to display based on reporter_type

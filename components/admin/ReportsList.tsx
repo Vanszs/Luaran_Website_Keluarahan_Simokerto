@@ -51,6 +51,7 @@ import { getStatusChipStyle, getStatusInIndonesian, standardChipStyles } from '.
 import { useAuth } from '../../contexts/AuthContext';
 import responsiveUtils from '../../shared-theme/responsive';
 import useMediaQuery from '@mui/material/useMediaQuery';
+import DateRangeFilter, { DateRange } from '../DateRangeFilter';
 
 interface Report {
   id: number;
@@ -153,6 +154,7 @@ export default function ReportsList({ isReadOnly = false, limit }: ReportsListPr
   const [statusFilter, setStatusFilter] = useState('all');
   const [reportTypeFilter, setReportTypeFilter] = useState('all');
   const [reporterTypeFilter, setReporterTypeFilter] = useState('all');
+  const [dateRange, setDateRange] = useState<DateRange | null>(null);
   const [selectedReport, setSelectedReport] = useState<Report | null>(null);
   const [detailDialogOpen, setDetailDialogOpen] = useState(false);
   
@@ -174,7 +176,24 @@ export default function ReportsList({ isReadOnly = false, limit }: ReportsListPr
   const fetchReports = useCallback(async () => {
     setLoading(true);
     try {
-      const url = limit ? `/api/admin/reports?limit=${limit}` : '/api/admin/reports';
+      // Build URL with filters
+      const params = new URLSearchParams();
+      
+      if (limit) {
+        params.append('limit', limit.toString());
+      }
+      
+      if (dateRange) {
+        params.append('startDate', dateRange.startDate);
+        params.append('endDate', dateRange.endDate);
+      }
+      
+      if (statusFilter && statusFilter !== 'all') {
+        params.append('status', statusFilter);
+      }
+      
+      const url = `/api/admin/reports${params.toString() ? `?${params.toString()}` : ''}`;
+      
       const response = await fetch(url);
       if (!response.ok) {
         throw new Error('Failed to fetch reports');
@@ -187,7 +206,7 @@ export default function ReportsList({ isReadOnly = false, limit }: ReportsListPr
     } finally {
       setLoading(false);
     }
-  }, [limit]);
+  }, [limit, dateRange, statusFilter]);
 
   useEffect(() => {
     fetchReports();
@@ -332,10 +351,27 @@ export default function ReportsList({ isReadOnly = false, limit }: ReportsListPr
       (report.pelapor && report.pelapor.toLowerCase().includes(searchTerm.toLowerCase())) ||
       (report.user.name && report.user.name.toLowerCase().includes(searchTerm.toLowerCase())) ||
       (report.jenis_laporan && report.jenis_laporan.toLowerCase().includes(searchTerm.toLowerCase()));
+    
     const matchesStatus =
       statusFilter === 'all' || 
       (report.status && report.status.toLowerCase() === statusFilter.toLowerCase());
-    return matchesSearch && matchesStatus;
+
+    // Date range filter
+    const matchesDateRange = (() => {
+      if (!dateRange) return true;
+      
+      const reportDate = new Date(report.created_at);
+      const startDate = new Date(dateRange.startDate);
+      const endDate = new Date(dateRange.endDate);
+      
+      // Set time to start and end of day for proper comparison
+      startDate.setHours(0, 0, 0, 0);
+      endDate.setHours(23, 59, 59, 999);
+      
+      return reportDate >= startDate && reportDate <= endDate;
+    })();
+
+    return matchesSearch && matchesStatus && matchesDateRange;
   });
 
   if (loading) {
@@ -420,6 +456,14 @@ export default function ReportsList({ isReadOnly = false, limit }: ReportsListPr
               </Grid>
             </Grid>
           </Paper>
+        )}
+
+        {/* Date Range Filter - Mobile */}
+        {!limit && (
+          <DateRangeFilter 
+            onDateRangeChange={setDateRange}
+            className="mb-3"
+          />
         )}
 
         {/* Mobile Cards */}
@@ -880,7 +924,7 @@ export default function ReportsList({ isReadOnly = false, limit }: ReportsListPr
         }}
       >
         <Grid container spacing={{ xs: 1, sm: 2 }} alignItems="center">
-          <Grid item xs={12} md={6}>
+          <Grid item xs={12} md={4}>
             <TextField
               fullWidth
               placeholder="Cari berdasarkan nama warga atau alamat..."
@@ -920,6 +964,11 @@ export default function ReportsList({ isReadOnly = false, limit }: ReportsListPr
                 <MenuItem value="completed">Selesai</MenuItem>
               </Select>
             </FormControl>
+          </Grid>
+          <Grid item xs={12} md={5}>
+            <DateRangeFilter 
+              onDateRangeChange={setDateRange}
+            />
           </Grid>
         </Grid>
       </Paper>
