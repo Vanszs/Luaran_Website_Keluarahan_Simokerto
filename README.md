@@ -728,18 +728,10 @@ If applicable, add screenshots.
 ## 📞 Support & Contact
 
 ### 🏛️ Tim Pengembang
-- **Project Manager**: Kelurahan Simokerto
-- **Lead Developer**: [Your Name](mailto:your.email@example.com)
-- **UI/UX Designer**: [Designer Name](mailto:designer@example.com)
+- **Project Manager**: Saya sendiri
+- **Lead Developer**: Saya Sendiri
+- **UI/UX Designer**: Claude 4 Sonnet : D
 
-### 📧 Kontak
-- **Email**: support@dashboard-pintar.id
-- **Website**: https://dashboard-pintar.vercel.app
-- **Documentation**: https://docs.dashboard-pintar.id
-
-### 💬 Community
-- **Discord**: [Join our Discord](https://discord.gg/dashboard-pintar)
-- **Telegram**: [@dashboard_pintar](https://t.me/dashboard_pintar)
 
 ---
 
