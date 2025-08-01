@@ -576,7 +576,7 @@ git commit -m "feat: add amazing feature"
 ```
 
 ### 4️⃣ Push & Create PR
-```bash
+
 ## 📈 Development History & Statistik
 
 ### 📊 **Project Statistics**
@@ -611,7 +611,7 @@ Proyek ini merupakan hasil kerja solo development selama 2 minggu dengan fokus p
 - **User-Centric**: Design yang mengutamakan experience pengguna
 
 ### 🔄 **Development Workflow**
-```bash
+
 # Feature development
 git checkout -b feature/new-feature
 git commit -m "feat: add new feature description"
@@ -626,10 +626,10 @@ git push origin security/vulnerability-fix
 git checkout -b hotfix/critical-bug
 git commit -m "fix: resolve critical issue in report system"
 git push origin hotfix/critical-bug
-```
+
 
 ### 📋 **Commit Convention**
-```bash
+
 🔐 security:  # Security improvements & fixes
 ✨ feat:      # New features & enhancements  
 🐛 fix:       # Bug fixes & patches
@@ -638,10 +638,10 @@ git push origin hotfix/critical-bug
 ♻️  refactor: # Code refactoring & optimization
 🧪 test:      # Testing improvements
 🔧 chore:     # Maintenance & tooling
-```
+
 
 ### 🛠️ **Development Setup untuk Contributors**
-```bash
+
 # Clone all repositories
 git clone https://github.com/Vanszs/Luaran_Website_Keluarahan_Simokerto.git
 git clone https://github.com/Vanszs/Flutter_Aplikasi_Pintar_Kelurahan.git  
@@ -650,7 +650,7 @@ git clone https://github.com/Vanszs/Aplikasi_Pintar_Petugas.git
 # Install development tools
 npm install -g @typescript-eslint/eslint-plugin
 flutter doctor # Verify Flutter installation
-```
+
 
 ---
 
