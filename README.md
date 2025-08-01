@@ -604,7 +604,7 @@ git commit -m "feat: add amazing feature"
 ## 🤝 Contributing & Development
 
 ### 👨‍💻 **Solo Development Journey**
-Proyek ini merupakan hasil kerja solo development selama 6+ bulan dengan fokus pada:
+Proyek ini merupakan hasil kerja solo development selama 2 minggu dengan fokus pada:
 - **Clean Architecture**: Pemisahan concerns yang jelas antar layer
 - **Security First**: Implementation security best practices dari awal
 - **Scalable Design**: Arsitektur yang mendukung pertumbuhan user
